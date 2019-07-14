@@ -5,8 +5,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <bean id="helloWorld" class="com.rocket.test.HelloWorld">
-        <property name="message" value="Hello World!"/>
+    <bean id="helloWorld" class="com.rocket.test.HelloWorld" scope="singleton">
+        <property name="message1" value="Hello World!" />
     </bean>
-
+    <bean id="helloChina" class="com.rocket.test.HelloChina" parent="helloWorld">
+        <property name="message1" value="你好，中国!"/>
+        <property name="message3" value="欢迎来到四川!"/>
+    </bean>
 </beans>

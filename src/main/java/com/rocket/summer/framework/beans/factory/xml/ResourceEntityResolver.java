@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * EntityResolver implementation that tries to resolve entity references
@@ -57,9 +58,9 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
         if (source == null && systemId != null) {
             String resourcePath = null;
             try {
-                String decodedSystemId = URLDecoder.decode(systemId);
+                String decodedSystemId = URLDecoder.decode(systemId, null);
                 String givenUrl = new URL(decodedSystemId).toString();
-                String systemRootUrl = new File("").toURL().toString();
+                String systemRootUrl = new File("").toURI().toURL().toString();
                 // Try relative to resource base if currently in system root.
                 if (givenUrl.startsWith(systemRootUrl)) {
                     resourcePath = givenUrl.substring(systemRootUrl.length());

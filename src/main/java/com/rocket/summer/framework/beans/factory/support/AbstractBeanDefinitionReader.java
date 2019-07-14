@@ -63,7 +63,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
         }
     }
 
-
+    @Override
     public final BeanDefinitionRegistry getBeanFactory() {
         return this.registry;
     }

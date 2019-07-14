@@ -1,6 +1,5 @@
 package com.rocket.summer.framework.context.support;
 
-import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.io.ClassPathResource;
@@ -8,24 +7,18 @@ import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.util.Assert;
 
 /**
- * Standalone XML application context, taking the context definition files
- * from the class path, interpreting plain paths as class path resource names
- * that include the package path (e.g. "mypackage/myresource.txt"). Useful for
- * test harnesses as well as for application contexts embedded within JARs.
+ * 单独的xml应用上下文, 加载上下文定义文件从类路径下面, 将会解析路径下的该资源 (比如. "mypackage/myresource.txt").
+ * 在嵌入式容器应用中很有用.
+ * <p>配置文件位置默认可以被重写覆盖通过 {@link #getConfigLocations},
+ * 文件位置可以指明某些具体的文件像 "/myfiles/context.xml", 也可以使用 Ant风格的表达式像 "/myfiles/*-context.xml" (具体实现细节
+ * {@link org.springframework.util.AntPathMatcher} ).
  *
- * <p>The config location defaults can be overridden via {@link #getConfigLocations},
- * Config locations can either denote concrete files like "/myfiles/context.xml"
- * or Ant-style patterns like "/myfiles/*-context.xml" (see the
- * {@link org.springframework.util.AntPathMatcher} javadoc for pattern details).
+ * <p>笔记: 在多个配置文件路径的情况下, 越往后的配置会覆盖前面加载的配置文件相关的信息. 这样可以使用额外的Xml文件故意重写某些定义.
  *
- * <p>Note: In case of multiple config locations, later bean definitions will
- * override ones defined in earlier loaded files. This can be leveraged to
- * deliberately override certain bean definitions via an extra XML file.
- *
- * <p><b>This is a simple, one-stop shop convenience ApplicationContext.
- * Consider using the {@link GenericApplicationContext} class in combination
- * with an {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}
- * for more flexible context setup.</b>
+ * <p><b>这是一个简单, 一站式的 ApplicationContext.
+ * 考虑使用 {@link GenericApplicationContext} 类整合了
+ * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}
+ * 提供了更多灵活的容器启动方式.</b>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -39,7 +32,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 
 
     /**
-     * Create a new ClassPathXmlApplicationContext for bean-style configuration.
+     * 创建一个 ClassPathXmlApplicationContext.
      * @see #setConfigLocation
      * @see #setConfigLocations
      * @see #afterPropertiesSet()
@@ -48,7 +41,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext for bean-style configuration.
+     * 创建一个 ClassPathXmlApplicationContext.
      * @param parent the parent context
      * @see #setConfigLocation
      * @see #setConfigLocations
@@ -59,8 +52,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext, loading the definitions
-     * from the given XML file and automatically refreshing the context.
+     * 创建一个 ClassPathXmlApplicationContext, 从给定的XML加载上下文，并且自动刷新容器立即生效.
      * @param configLocation resource location
      * @throws BeansException if context creation failed
      */
@@ -69,7 +61,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext, loading the definitions
+     * 创建一个 ClassPathXmlApplicationContext, loading the definitions
      * from the given XML files and automatically refreshing the context.
      * @param configLocations array of resource locations
      * @throws BeansException if context creation failed
