@@ -413,4 +413,23 @@ public abstract class ObjectUtils {
 		buffer.append(ARRAY_END);
 		return buffer.toString();
 	}
+
+	/**
+	 * Check whether the given array contains the given element.
+	 * @param array the array to check (may be <code>null</code>,
+	 * in which case the return value will always be <code>false</code>)
+	 * @param element the element to check for
+	 * @return whether the element has been found in the given array
+	 */
+	public static boolean containsElement(Object[] array, Object element) {
+		if (array == null) {
+			return false;
+		}
+		for (int i = 0; i < array.length; i++) {
+			if (nullSafeEquals(array[i], element)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

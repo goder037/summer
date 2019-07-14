@@ -58,16 +58,6 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
         super(parent);
     }
 
-    @Override
-    protected void refreshBeanFactory() throws BeansException, IllegalStateException {
-
-    }
-
-    @Override
-    protected void closeBeanFactory() {
-
-    }
-
     /**
      * Create a new ClassPathXmlApplicationContext, loading the definitions
      * from the given XML file and automatically refreshing the context.

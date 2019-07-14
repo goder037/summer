@@ -24,7 +24,7 @@ import java.util.Set;
 abstract class AutowireUtils {
 
     private static final String QUALIFIED_ANNOTATION_AUTOWIRE_CANDIDATE_RESOLVER_CLASS_NAME =
-            "org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver";
+            "com.rocket.summer.framework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver";
 
 
     /**

@@ -515,6 +515,33 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Get the class name without the qualified package name.
+     * @param clazz the class to get the short name for
+     * @return the class name of the class without the package name
+     */
+    public static String getShortName(Class clazz) {
+        return getShortName(getQualifiedName(clazz));
+    }
+
+    /**
+     * Get the class name without the qualified package name.
+     * @param className the className to get the short name for
+     * @return the class name of the class without the package name
+     * @throws IllegalArgumentException if the className is empty
+     */
+    public static String getShortName(String className) {
+        Assert.hasLength(className, "Class name must not be empty");
+        int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
+        int nameEndIndex = className.indexOf(CGLIB_CLASS_SEPARATOR);
+        if (nameEndIndex == -1) {
+            nameEndIndex = className.length();
+        }
+        String shortName = className.substring(lastDotIndex + 1, nameEndIndex);
+        shortName = shortName.replace(INNER_CLASS_SEPARATOR, PACKAGE_SEPARATOR);
+        return shortName;
+    }
+
+    /**
      * Return the user-defined class for the given instance: usually simply
      * the class of the given instance, but the original class in case of a
      * CGLIB-generated subclass.

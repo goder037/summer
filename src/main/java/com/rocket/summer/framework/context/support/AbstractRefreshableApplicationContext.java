@@ -3,6 +3,7 @@ package com.rocket.summer.framework.context.support;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.context.ApplicationContextException;
 import com.rocket.summer.framework.context.BeansException;
 
 import java.io.IOException;
@@ -23,6 +24,12 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
      * Create a new AbstractRefreshableApplicationContext with no parent.
      */
     public AbstractRefreshableApplicationContext() {
+    }
+
+    protected final void closeBeanFactory() {
+        synchronized (this.beanFactoryMonitor) {
+            this.beanFactory = null;
+        }
     }
 
     /**
@@ -75,6 +82,58 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
                         "call 'refresh' before accessing beans via the ApplicationContext");
             }
             return this.beanFactory;
+        }
+    }
+
+    /**
+     * This implementation performs an actual refresh of this context's underlying
+     * bean factory, shutting down the previous bean factory (if any) and
+     * initializing a fresh bean factory for the next phase of the context's lifecycle.
+     */
+    protected final void refreshBeanFactory() throws BeansException {
+        if (hasBeanFactory()) {
+            destroyBeans();
+            closeBeanFactory();
+        }
+        try {
+            DefaultListableBeanFactory beanFactory = createBeanFactory();
+            customizeBeanFactory(beanFactory);
+            loadBeanDefinitions(beanFactory);
+            synchronized (this.beanFactoryMonitor) {
+                this.beanFactory = beanFactory;
+            }
+        }
+        catch (IOException ex) {
+            throw new ApplicationContextException(
+                    "I/O error parsing XML document for application context [" + getDisplayName() + "]", ex);
+        }
+    }
+
+    /**
+     * Create an internal bean factory for this context.
+     * Called for each {@link #refresh()} attempt.
+     * <p>The default implementation creates a
+     * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+     * with the {@link #getInternalParentBeanFactory() internal bean factory} of this
+     * context's parent as parent bean factory. Can be overridden in subclasses,
+     * for example to customize DefaultListableBeanFactory's settings.
+     * @return the bean factory for this context
+     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
+     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
+     */
+    protected DefaultListableBeanFactory createBeanFactory() {
+        return new DefaultListableBeanFactory(getInternalParentBeanFactory());
+    }
+
+    /**
+     * Determine whether this context currently holds a bean factory,
+     * i.e. has been refreshed at least once and not been closed yet.
+     */
+    protected final boolean hasBeanFactory() {
+        synchronized (this.beanFactoryMonitor) {
+            return (this.beanFactory != null);
         }
     }
 }
