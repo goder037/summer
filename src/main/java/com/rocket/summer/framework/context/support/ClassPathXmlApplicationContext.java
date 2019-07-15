@@ -20,8 +20,6 @@ import com.rocket.summer.framework.util.Assert;
  * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}
  * 提供了更多灵活的容器启动方式.</b>
  *
- * @author Rod Johnson
- * @author Juergen Hoeller
  * @see #getResource
  * @see #getResourceByPath
  * @see GenericApplicationContext
@@ -61,8 +59,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * 创建一个 ClassPathXmlApplicationContext, loading the definitions
-     * from the given XML files and automatically refreshing the context.
+     * 创建一个 ClassPathXmlApplicationContext, 从给定的XML加载上下文，并且自动刷新容器立即生效.
      * @param configLocations array of resource locations
      * @throws BeansException if context creation failed
      */
@@ -71,9 +68,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext with the given parent,
-     * loading the definitions from the given XML files and automatically
-     * refreshing the context.
+     * 创建一个 ClassPathXmlApplicationContext并指明父容器 ,
+     * 从给定的XML文件中加载并立即生效容器.
      * @param configLocations array of resource locations
      * @param parent the parent context
      * @throws BeansException if context creation failed
@@ -83,8 +79,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext, loading the definitions
-     * from the given XML files.
+     * 创建一个 ClassPathXmlApplicationContext, 从给定的XML加载上下文.并指定是否立即生效
      * @param configLocations array of resource locations
      * @param refresh whether to automatically refresh the context,
      * loading all bean definitions and creating all singletons.
@@ -97,8 +92,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     }
 
     /**
-     * Create a new ClassPathXmlApplicationContext with the given parent,
-     * loading the definitions from the given XML files.
+     * 创建一个 ClassPathXmlApplicationContext并指明父容器 ,
+     * 从给定的XML文件中加载并设置是否生效容器.
      * @param configLocations array of resource locations
      * @param refresh whether to automatically refresh the context,
      * loading all bean definitions and creating all singletons.

@@ -552,4 +552,13 @@ public abstract class ClassUtils {
         Assert.notNull(instance, "Instance must not be null");
         return getUserClass(instance.getClass());
     }
+
+    /**
+     * Convert a "."-based fully qualified class name to a "/"-based resource path.
+     * @param className the fully qualified class name
+     * @return the corresponding resource path, pointing to the class
+     */
+    public static String convertClassNameToResourcePath(String className) {
+        return className.replace('.', '/');
+    }
 }
