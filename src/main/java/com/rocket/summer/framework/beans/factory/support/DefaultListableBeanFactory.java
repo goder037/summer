@@ -103,8 +103,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
         // Check all bean definitions.
         String[] beanDefinitionNames = getBeanDefinitionNames();
-        for (int i = 0; i < beanDefinitionNames.length; i++) {
-            String beanName = beanDefinitionNames[i];
+        for (String beanDefinitionName : beanDefinitionNames) {
+            String beanName = beanDefinitionName;
             // Only consider bean as eligible if the bean name
             // is not defined as alias for some other bean.
             if (!isAlias(beanName)) {
@@ -128,8 +128,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                             result.add(beanName);
                         }
                     }
-                }
-                catch (CannotLoadBeanClassException ex) {
+                } catch (CannotLoadBeanClassException ex) {
                     if (allowEagerInit) {
                         throw ex;
                     }
@@ -138,8 +137,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                         this.logger.debug("Ignoring bean class loading failure for bean '" + beanName + "'", ex);
                     }
                     onSuppressedException(ex);
-                }
-                catch (BeanDefinitionStoreException ex) {
+                } catch (BeanDefinitionStoreException ex) {
                     if (allowEagerInit) {
                         throw ex;
                     }
