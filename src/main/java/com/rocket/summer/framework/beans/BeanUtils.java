@@ -309,4 +309,24 @@ public abstract class BeanUtils {
                 clazz.equals(URI.class) || clazz.equals(URL.class) ||
                 clazz.equals(Locale.class) || clazz.equals(Class.class);
     }
+
+    /**
+     * Find a JavaBeans <code>PropertyDescriptor</code> for the given method,
+     * with the method either being the read method or the write method for
+     * that bean property.
+     * @param method the method to find a corresponding PropertyDescriptor for
+     * @return the corresponding PropertyDescriptor, or <code>null</code> if none
+     * @throws BeansException if PropertyDescriptor lookup fails
+     */
+    public static PropertyDescriptor findPropertyForMethod(Method method) throws BeansException {
+        Assert.notNull(method, "Method must not be null");
+        PropertyDescriptor[] pds = getPropertyDescriptors(method.getDeclaringClass());
+        for (int i = 0; i < pds.length; i++) {
+            PropertyDescriptor pd = pds[i];
+            if (method.equals(pd.getReadMethod()) || method.equals(pd.getWriteMethod())) {
+                return pd;
+            }
+        }
+        return null;
+    }
 }

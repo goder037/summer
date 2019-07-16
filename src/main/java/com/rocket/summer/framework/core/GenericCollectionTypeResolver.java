@@ -61,6 +61,15 @@ public abstract class GenericCollectionTypeResolver {
     }
 
     /**
+     * Determine the generic element type of the given Collection return type.
+     * @param method the method to check the return type for
+     * @return the generic type, or <code>null</code> if none
+     */
+    public static Class getCollectionReturnType(Method method) {
+        return getGenericReturnType(method, Collection.class, 0, 1);
+    }
+
+    /**
      * Extract the generic type from the given ParameterizedType object.
      * @param methodParam the method parameter specification
      * @param ptype the ParameterizedType to check

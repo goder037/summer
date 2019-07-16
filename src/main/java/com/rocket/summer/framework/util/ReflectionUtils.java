@@ -42,6 +42,36 @@ public abstract class ReflectionUtils {
     }
 
     /**
+     * Determine whether the given method is an "equals" method.
+     * @see java.lang.Object#equals
+     */
+    public static boolean isEqualsMethod(Method method) {
+        if (method == null || !method.getName().equals("equals")) {
+            return false;
+        }
+        Class[] paramTypes = method.getParameterTypes();
+        return (paramTypes.length == 1 && paramTypes[0] == Object.class);
+    }
+
+    /**
+     * Determine whether the given method is a "hashCode" method.
+     * @see java.lang.Object#hashCode
+     */
+    public static boolean isHashCodeMethod(Method method) {
+        return (method != null && method.getName().equals("hashCode") &&
+                method.getParameterTypes().length == 0);
+    }
+
+    /**
+     * Determine whether the given method is a "toString" method.
+     * @see java.lang.Object#toString()
+     */
+    public static boolean isToStringMethod(Method method) {
+        return (method != null && method.getName().equals("toString") &&
+                method.getParameterTypes().length == 0);
+    }
+
+    /**
      * Handle the given reflection exception. Should only be called if
      * no checked exception is expected to be thrown by the target method.
      * <p>Throws the underlying RuntimeException or Error in case of an
@@ -204,6 +234,62 @@ public abstract class ReflectionUtils {
             searchType = searchType.getSuperclass();
         }
         return null;
+    }
+
+    /**
+     * Make the given field accessible, explicitly setting it accessible if necessary.
+     * The <code>setAccessible(true)</code> method is only called when actually necessary,
+     * to avoid unnecessary conflicts with a JVM SecurityManager (if active).
+     * @param field the field to make accessible
+     * @see java.lang.reflect.Field#setAccessible
+     */
+    public static void makeAccessible(Field field) {
+        if (!Modifier.isPublic(field.getModifiers()) ||
+                !Modifier.isPublic(field.getDeclaringClass().getModifiers())) {
+            field.setAccessible(true);
+        }
+    }
+
+    /**
+     * Invoke the given callback on all fields in the target class,
+     * going up the class hierarchy to get all declared fields.
+     * @param targetClass the target class to analyze
+     * @param fc the callback to invoke for each field
+     */
+    public static void doWithFields(Class targetClass, FieldCallback fc) throws IllegalArgumentException {
+        doWithFields(targetClass, fc, null);
+    }
+
+    /**
+     * Invoke the given callback on all fields in the target class,
+     * going up the class hierarchy to get all declared fields.
+     * @param targetClass the target class to analyze
+     * @param fc the callback to invoke for each field
+     * @param ff the filter that determines the fields to apply the callback to
+     */
+    public static void doWithFields(Class targetClass, FieldCallback fc, FieldFilter ff)
+            throws IllegalArgumentException {
+
+        // Keep backing up the inheritance hierarchy.
+        do {
+            // Copy each field declared on this class unless it's static or file.
+            Field[] fields = targetClass.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                // Skip static and final fields.
+                if (ff != null && !ff.matches(fields[i])) {
+                    continue;
+                }
+                try {
+                    fc.doWith(fields[i]);
+                }
+                catch (IllegalAccessException ex) {
+                    throw new IllegalStateException(
+                            "Shouldn't be illegal to access field '" + fields[i].getName() + "': " + ex);
+                }
+            }
+            targetClass = targetClass.getSuperclass();
+        }
+        while (targetClass != null && targetClass != Object.class);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.util;
 
+import java.beans.Introspector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -90,6 +91,42 @@ public abstract class ClassUtils {
         else {
             return clazz.getName();
         }
+    }
+
+    /**
+     * Return all interfaces that the given instance implements as array,
+     * including ones implemented by superclasses.
+     * @param instance the instance to analyse for interfaces
+     * @return all interfaces that the given instance implements as array
+     */
+    public static Class[] getAllInterfaces(Object instance) {
+        Assert.notNull(instance, "Instance must not be null");
+        return getAllInterfacesForClass(instance.getClass());
+    }
+
+    /**
+     * Build a String that consists of the names of the classes/interfaces
+     * in the given collection.
+     * <p>Basically like <code>AbstractCollection.toString()</code>, but stripping
+     * the "class "/"interface " prefix before every class name.
+     * @param classes a Collection of Class objects (may be <code>null</code>)
+     * @return a String of form "[com.foo.Bar, com.foo.Baz]"
+     * @see java.util.AbstractCollection#toString()
+     */
+    public static String classNamesToString(Collection classes) {
+        if (CollectionUtils.isEmpty(classes)) {
+            return "[]";
+        }
+        StringBuffer sb = new StringBuffer("[");
+        for (Iterator it = classes.iterator(); it.hasNext(); ) {
+            Class clazz = (Class) it.next();
+            sb.append(clazz.getName());
+            if (it.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     /**
@@ -560,5 +597,79 @@ public abstract class ClassUtils {
      */
     public static String convertClassNameToResourcePath(String className) {
         return className.replace('.', '/');
+    }
+
+    /**
+     * Convert a "/"-based resource path to a "."-based fully qualified class name.
+     * @param resourcePath the resource path pointing to a class
+     * @return the corresponding fully qualified class name
+     */
+    public static String convertResourcePathToClassName(String resourcePath) {
+        return resourcePath.replace('/', '.');
+    }
+
+    /**
+     * Determine whether the {@link Class} identified by the supplied name is present
+     * and can be loaded. Will return <code>false</code> if either the class or
+     * one of its dependencies is not present or cannot be loaded.
+     * @param className the name of the class to check
+     * @param classLoader the class loader to use
+     * (may be <code>null</code>, which indicates the default class loader)
+     * @return whether the specified class is present
+     */
+    public static boolean isPresent(String className, ClassLoader classLoader) {
+        try {
+            forName(className, classLoader);
+            return true;
+        }
+        catch (Throwable ex) {
+            // Class or one of its dependencies is not present...
+            return false;
+        }
+    }
+
+    /**
+     * Given a method, which may come from an interface, and a target class used
+     * in the current reflective invocation, find the corresponding target method
+     * if there is one. E.g. the method may be <code>IFoo.bar()</code> and the
+     * target class may be <code>DefaultFoo</code>. In this case, the method may be
+     * <code>DefaultFoo.bar()</code>. This enables attributes on that method to be found.
+     * <p><b>NOTE:</b> In contrast to {@link org.springframework.aop.support.AopUtils#getMostSpecificMethod},
+     * this method does <i>not</i> resolve Java 5 bridge methods automatically.
+     * Call {@link org.springframework.core.BridgeMethodResolver#findBridgedMethod}
+     * if bridge method resolution is desirable (e.g. for obtaining metadata from
+     * the original method definition).
+     * @param method the method to be invoked, which may come from an interface
+     * @param targetClass the target class for the current invocation.
+     * May be <code>null</code> or may not even implement the method.
+     * @return the specific target method, or the original method if the
+     * <code>targetClass</code> doesn't implement it or is <code>null</code>
+     * @see org.springframework.aop.support.AopUtils#getMostSpecificMethod
+     */
+    public static Method getMostSpecificMethod(Method method, Class targetClass) {
+        if (method != null && targetClass != null && !targetClass.equals(method.getDeclaringClass())) {
+            try {
+                method = targetClass.getMethod(method.getName(), method.getParameterTypes());
+            }
+            catch (NoSuchMethodException ex) {
+                // Perhaps the target class doesn't implement this method:
+                // that's fine, just use the original method.
+            }
+        }
+        return method;
+    }
+
+    /**
+     * Return the short string name of a Java class in decapitalized JavaBeans
+     * property format. Strips the outer class name in case of an inner class.
+     * @param clazz the class
+     * @return the short name rendered in a standard JavaBeans property format
+     * @see java.beans.Introspector#decapitalize(String)
+     */
+    public static String getShortNameAsProperty(Class clazz) {
+        String shortName = ClassUtils.getShortName(clazz);
+        int dotIndex = shortName.lastIndexOf('.');
+        shortName = (dotIndex != -1 ? shortName.substring(dotIndex + 1) : shortName);
+        return Introspector.decapitalize(shortName);
     }
 }

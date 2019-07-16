@@ -1,11 +1,9 @@
 package com.rocket.summer.framework.context.annotation;
 
+import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
-import com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition;
-import com.rocket.summer.framework.beans.factory.support.BeanDefinitionReaderUtils;
-import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
-import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
+import com.rocket.summer.framework.beans.factory.support.*;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.PatternMatchUtils;

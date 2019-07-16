@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans.factory.config;
 
 import com.rocket.summer.framework.beans.PropertyEditorRegistrar;
+import com.rocket.summer.framework.beans.TypeConverter;
 import com.rocket.summer.framework.beans.factory.HierarchicalBeanFactory;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 
@@ -63,6 +64,30 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * or an empty array if none
      */
     String[] getDependenciesForBean(String beanName);
+
+    /**
+     * Register a dependent bean for the given bean,
+     * to be destroyed before the given bean is destroyed.
+     * @param beanName the name of the bean
+     * @param dependentBeanName the name of the dependent bean
+     */
+    void registerDependentBean(String beanName, String dependentBeanName);
+
+    /**
+     * Obtain a type converter as used by this BeanFactory. This may be a fresh
+     * instance for each call, since TypeConverters are usually <i>not</i> thread-safe.
+     * <p>If the default PropertyEditor mechanism is active, the returned
+     * TypeConverter will be aware of all custom editors that have been registered.
+     */
+    TypeConverter getTypeConverter();
+
+    /**
+     * Destroy the specified scoped bean in the current target scope, if any.
+     * <p>Any exception that arises during destruction should be caught
+     * and logged instead of propagated to the caller of this method.
+     * @param beanName the name of the scoped bean
+     */
+    void destroyScopedBean(String beanName);
 
     /**
      * Add a PropertyEditorRegistrar to be applied to all bean creation processes.

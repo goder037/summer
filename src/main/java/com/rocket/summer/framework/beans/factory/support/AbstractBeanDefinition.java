@@ -196,6 +196,20 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         return this.enforceDestroyMethod;
     }
 
+    /**
+     * Apply the provided default values to this bean.
+     * @param defaults the defaults to apply
+     */
+    public void applyDefaults(BeanDefinitionDefaults defaults) {
+        setLazyInit(defaults.isLazyInit());
+        setDependencyCheck(defaults.getDependencyCheck());
+        setAutowireMode(defaults.getAutowireMode());
+        setInitMethodName(defaults.getInitMethodName());
+        setEnforceInitMethod(false);
+        setDestroyMethodName(defaults.getDestroyMethodName());
+        setEnforceDestroyMethod(false);
+    }
+
     public String getBeanClassName() {
         Object beanClassObject = this.beanClass;
         if (beanClassObject instanceof Class) {
