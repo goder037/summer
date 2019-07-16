@@ -1,5 +1,8 @@
 package com.rocket.test;
 
+import com.rocket.summer.framework.stereotype.Service;
+
+@Service
 public class HelloWorld {
 
     private String message1;

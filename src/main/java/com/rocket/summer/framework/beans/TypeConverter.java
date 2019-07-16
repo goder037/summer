@@ -28,7 +28,7 @@ public interface TypeConverter {
      * @see java.beans.PropertyEditor#setAsText(String)
      * @see java.beans.PropertyEditor#getValue()
      */
-    Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException;
+    <T> T convertIfNecessary(Object value, Class<T> requiredType) throws TypeMismatchException;
 
     /**
      * Convert the value to the required type (if necessary from a String).
@@ -46,7 +46,7 @@ public interface TypeConverter {
      * @see java.beans.PropertyEditor#setAsText(String)
      * @see java.beans.PropertyEditor#getValue()
      */
-    Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
+    <T> T convertIfNecessary(Object value, Class<T> requiredType, MethodParameter methodParam)
             throws TypeMismatchException;
 
 }

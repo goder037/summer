@@ -87,7 +87,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     private boolean hasDestructionAwareBeanPostProcessors;
 
     /** Map from scope identifier String to corresponding Scope */
-    private final Map scopes = new HashMap();
+    private final Map<String, Scope> scopes = new HashMap<String, Scope>();
 
     /** Map from bean name to merged RootBeanDefinition */
     private final Map mergedBeanDefinitions = CollectionFactory.createConcurrentMapIfPossible(16);
@@ -124,12 +124,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         return getBean(name, null, null);
     }
 
-    public Object getBean(String name, Class requiredType) throws BeansException {
-        return getBean(name, requiredType, null);
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+        return doGetBean(name, requiredType, null, false);
     }
 
-    public Object getBean(String name, Object[] args) throws BeansException {
-        return getBean(name, null, args);
+    public Object getBean(String name, Object... args) throws BeansException {
+        return doGetBean(name, null, args, false);
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @return an instance of the bean
      * @throws BeansException if the bean could not be created
      */
-    public Object getBean(String name, Class requiredType, Object[] args) throws BeansException {
+    public <T> T getBean(String name, Class<T> requiredType, Object... args) throws BeansException {
         return doGetBean(name, requiredType, args, false);
     }
 
@@ -156,11 +156,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @return an instance of the bean
      * @throws BeansException if the bean could not be created
      */
-    protected Object doGetBean(
-            final String name, final Class requiredType, final Object[] args, boolean typeCheckOnly) throws BeansException {
+    @SuppressWarnings("unchecked")
+    protected <T> T doGetBean(
+            final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
+            throws BeansException {
 
         final String beanName = transformedBeanName(name);
-        Object bean = null;
+        Object bean;
 
         // Eagerly check singleton cache for manually registered singletons.
         Object sharedInstance = getSingleton(beanName);
@@ -191,7 +193,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
                 String nameToLookup = originalBeanName(name);
                 if (args != null) {
                     // Delegation to parent with explicit args.
-                    return parentBeanFactory.getBean(nameToLookup, args);
+                    return (T) parentBeanFactory.getBean(nameToLookup, args);
                 }
                 else {
                     // No args -> delegate to standard getBean method.
@@ -209,8 +211,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             // Guarantee initialization of beans that the current bean depends on.
             String[] dependsOn = mbd.getDependsOn();
             if (dependsOn != null) {
-                for (int i = 0; i < dependsOn.length; i++) {
-                    String dependsOnBean = dependsOn[i];
+                for (String dependsOnBean : dependsOn) {
                     getBean(dependsOnBean);
                     registerDependentBean(dependsOnBean, beanName);
                 }
@@ -250,7 +251,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
             else {
                 String scopeName = mbd.getScope();
-                final Scope scope = (Scope) this.scopes.get(scopeName);
+                final Scope scope = this.scopes.get(scopeName);
                 if (scope == null) {
                     throw new IllegalStateException("No Scope registered for scope '" + scopeName + "'");
                 }
@@ -279,10 +280,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
         // Check if required type matches the type of the actual bean instance.
         if (requiredType != null && bean != null && !requiredType.isAssignableFrom(bean.getClass())) {
-            throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+            try {
+                return getTypeConverter().convertIfNecessary(bean, requiredType);
+            }
+            catch (TypeMismatchException ex) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Failed to convert bean '" + name + "' to required type [" +
+                            ClassUtils.getQualifiedName(requiredType) + "]", ex);
+                }
+                throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
+            }
         }
-        return bean;
+        return (T) bean;
     }
+
 
     public boolean containsBean(String name) {
         String beanName = transformedBeanName(name);

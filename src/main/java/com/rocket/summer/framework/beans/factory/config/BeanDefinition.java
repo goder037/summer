@@ -199,4 +199,25 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
      */
     BeanDefinition getOriginatingBeanDefinition();
 
+
+    /**
+     * Set whether this bean is a primary autowire candidate.
+     * <p>If this value is true for exactly one bean among multiple
+     * matching candidates, it will serve as a tie-breaker.
+     */
+    void setPrimary(boolean primary);
+
+    /**
+     * Set whether this bean should be lazily initialized.
+     * <p>If <code>false</code>, the bean will get instantiated on startup by bean
+     * factories that perform eager initialization of singletons.
+     */
+    void setLazyInit(boolean lazyInit);
+
+    /**
+     * Set the names of the beans that this bean depends on being initialized.
+     * The bean factory will guarantee that these beans get initialized first.
+     */
+    void setDependsOn(String[] dependsOn);
+
 }

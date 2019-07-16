@@ -55,5 +55,16 @@ public interface AnnotationMetadata extends ClassMetadata {
      */
     Map<String, Object> getAnnotationAttributes(String annotationType);
 
+    /**
+     * Determine whether the underlying class has an annotation or
+     * meta-annotation of the given type defined.
+     * <p>This is equivalent to a "hasAnnotation || hasMetaAnnotation"
+     * check. If this method returns <code>true</code>, then
+     * {@link #getAnnotationAttributes} will return a non-null Map.
+     * @param annotationType the annotation type to look for
+     * @return whether a matching annotation is defined
+     */
+    boolean isAnnotated(String annotationType);
+
 }
 

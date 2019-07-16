@@ -20,10 +20,11 @@ import java.util.*;
  */
 class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor implements AnnotationMetadata {
 
-    private final Map<String, Map<String, Object>> attributesMap = new LinkedHashMap<String, Map<String, Object>>();
+    private final Map<String, Map<String, Object>> attributesMap = new LinkedHashMap<>();
 
-    private final Map<String, Set<String>> metaAnnotationMap = new LinkedHashMap<String, Set<String>>();
+    private final Map<String, Set<String>> metaAnnotationMap = new LinkedHashMap<>();
 
+    private final Map<String, Map<String, Object>> attributeMap = new LinkedHashMap<>(4);
 
     private final ClassLoader classLoader;
 
@@ -46,8 +47,7 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
                     Class annotationClass = classLoader.loadClass(className);
                     // Check declared default values of attributes in the annotation type.
                     Method[] annotationAttributes = annotationClass.getMethods();
-                    for (int i = 0; i < annotationAttributes.length; i++) {
-                        Method annotationAttribute = annotationAttributes[i];
+                    for (Method annotationAttribute : annotationAttributes) {
                         String attributeName = annotationAttribute.getName();
                         Object defaultValue = annotationAttribute.getDefaultValue();
                         if (defaultValue != null && !attributes.containsKey(attributeName)) {
@@ -56,7 +56,7 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
                     }
                     // Register annotations that the annotation type is annotated with.
                     Annotation[] metaAnnotations = annotationClass.getAnnotations();
-                    Set<String> metaAnnotationTypeNames = new HashSet<String>();
+                    Set<String> metaAnnotationTypeNames = new HashSet<>();
                     for (Annotation metaAnnotation : metaAnnotations) {
                         metaAnnotationTypeNames.add(metaAnnotation.annotationType().getName());
                     }
@@ -95,6 +95,10 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
 
     public Map<String, Object> getAnnotationAttributes(String annotationType) {
         return this.attributesMap.get(annotationType);
+    }
+
+    public boolean isAnnotated(String annotationType) {
+        return this.attributeMap.containsKey(annotationType);
     }
 
 }

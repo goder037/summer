@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.context.annotation;
 
+import com.rocket.summer.framework.aop.scope.ScopedProxyUtils;
 import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;

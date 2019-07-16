@@ -114,6 +114,21 @@ public interface BeanFactory {
     Object getBean(String name) throws BeansException;
 
     /**
+     * Return the bean instance that uniquely matches the given object type, if any.
+     * @param requiredType type the bean must match; can be an interface or superclass.
+     * {@literal null} is disallowed.
+     * <p>This method goes into {@link ListableBeanFactory} by-type lookup territory
+     * but may also be translated into a conventional by-name lookup based on the name
+     * of the given type. For more extensive retrieval operations across sets of beans,
+     * use {@link ListableBeanFactory} and/or {@link BeanFactoryUtils}.
+     * @return an instance of the single bean matching the required type
+     * @throws NoSuchBeanDefinitionException if there is not exactly one matching bean found
+     * @since 3.0
+     * @see ListableBeanFactory
+     */
+    <T> T getBean(Class<T> requiredType) throws BeansException;
+
+    /**
      * Return an instance, which may be shared or independent, of the specified bean.
      * <p>Behaves the same as {@link #getBean(String)}, but provides a measure of type
      * safety by throwing a BeanNotOfRequiredTypeException if the bean is not of the
@@ -131,7 +146,7 @@ public interface BeanFactory {
      * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
      * @throws BeansException if the bean could not be created
      */
-    Object getBean(String name, Class requiredType) throws BeansException;
+    <T> T getBean(String name, Class<T> requiredType) throws BeansException;
 
     /**
      * Return an instance, which may be shared or independent, of the specified bean.
@@ -147,7 +162,7 @@ public interface BeanFactory {
      * @throws BeansException if the bean could not be created
      * @since 2.5
      */
-    Object getBean(String name, Object[] args) throws BeansException;
+    Object getBean(String name, Object... args) throws BeansException;
 
     /**
      * Does this bean factory contain a bean with the given name? More specifically,
