@@ -121,7 +121,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     //---------------------------------------------------------------------
 
     public Object getBean(String name) throws BeansException {
-        return getBean(name, null, null);
+        return doGetBean(name, null, null, false);
     }
 
     public <T> T getBean(String name, Class<T> requiredType) throws BeansException {

@@ -460,8 +460,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         // Invoke factory processors registered with the context instance.
-        for (Iterator it = getBeanFactoryPostProcessors().iterator(); it.hasNext();) {
-            BeanFactoryPostProcessor factoryProcessor = (BeanFactoryPostProcessor) it.next();
+        for (Object o : getBeanFactoryPostProcessors()) {
+            BeanFactoryPostProcessor factoryProcessor = (BeanFactoryPostProcessor) o;
             factoryProcessor.postProcessBeanFactory(beanFactory);
         }
 
@@ -513,8 +513,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * Invoke the given BeanFactoryPostProcessor beans.
      */
     private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory, List postProcessors) {
-        for (Iterator it = postProcessors.iterator(); it.hasNext();) {
-            BeanFactoryPostProcessor postProcessor = (BeanFactoryPostProcessor) it.next();
+        for (Object processor : postProcessors) {
+            BeanFactoryPostProcessor postProcessor = (BeanFactoryPostProcessor) processor;
             postProcessor.postProcessBeanFactory(beanFactory);
         }
     }
@@ -538,15 +538,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         List priorityOrderedPostProcessors = new ArrayList();
         List orderedPostProcessorNames = new ArrayList();
         List nonOrderedPostProcessorNames = new ArrayList();
-        for (int i = 0; i < postProcessorNames.length; i++) {
-            if (isTypeMatch(postProcessorNames[i], PriorityOrdered.class)) {
-                priorityOrderedPostProcessors.add(beanFactory.getBean(postProcessorNames[i]));
-            }
-            else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
-                orderedPostProcessorNames.add(postProcessorNames[i]);
-            }
-            else {
-                nonOrderedPostProcessorNames.add(postProcessorNames[i]);
+        for (String processorName : postProcessorNames) {
+            if (isTypeMatch(processorName, PriorityOrdered.class)) {
+                priorityOrderedPostProcessors.add(beanFactory.getBean(processorName));
+            } else if (isTypeMatch(processorName, Ordered.class)) {
+                orderedPostProcessorNames.add(processorName);
+            } else {
+                nonOrderedPostProcessorNames.add(processorName);
             }
         }
 

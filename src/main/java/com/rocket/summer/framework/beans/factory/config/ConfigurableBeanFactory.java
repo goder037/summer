@@ -5,6 +5,8 @@ import com.rocket.summer.framework.beans.TypeConverter;
 import com.rocket.summer.framework.beans.factory.HierarchicalBeanFactory;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 
+import java.beans.PropertyEditor;
+
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
     /**
@@ -20,6 +22,13 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * @see #registerScope
      */
     String SCOPE_PROTOTYPE = "prototype";
+
+    /**
+     * Register the given scope, backed by the given Scope implementation.
+     * @param scopeName the scope identifier
+     * @param scope the backing Scope implementation
+     */
+    void registerScope(String scopeName, Scope scope);
 
     /**
      * Destroy all singleton beans in this factory, including inner beans that have
@@ -106,6 +115,17 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * @param registrar the PropertyEditorRegistrar to register
      */
     void addPropertyEditorRegistrar(PropertyEditorRegistrar registrar);
+    /**
+     * Register the given custom property editor for all properties of the
+     * given type. To be invoked during factory configuration.
+     * <p>Note that this method will register a shared custom editor instance;
+     * access to that instance will be synchronized for thread-safety. It is
+     * generally preferable to use {@link #addPropertyEditorRegistrar} instead
+     * of this method, to avoid for the need for synchronization on custom editors.
+     * @param requiredType type of the property
+     * @param propertyEditorClass the {@link PropertyEditor} class to register
+     */
+    void registerCustomEditor(Class<?> requiredType, Class<? extends PropertyEditor> propertyEditorClass);
 
     /**
      * Add a new BeanPostProcessor that will get applied to beans created
