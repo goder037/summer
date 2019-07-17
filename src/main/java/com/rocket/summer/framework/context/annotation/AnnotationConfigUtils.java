@@ -15,46 +15,54 @@ import java.util.Set;
 
 /**
  * Utility class that allows for convenient registration of common
- * {@link org.springframework.beans.factory.config.BeanPostProcessor}
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor} and
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor}
  * definitions for annotation-based configuration.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 2.5
  * @see CommonAnnotationBeanPostProcessor
- * @see org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor
- * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
- * @see org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor
+ * @see com.rocket.summer.framework.context.annotation.ConfigurationClassPostProcessor;
+ * @see com.rocket.summer.framework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
+ * @see com.rocket.summer.framework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor
  */
 public class AnnotationConfigUtils {
 
     /**
-     * The bean name of the internally managed JPA annotation processor.
+     * The bean name of the internally managed Configuration annotation processor.
      */
-    public static final String PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME =
-            "org.springframework.context.annotation.internalPersistenceAnnotationProcessor";
-
-    /**
-     * The bean name of the internally managed JSR-250 annotation processor.
-     */
-    public static final String COMMON_ANNOTATION_PROCESSOR_BEAN_NAME =
-            "org.springframework.context.annotation.internalCommonAnnotationProcessor";
+    public static final String CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME =
+            "com.rocket.summer.framework.context.annotation.internalConfigurationAnnotationProcessor";
 
     /**
      * The bean name of the internally managed Autowired annotation processor.
      */
     public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
-            "org.springframework.context.annotation.internalAutowiredAnnotationProcessor";
+            "com.rocket.summer.framework.context.annotation.internalAutowiredAnnotationProcessor";
 
     /**
      * The bean name of the internally managed Required annotation processor.
      */
     public static final String REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME =
-            "org.springframework.context.annotation.internalRequiredAnnotationProcessor";
+            "com.rocket.summer.framework.context.annotation.internalRequiredAnnotationProcessor";
+
+    /**
+     * The bean name of the internally managed JSR-250 annotation processor.
+     */
+    public static final String COMMON_ANNOTATION_PROCESSOR_BEAN_NAME =
+            "com.rocket.summer.framework.context.annotation.internalCommonAnnotationProcessor";
+
+    /**
+     * The bean name of the internally managed JPA annotation processor.
+     */
+    public static final String PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME =
+            "com.rocket.summer.framework.context.annotation.internalPersistenceAnnotationProcessor";
 
 
     private static final String PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME =
-            "org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor";
+            "com.rocket.summer.framework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor";
 
 
     private static final boolean jsr250Present =
@@ -84,7 +92,32 @@ public class AnnotationConfigUtils {
     public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
             BeanDefinitionRegistry registry, Object source) {
 
-        Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>(4);
+        Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<BeanDefinitionHolder>(4);
+
+        if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+            RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
+            def.setSource(source);
+            beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
+        }
+
+        if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+            RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
+            def.setSource(source);
+            beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
+        }
+
+        if (!registry.containsBeanDefinition(REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+            RootBeanDefinition def = new RootBeanDefinition(RequiredAnnotationBeanPostProcessor.class);
+            def.setSource(source);
+            beanDefs.add(registerPostProcessor(registry, def, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
+        }
+
+        // Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
+        if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+            RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
+            def.setSource(source);
+            beanDefs.add(registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
+        }
 
         // Check for JPA support, and if present add the PersistenceAnnotationBeanPostProcessor.
         if (jpaPresent && !registry.containsBeanDefinition(PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME)) {
@@ -98,42 +131,16 @@ public class AnnotationConfigUtils {
                         "Cannot load optional framework class: " + PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME, ex);
             }
             def.setSource(source);
-            def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            beanDefinitions.add(registerBeanPostProcessor(registry, def, PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME));
+            beanDefs.add(registerPostProcessor(registry, def, PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME));
         }
 
-        // Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
-        if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-            RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
-            def.setSource(source);
-            def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            beanDefinitions.add(registerBeanPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
-        }
-
-        if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-            RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
-            def.setSource(source);
-            def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            beanDefinitions.add(registerBeanPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
-        }
-
-        if (!registry.containsBeanDefinition(REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
-            RootBeanDefinition def = new RootBeanDefinition(RequiredAnnotationBeanPostProcessor.class);
-            def.setSource(source);
-            def.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            beanDefinitions.add(registerBeanPostProcessor(registry, def, REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
-        }
-
-        return beanDefinitions;
+        return beanDefs;
     }
 
-    private static BeanDefinitionHolder registerBeanPostProcessor(
+    private static BeanDefinitionHolder registerPostProcessor(
             BeanDefinitionRegistry registry, RootBeanDefinition definition, String beanName) {
 
-        // Default infrastructure bean: lowest order value; role infrastructure.
-        definition.getPropertyValues().addPropertyValue("order", new Integer(Ordered.LOWEST_PRECEDENCE));
         definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-
         registry.registerBeanDefinition(beanName, definition);
         return new BeanDefinitionHolder(definition, beanName);
     }

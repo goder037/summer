@@ -1,14 +1,15 @@
 package com.rocket.test;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class SpringMain {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("Beans.xml");
-        HelloWorld obj = (HelloWorld) context.getBean("helloWorld");
-
-        obj.getMessage1();
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConf.class);
+        ctx.scan("com.rocket.test");
+        SpringHelloWorld hw = ctx.getBean(SpringHelloWorld.class);
+        hw.getMessage1();
+        HelloChina helloChina = ctx.getBean(HelloChina.class);
+        helloChina.getMessage1();
     }
 }

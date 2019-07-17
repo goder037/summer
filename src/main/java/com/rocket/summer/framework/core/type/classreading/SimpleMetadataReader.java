@@ -1,8 +1,14 @@
 package com.rocket.summer.framework.core.type.classreading;
 
+import com.rocket.summer.framework.core.NestedIOException;
+import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.ClassMetadata;
 import org.objectweb.asm.ClassReader;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * {@link MetadataReader} implementation based on an ASM
@@ -16,27 +22,50 @@ import org.objectweb.asm.ClassReader;
  */
 class SimpleMetadataReader implements MetadataReader {
 
-    private final ClassReader classReader;
+    private final Resource resource;
 
-    private final ClassLoader classLoader;
+    private final ClassMetadata classMetadata;
+
+    private final AnnotationMetadata annotationMetadata;
 
 
-    public SimpleMetadataReader(ClassReader classReader, ClassLoader classLoader) {
-        this.classReader = classReader;
-        this.classLoader = classLoader;
+    SimpleMetadataReader(Resource resource, ClassLoader classLoader) throws IOException {
+        InputStream is = new BufferedInputStream(resource.getInputStream());
+        ClassReader classReader;
+        try {
+            classReader = new ClassReader(is);
+        }
+        catch (IllegalArgumentException ex) {
+            throw new NestedIOException("ASM ClassReader failed to parse class file - " +
+                    "probably due to a new Java class file version that isn't supported yet: " + resource, ex);
+        }
+        finally {
+            is.close();
+        }
+
+        AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
+        classReader.accept(visitor, ClassReader.SKIP_DEBUG);
+
+        this.annotationMetadata = visitor;
+        // (since AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor)
+        this.classMetadata = visitor;
+        this.resource = resource;
     }
 
 
+    @Override
+    public Resource getResource() {
+        return this.resource;
+    }
+
+    @Override
     public ClassMetadata getClassMetadata() {
-        ClassMetadataReadingVisitor visitor = new ClassMetadataReadingVisitor();
-        this.classReader.accept(visitor, true);
-        return visitor;
+        return this.classMetadata;
     }
 
+    @Override
     public AnnotationMetadata getAnnotationMetadata() {
-        AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(this.classLoader);
-        this.classReader.accept(visitor, true);
-        return visitor;
+        return this.annotationMetadata;
     }
 
 }

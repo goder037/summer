@@ -53,14 +53,9 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
         return getMetadataReader(this.resourceLoader.getResource(resourcePath));
     }
 
+    @Override
     public MetadataReader getMetadataReader(Resource resource) throws IOException {
-        InputStream is = resource.getInputStream();
-        try {
-            return new SimpleMetadataReader(new ClassReader(is), this.resourceLoader.getClassLoader());
-        }
-        finally {
-            is.close();
-        }
+        return new SimpleMetadataReader(resource, this.resourceLoader.getClassLoader());
     }
 
 }

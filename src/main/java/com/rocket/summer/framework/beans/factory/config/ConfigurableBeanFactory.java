@@ -90,6 +90,14 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void destroyScopedBean(String beanName);
 
     /**
+     * Determine whether the specified bean is currently in creation.
+     * @param beanName the name of the bean
+     * @return whether the bean is currently in creation
+     * @since 2.5
+     */
+    boolean isCurrentlyInCreation(String beanName);
+
+    /**
      * Add a PropertyEditorRegistrar to be applied to all bean creation processes.
      * <p>Such a registrar creates new PropertyEditor instances and registers them
      * on the given registry, fresh for each bean creation attempt. This avoids

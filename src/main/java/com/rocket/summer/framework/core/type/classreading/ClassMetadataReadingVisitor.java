@@ -24,6 +24,8 @@ class ClassMetadataReadingVisitor extends EmptyVisitor implements ClassMetadata 
 
     private boolean isAbstract;
 
+    private boolean isFinal;
+
     private String enclosingClassName;
 
     private boolean independentInnerClass;
@@ -37,6 +39,7 @@ class ClassMetadataReadingVisitor extends EmptyVisitor implements ClassMetadata 
         this.className = ClassUtils.convertResourcePathToClassName(name);
         this.isInterface = ((access & Opcodes.ACC_INTERFACE) != 0);
         this.isAbstract = ((access & Opcodes.ACC_ABSTRACT) != 0);
+        this.isFinal = ((access & Opcodes.ACC_FINAL) != 0);
         if (supername != null) {
             this.superClassName = ClassUtils.convertResourcePathToClassName(supername);
         }
@@ -96,6 +99,10 @@ class ClassMetadataReadingVisitor extends EmptyVisitor implements ClassMetadata 
 
     public String[] getInterfaceNames() {
         return this.interfaces;
+    }
+
+    public boolean isFinal() {
+        return this.isFinal;
     }
 
 }

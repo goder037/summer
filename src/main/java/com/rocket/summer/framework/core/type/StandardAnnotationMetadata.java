@@ -3,7 +3,9 @@ package com.rocket.summer.framework.core.type;
 import com.rocket.summer.framework.core.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,17 +71,6 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
         return false;
     }
 
-    public Map<String, Object> getAnnotationAttributes(String annotationType) {
-        Annotation[] anns = getIntrospectedClass().getAnnotations();
-        for (int i = 0; i < anns.length; i++) {
-            Annotation ann = anns[i];
-            if (ann.annotationType().getName().equals(annotationType)) {
-                return AnnotationUtils.getAnnotationAttributes(ann);
-            }
-        }
-        return null;
-    }
-
     public boolean isAnnotated(String annotationType) {
         Annotation[] anns = getIntrospectedClass().getAnnotations();
         for (Annotation ann : anns) {
@@ -93,6 +84,67 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
             }
         }
         return false;
+    }
+    @Override
+    public Map<String, Object> getAnnotationAttributes(String annotationType) {
+        return getAnnotationAttributes(annotationType, false);
+    }
+    @Override
+    public Map<String, Object> getAnnotationAttributes(String annotationType, boolean classValuesAsString) {
+        Annotation[] anns = getIntrospectedClass().getAnnotations();
+        for (Annotation ann : anns) {
+            if (ann.annotationType().getName().equals(annotationType)) {
+                return AnnotationUtils.getAnnotationAttributes(ann, classValuesAsString);
+            }
+            for (Annotation metaAnn : ann.annotationType().getAnnotations()) {
+                if (metaAnn.annotationType().getName().equals(annotationType)) {
+                    return AnnotationUtils.getAnnotationAttributes(metaAnn, classValuesAsString);
+                }
+            }
+        }
+        return null;
+    }
+    @Override
+    public boolean hasAnnotatedMethods(String annotationType) {
+        Method[] methods = getIntrospectedClass().getDeclaredMethods();
+        for (Method method : methods) {
+            for (Annotation ann : method.getAnnotations()) {
+                if (ann.annotationType().getName().equals(annotationType)) {
+                    return true;
+                }
+                else {
+                    for (Annotation metaAnn : ann.annotationType().getAnnotations()) {
+                        if (metaAnn.annotationType().getName().equals(annotationType)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Set<MethodMetadata> getAnnotatedMethods(String annotationType) {
+        Method[] methods = getIntrospectedClass().getDeclaredMethods();
+        Set<MethodMetadata> annotatedMethods = new LinkedHashSet<MethodMetadata>();
+        for (Method method : methods) {
+            for (Annotation ann : method.getAnnotations()) {
+                if (ann.annotationType().getName().equals(annotationType)) {
+                    annotatedMethods.add(new StandardMethodMetadata(method));
+                    break;
+                }
+                else {
+                    for (Annotation metaAnn : ann.annotationType().getAnnotations()) {
+                        if (metaAnn.annotationType().getName().equals(annotationType)) {
+                            annotatedMethods.add(new StandardMethodMetadata(method));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return annotatedMethods;
     }
 
 }

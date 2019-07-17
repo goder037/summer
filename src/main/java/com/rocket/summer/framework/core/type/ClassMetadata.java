@@ -34,6 +34,11 @@ public interface ClassMetadata {
     boolean isConcrete();
 
     /**
+     * Return whether the underlying class is marked as 'final'.
+     */
+    boolean isFinal();
+
+    /**
      * Determine whether the underlying class is independent,
      * i.e. whether it is a top-level class or a nested class
      * (static inner class) that can be constructed independent

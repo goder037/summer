@@ -129,6 +129,44 @@ public abstract class AnnotationUtils {
     }
 
     /**
+     * Retrieve the given annotation's attributes as a Map.
+     * @param annotation the annotation to retrieve the attributes for
+     * @param classValuesAsString whether to turn Class references into Strings (for compatibility with
+     * {@link org.springframework.core.type.AnnotationMetadata} or to preserve them as Class references
+     * @return the Map of annotation attributes, with attribute names as keys and
+     * corresponding attribute values as values
+     */
+    public static Map<String, Object> getAnnotationAttributes(Annotation annotation, boolean classValuesAsString) {
+        Map<String, Object> attrs = new HashMap<String, Object>();
+        Method[] methods = annotation.annotationType().getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getParameterTypes().length == 0 && method.getReturnType() != void.class) {
+                try {
+                    Object value = method.invoke(annotation);
+                    if (classValuesAsString) {
+                        if (value instanceof Class) {
+                            value = ((Class) value).getName();
+                        }
+                        else if (value instanceof Class[]) {
+                            Class[] clazzArray = (Class[]) value;
+                            String[] newValue = new String[clazzArray.length];
+                            for (int i = 0; i < clazzArray.length; i++) {
+                                newValue[i] = clazzArray[i].getName();
+                            }
+                            value = newValue;
+                        }
+                    }
+                    attrs.put(method.getName(), value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException("Could not obtain annotation attribute values", ex);
+                }
+            }
+        }
+        return attrs;
+    }
+
+    /**
      * Find the first {@link Class} in the inheritance hierarchy of the
      * specified <code>clazz</code> (including the specified
      * <code>clazz</code> itself) which declares an annotation for the

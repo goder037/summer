@@ -175,25 +175,32 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
      * @param basePackages the packages to check for annotated classes
      * @return number of beans registered
      */
-    protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
-        Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
-        for (int i = 0; i < basePackages.length; i++) {
-            Set<BeanDefinition> candidates = findCandidateComponents(basePackages[i]);
-            for (BeanDefinition candidate : candidates) {
-                String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
-                if (candidate instanceof AbstractBeanDefinition) {
-                    postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
-                }
-                ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
-                if (checkCandidate(beanName, candidate)) {
-                    BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
-                    definitionHolder = applyScope(definitionHolder, scopeMetadata);
-                    beanDefinitions.add(definitionHolder);
-                    registerBeanDefinition(definitionHolder, this.registry);
-                }
-            }
+    /**
+     * Check the given candidate's bean name, determining whether the corresponding
+     * bean definition needs to be registered or conflicts with an existing definition.
+     * @param beanName the suggested name for the bean
+     * @param beanDefinition the corresponding bean definition
+     * @return {@code true} if the bean can be registered as-is;
+     * {@code false} if it should be skipped because there is an
+     * existing, compatible bean definition for the specified name
+     * @throws ConflictingBeanDefinitionException if an existing, incompatible
+     * bean definition has been found for the specified name
+     */
+    protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
+        if (!this.registry.containsBeanDefinition(beanName)) {
+            return true;
         }
-        return beanDefinitions;
+        BeanDefinition existingDef = this.registry.getBeanDefinition(beanName);
+        BeanDefinition originatingDef = existingDef.getOriginatingBeanDefinition();
+        if (originatingDef != null) {
+            existingDef = originatingDef;
+        }
+        if (isCompatible(beanDefinition, existingDef)) {
+            return false;
+        }
+        throw new ConflictingBeanDefinitionException("Annotation-specified bean name '" + beanName +
+                "' for bean class [" + beanDefinition.getBeanClassName() + "] conflicts with existing, " +
+                "non-compatible bean definition of same name and class [" + existingDef.getBeanClassName() + "]");
     }
 
     /**
@@ -220,40 +227,46 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
         BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
     }
 
-
     /**
-     * Check the given candidate's bean name, determining whether the corresponding
-     * bean definition needs to be registered or conflicts with an existing definition.
-     * @param beanName the suggested name for the bean
-     * @param beanDefinition the corresponding bean definition
-     * @return <code>true</code> if the bean can be registered as-is;
-     * <code>false</code> if it should be skipped because there is an
-     * existing, compatible bean definition for the specified name
-     * @throws IllegalStateException if an existing, incompatible
-     * bean definition has been found for the specified name
+     * Perform a scan within the specified base packages,
+     * returning the registered bean definitions.
+     * <p>This method does <i>not</i> register an annotation config processor
+     * but rather leaves this up to the caller.
+     * @param basePackages the packages to check for annotated classes
+     * @return set of beans registered if any for tooling registration purposes (never {@code null})
      */
-    protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
-        if (!this.registry.containsBeanDefinition(beanName)) {
-            return true;
+    protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+        Assert.notEmpty(basePackages, "At least one base package must be specified");
+        Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
+        for (String basePackage : basePackages) {
+            Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+            for (BeanDefinition candidate : candidates) {
+                ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
+                candidate.setScope(scopeMetadata.getScopeName());
+                String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+                if (candidate instanceof AbstractBeanDefinition) {
+                    postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
+                }
+                if (candidate instanceof AnnotatedBeanDefinition) {
+                    AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
+                }
+                if (checkCandidate(beanName, candidate)) {
+                    BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+                    definitionHolder =
+                            AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+                    beanDefinitions.add(definitionHolder);
+                    registerBeanDefinition(definitionHolder, this.registry);
+                }
+            }
         }
-        BeanDefinition existingDef = this.registry.getBeanDefinition(beanName);
-        BeanDefinition originatingDef = existingDef.getOriginatingBeanDefinition();
-        if (originatingDef != null) {
-            existingDef = originatingDef;
-        }
-        if (isCompatible(beanDefinition, existingDef)) {
-            return false;
-        }
-        throw new IllegalStateException("Annotation-specified bean name '" + beanName +
-                "' for bean class [" + beanDefinition.getBeanClassName() + "] conflicts with existing, " +
-                "non-compatible bean definition of same name and class [" + existingDef.getBeanClassName() + "]");
+        return beanDefinitions;
     }
 
     /**
      * Determine whether the given new bean definition is compatible with
      * the given existing bean definition.
-     * <p>The default implementation simply considers them as compatible
-     * when the bean class name matches.
+     * <p>The default implementation considers them as compatible when the existing
+     * bean definition comes from the same source or from a non-scanning source.
      * @param newDefinition the new bean definition, originated from scanning
      * @param existingDefinition the existing bean definition, potentially an
      * explicitly defined one or a previously generated one from scanning
@@ -261,7 +274,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
      * new definition to be skipped in favor of the existing definition
      */
     protected boolean isCompatible(BeanDefinition newDefinition, BeanDefinition existingDefinition) {
-        return (!(existingDefinition instanceof AnnotatedBeanDefinition) ||  // explicitly registered overriding bean
+        return (!(existingDefinition instanceof ScannedGenericBeanDefinition) ||  // explicitly registered overriding bean
                 newDefinition.getSource().equals(existingDefinition.getSource()) ||  // scanned same file twice
                 newDefinition.equals(existingDefinition));  // scanned equivalent class twice
     }

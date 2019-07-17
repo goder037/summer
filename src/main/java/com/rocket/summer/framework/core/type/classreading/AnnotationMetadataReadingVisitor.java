@@ -1,6 +1,10 @@
 package com.rocket.summer.framework.core.type.classreading;
 
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
+import com.rocket.summer.framework.core.type.MethodMetadata;
+import com.rocket.summer.framework.util.CollectionUtils;
+import com.rocket.summer.framework.util.LinkedMultiValueMap;
+import com.rocket.summer.framework.util.MultiValueMap;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.EmptyVisitor;
@@ -27,6 +31,8 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
     private final Map<String, Map<String, Object>> attributeMap = new LinkedHashMap<>(4);
 
     private final ClassLoader classLoader;
+
+    private final MultiValueMap<String, MethodMetadata> methodMetadataMap = new LinkedMultiValueMap<String, MethodMetadata>();
 
 
     public AnnotationMetadataReadingVisitor(ClassLoader classLoader) {
@@ -93,12 +99,59 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
         return false;
     }
 
-    public Map<String, Object> getAnnotationAttributes(String annotationType) {
-        return this.attributesMap.get(annotationType);
-    }
-
     public boolean isAnnotated(String annotationType) {
         return this.attributeMap.containsKey(annotationType);
+    }
+
+    public Map<String, Object> getAnnotationAttributes(String annotationType) {
+        return getAnnotationAttributes(annotationType, false);
+    }
+
+    public Map<String, Object> getAnnotationAttributes(String annotationType, boolean classValuesAsString) {
+        Map<String, Object> raw = this.attributeMap.get(annotationType);
+        if (raw == null) {
+            return null;
+        }
+        Map<String, Object> result = new LinkedHashMap<>(raw.size());
+        for (Map.Entry<String, Object> entry : raw.entrySet()) {
+            try {
+                Object value = entry.getValue();
+                if (value instanceof Type) {
+                    value = (classValuesAsString ? ((Type) value).getClassName() :
+                            this.classLoader.loadClass(((Type) value).getClassName()));
+                }
+                else if (value instanceof Type[]) {
+                    Type[] array = (Type[]) value;
+                    Object[] convArray = (classValuesAsString ? new String[array.length] : new Class[array.length]);
+                    for (int i = 0; i < array.length; i++) {
+                        convArray[i] = (classValuesAsString ? array[i].getClassName() :
+                                this.classLoader.loadClass(array[i].getClassName()));
+                    }
+                    value = convArray;
+                }
+                result.put(entry.getKey(), value);
+            }
+            catch (Exception ex) {
+                // Class not found - can't resolve class reference in annotation attribute.
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasAnnotatedMethods(String annotationType) {
+        return this.methodMetadataMap.containsKey(annotationType);
+    }
+
+    @Override
+    public Set<MethodMetadata> getAnnotatedMethods(String annotationType) {
+        List<MethodMetadata> list = this.methodMetadataMap.get(annotationType);
+        if (CollectionUtils.isEmpty(list)) {
+            return new LinkedHashSet<>(0);
+        }
+        Set<MethodMetadata> annotatedMethods = new LinkedHashSet<MethodMetadata>(list.size());
+        annotatedMethods.addAll(list);
+        return annotatedMethods;
     }
 
 }

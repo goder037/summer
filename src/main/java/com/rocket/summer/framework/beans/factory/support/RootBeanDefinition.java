@@ -3,8 +3,10 @@ package com.rocket.summer.framework.beans.factory.support;
 import com.rocket.summer.framework.beans.MutablePropertyValues;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues;
+import com.rocket.summer.framework.util.Assert;
 
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,11 +31,11 @@ import java.util.Set;
  */
 public class RootBeanDefinition extends AbstractBeanDefinition {
 
-    private final Set externallyManagedConfigMembers = Collections.synchronizedSet(new HashSet());
+    private final Set<Member> externallyManagedConfigMembers = Collections.synchronizedSet(new HashSet<Member>(0));
 
-    private final Set externallyManagedInitMethods = Collections.synchronizedSet(new HashSet());
+    private final Set<String> externallyManagedInitMethods = Collections.synchronizedSet(new HashSet<String>(0));
 
-    private final Set externallyManagedDestroyMethods = Collections.synchronizedSet(new HashSet());
+    private final Set<String> externallyManagedDestroyMethods = Collections.synchronizedSet(new HashSet<String>(0));
 
     /** Package-visible field for caching the resolved constructor or factory method */
     volatile Object resolvedConstructorOrFactoryMethod;
@@ -46,6 +48,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
     /** Package-visible field that marks the constructor arguments as resolved */
     volatile boolean constructorArgumentsResolved = false;
+
+    boolean isFactoryMethodUnique;
 
     /** Package-visible field that indicates a before-instantiation post-processor having kicked in */
     volatile Boolean beforeInstantiationResolved;
@@ -169,6 +173,22 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
     public RootBeanDefinition(String beanClassName, ConstructorArgumentValues cargs, MutablePropertyValues pvs) {
         super(cargs, pvs);
         setBeanClassName(beanClassName);
+    }
+
+    /**
+     * Check whether the given candidate qualifies as a factory method.
+     */
+    public boolean isFactoryMethod(Method candidate) {
+        return (candidate != null && candidate.getName().equals(getFactoryMethodName()));
+    }
+
+    /**
+     * Specify a factory method name that refers to a non-overloaded method.
+     */
+    public void setUniqueFactoryMethodName(String name) {
+        Assert.hasText(name, "Factory method name must not be empty");
+        setFactoryMethodName(name);
+        this.isFactoryMethodUnique = true;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.core.type.classreading;
 
+import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.ClassMetadata;
 
@@ -21,6 +22,11 @@ public interface MetadataReader {
      * Read full annotation metadata for the underlying class.
      */
     AnnotationMetadata getAnnotationMetadata();
+
+    /**
+     * Return the resource reference for the class file.
+     */
+    Resource getResource();
 
 }
 

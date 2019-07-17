@@ -1,6 +1,5 @@
-package com.rocket.summer.framework.util.xml;
+package com.rocket.summer.framework.util;
 
-import com.rocket.summer.framework.util.Assert;
 import org.w3c.dom.*;
 
 import java.util.ArrayList;

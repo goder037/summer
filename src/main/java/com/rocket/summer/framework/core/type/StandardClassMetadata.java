@@ -39,6 +39,10 @@ public class StandardClassMetadata implements ClassMetadata {
         return !(isInterface() || isAbstract());
     }
 
+    public boolean isFinal() {
+        return Modifier.isFinal(this.introspectedClass.getModifiers());
+    }
+
     public boolean isIndependent() {
         return (!hasEnclosingClass() ||
                 (getIntrospectedClass().getDeclaringClass() != null &&

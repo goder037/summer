@@ -14,6 +14,12 @@ package com.rocket.summer.framework.context.annotation;
 public enum ScopedProxyMode {
 
     /**
+     * Default typically equals {@link #NO}, unless a different default
+     * has been configured at the component-scan instruction level.
+     */
+    DEFAULT,
+
+    /**
      * Do not create a scoped proxy.
      * <p>This proxy-mode is not typically useful when used with a
      * non-singleton scoped instance, which should favor the use of the
