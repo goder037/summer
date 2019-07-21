@@ -24,6 +24,63 @@ public abstract class CollectionUtils {
     }
 
     /**
+     * Adapts an enumeration to an iterator.
+     * @param enumeration the enumeration
+     * @return the iterator
+     */
+    public static <E> Iterator<E> toIterator(Enumeration<E> enumeration) {
+        return new EnumerationIterator<E>(enumeration);
+    }
+
+    /**
+     * Iterator wrapping an Enumeration.
+     */
+    private static class EnumerationIterator<E> implements Iterator<E> {
+
+        private Enumeration<E> enumeration;
+
+        public EnumerationIterator(Enumeration<E> enumeration) {
+            this.enumeration = enumeration;
+        }
+
+        public boolean hasNext() {
+            return this.enumeration.hasMoreElements();
+        }
+
+        public E next() {
+            return this.enumeration.nextElement();
+        }
+
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException("Not supported");
+        }
+    }
+
+    /**
+     * Find the common element type of the given Collection, if any.
+     * @param collection the Collection to check
+     * @return the common element type, or <code>null</code> if no clear
+     * common type has been found (or the collection was empty)
+     */
+    public static Class<?> findCommonElementType(Collection collection) {
+        if (isEmpty(collection)) {
+            return null;
+        }
+        Class<?> candidate = null;
+        for (Object val : collection) {
+            if (val != null) {
+                if (candidate == null) {
+                    candidate = val.getClass();
+                }
+                else if (candidate != val.getClass()) {
+                    return null;
+                }
+            }
+        }
+        return candidate;
+    }
+
+    /**
      * Convert the supplied array into a List. A primitive array gets
      * converted into a List of the appropriate wrapper type.
      * <p>A <code>null</code> source value will be converted to an

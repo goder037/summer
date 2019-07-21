@@ -50,6 +50,15 @@ public abstract class AbstractResource implements Resource {
     }
 
     /**
+     * This implementation checks the timestamp of the underlying File,
+     * if available.
+     * @see #getFile()
+     */
+    public long contentLength() throws IOException {
+        return getFile().length();
+    }
+
+    /**
      * This implementation always returns <code>true</code>.
      */
     @Override

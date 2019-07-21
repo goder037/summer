@@ -77,6 +77,17 @@ public abstract class ResourceUtils {
     }
 
     /**
+     * Determine whether the given URL points to a resource in the file system,
+     * that is, has protocol "file" .
+     * @param url the URL to check
+     * @return whether the URL has been identified as a file system URL
+     */
+    public static boolean isFileURL(URL url) {
+        String protocol = url.getProtocol();
+        return URL_PROTOCOL_FILE.equals(protocol);
+    }
+
+    /**
      * Determine whether the given URL points to a resource in a jar file,
      * that is, has protocol "jar", "zip", "wsjar" or "code-source".
      * <p>"zip" and "wsjar" are used by BEA WebLogic Server and IBM WebSphere, respectively,

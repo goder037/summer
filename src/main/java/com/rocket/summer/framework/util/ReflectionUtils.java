@@ -8,6 +8,42 @@ import java.util.List;
 public abstract class ReflectionUtils {
 
     /**
+     * Attempt to find a {@link Field field} on the supplied {@link Class} with the
+     * supplied <code>name</code>. Searches all superclasses up to {@link Object}.
+     * @param clazz the class to introspect
+     * @param name the name of the field
+     * @return the corresponding Field object, or <code>null</code> if not found
+     */
+    public static Field findField(Class<?> clazz, String name) {
+        return findField(clazz, name, null);
+    }
+
+    /**
+     * Attempt to find a {@link Field field} on the supplied {@link Class} with the
+     * supplied <code>name</code> and/or {@link Class type}. Searches all superclasses
+     * up to {@link Object}.
+     * @param clazz the class to introspect
+     * @param name the name of the field (may be <code>null</code> if type is specified)
+     * @param type the type of the field (may be <code>null</code> if name is specified)
+     * @return the corresponding Field object, or <code>null</code> if not found
+     */
+    public static Field findField(Class<?> clazz, String name, Class<?> type) {
+        Assert.notNull(clazz, "Class must not be null");
+        Assert.isTrue(name != null || type != null, "Either name or type of the field must be specified");
+        Class<?> searchType = clazz;
+        while (!Object.class.equals(searchType) && searchType != null) {
+            Field[] fields = searchType.getDeclaredFields();
+            for (Field field : fields) {
+                if ((name == null || name.equals(field.getName())) && (type == null || type.equals(field.getType()))) {
+                    return field;
+                }
+            }
+            searchType = searchType.getSuperclass();
+        }
+        return null;
+    }
+
+    /**
      * Invoke the specified {@link Method} against the supplied target object
      * with no arguments. The target object can be <code>null</code> when
      * invoking a static {@link Method}.

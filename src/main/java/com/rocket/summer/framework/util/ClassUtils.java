@@ -2,6 +2,7 @@ package com.rocket.summer.framework.util;
 
 import java.beans.Introspector;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.*;
@@ -38,6 +39,12 @@ public abstract class ClassUtils {
      * type as value, for example: "int" -> "int.class".
      */
     private static final Map primitiveTypeNameMap = new HashMap(16);
+
+    /**
+     * Map with primitive type as key and corresponding wrapper
+     * type as value, for example: int.class -> Integer.class.
+     */
+    private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap<Class<?>, Class<?>>(8);
 
 
     static {
@@ -130,6 +137,17 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Resolve the given class if it is a primitive class,
+     * returning the corresponding primitive wrapper type instead.
+     * @param clazz the class to check
+     * @return the original class, or a primitive wrapper for the original primitive type
+     */
+    public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        return (clazz.isPrimitive() && clazz != void.class? primitiveTypeToWrapperMap.get(clazz) : clazz);
+    }
+
+    /**
      * Build a nice qualified name for an array:
      * component type class name + "[]".
      * @param clazz the array class
@@ -176,6 +194,37 @@ public abstract class ClassUtils {
         Assert.notNull(methodName, "Method name must not be null");
         try {
             return clazz.getMethod(methodName, paramTypes);
+        }
+        catch (NoSuchMethodException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Determine whether the given class has a public constructor with the given signature.
+     * <p>Essentially translates <code>NoSuchMethodException</code> to "false".
+     * @param clazz	the clazz to analyze
+     * @param paramTypes the parameter types of the method
+     * @return whether the class has a corresponding constructor
+     * @see java.lang.Class#getMethod
+     */
+    public static boolean hasConstructor(Class<?> clazz, Class<?>... paramTypes) {
+        return (getConstructorIfAvailable(clazz, paramTypes) != null);
+    }
+
+    /**
+     * Determine whether the given class has a public constructor with the given signature,
+     * and return it if available (else return <code>null</code>).
+     * <p>Essentially translates <code>NoSuchMethodException</code> to <code>null</code>.
+     * @param clazz	the clazz to analyze
+     * @param paramTypes the parameter types of the method
+     * @return the constructor, or <code>null</code> if not found
+     * @see java.lang.Class#getConstructor
+     */
+    public static <T> Constructor<T> getConstructorIfAvailable(Class<T> clazz, Class<?>... paramTypes) {
+        Assert.notNull(clazz, "Class must not be null");
+        try {
+            return clazz.getConstructor(paramTypes);
         }
         catch (NoSuchMethodException ex) {
             return null;

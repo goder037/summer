@@ -4,6 +4,7 @@ import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -44,13 +45,13 @@ public class MethodParameter {
 
     private Class parameterType;
 
-    private Object[] parameterAnnotations;
-
     private ParameterNameDiscoverer parameterNameDiscoverer;
 
     private String parameterName;
 
     private int nestingLevel = 1;
+
+    private Annotation[] parameterAnnotations;
 
     /** Map from Integer level to Integer type index */
     private Map typeIndexesPerLevel;
@@ -171,23 +172,26 @@ public class MethodParameter {
     }
 
     /**
-     * Return the annotations associated with the method/constructor parameter.
-     * @return the parameter annotations, or <code>null</code> if there is
-     * no annotation support (on JDK < 1.5). The return value is an Object array
-     * instead of an Annotation array simply for compatibility with older JDKs;
-     * feel free to cast it to <code>Annotation[]</code> on JDK 1.5 or higher.
+     * Return the annotations associated with the target method/constructor itself.
      */
-    public Object[] getParameterAnnotations() {
-        if (this.parameterAnnotations != null) {
-            return this.parameterAnnotations;
+    public Annotation[] getMethodAnnotations() {
+        return (this.method != null ? this.method.getAnnotations() : this.constructor.getAnnotations());
+    }
+
+    /**
+     * Return the annotations associated with the specific method/constructor parameter.
+     */
+    public Annotation[] getParameterAnnotations() {
+        if (this.parameterAnnotations == null) {
+            Annotation[][] annotationArray = (this.method != null ?
+                    this.method.getParameterAnnotations() : this.constructor.getParameterAnnotations());
+            if (this.parameterIndex >= 0 && this.parameterIndex < annotationArray.length) {
+                this.parameterAnnotations = annotationArray[this.parameterIndex];
+            }
+            else {
+                this.parameterAnnotations = new Annotation[0];
+            }
         }
-        if (methodParameterAnnotationsMethod == null) {
-            return null;
-        }
-        Object[][] annotationArray = (this.method != null ?
-                ((Object[][]) ReflectionUtils.invokeMethod(methodParameterAnnotationsMethod, this.method)) :
-                ((Object[][]) ReflectionUtils.invokeMethod(constructorParameterAnnotationsMethod, this.constructor)));
-        this.parameterAnnotations = annotationArray[this.parameterIndex];
         return this.parameterAnnotations;
     }
 

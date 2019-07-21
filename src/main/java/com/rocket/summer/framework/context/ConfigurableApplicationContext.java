@@ -79,6 +79,11 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     void refresh() throws BeansException, IllegalStateException;
 
     /**
+     * Set the unique id of this application context.
+     */
+    void setId(String id);
+
+    /**
      * Register a shutdown hook with the JVM runtime, closing this context
      * on JVM shutdown unless it has already been closed at that time.
      * <p>This method can be called multiple times. Only one shutdown hook

@@ -53,7 +53,18 @@ public interface Scope {
      * object if it is not present in the underlying storage mechanism
      * @return the desired object (never <code>null</code>)
      */
-    Object get(String name, ObjectFactory objectFactory);
+    /**
+     * Return the object with the given name from the underlying scope,
+     * {@link org.springframework.beans.factory.ObjectFactory#getObject() creating it}
+     * if not found in the underlying storage mechanism.
+     * <p>This is the central operation of a Scope, and the only operation
+     * that is absolutely required.
+     * @param name the name of the object to retrieve
+     * @param objectFactory the {@link ObjectFactory} to use to create the scoped
+     * object if it is not present in the underlying storage mechanism
+     * @return the desired object (never <code>null</code>)
+     */
+    Object get(String name, ObjectFactory<?> objectFactory);
 
     /**
      * Remove the object with the given <code>name</code> from the underlying scope.

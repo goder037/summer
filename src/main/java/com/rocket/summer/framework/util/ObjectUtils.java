@@ -82,6 +82,67 @@ public abstract class ObjectUtils {
 	}
 
 	/**
+	 * Return a content-based String representation if <code>obj</code> is
+	 * not <code>null</code>; otherwise returns an empty String.
+	 * <p>Differs from {@link #nullSafeToString(Object)} in that it returns
+	 * an empty String rather than "null" for a <code>null</code> value.
+	 * @param obj the object to build a display String for
+	 * @return a display String representation of <code>obj</code>
+	 * @see #nullSafeToString(Object)
+	 */
+	public static String getDisplayString(Object obj) {
+		if (obj == null) {
+			return EMPTY_STRING;
+		}
+		return nullSafeToString(obj);
+	}
+
+	/**
+	 * Return a String representation of the specified Object.
+	 * <p>Builds a String representation of the contents in case of an array.
+	 * Returns <code>"null"</code> if <code>obj</code> is <code>null</code>.
+	 * @param obj the object to build a String representation for
+	 * @return a String representation of <code>obj</code>
+	 */
+	public static String nullSafeToString(Object obj) {
+		if (obj == null) {
+			return NULL_STRING;
+		}
+		if (obj instanceof String) {
+			return (String) obj;
+		}
+		if (obj instanceof Object[]) {
+			return nullSafeToString((Object[]) obj);
+		}
+		if (obj instanceof boolean[]) {
+			return nullSafeToString((boolean[]) obj);
+		}
+		if (obj instanceof byte[]) {
+			return nullSafeToString((byte[]) obj);
+		}
+		if (obj instanceof char[]) {
+			return nullSafeToString((char[]) obj);
+		}
+		if (obj instanceof double[]) {
+			return nullSafeToString((double[]) obj);
+		}
+		if (obj instanceof float[]) {
+			return nullSafeToString((float[]) obj);
+		}
+		if (obj instanceof int[]) {
+			return nullSafeToString((int[]) obj);
+		}
+		if (obj instanceof long[]) {
+			return nullSafeToString((long[]) obj);
+		}
+		if (obj instanceof short[]) {
+			return nullSafeToString((short[]) obj);
+		}
+		String str = obj.toString();
+		return (str != null ? str : EMPTY_STRING);
+	}
+
+	/**
 	 * Convert the given array (which may be a primitive array) to an
 	 * object array (if necessary of primitive wrapper objects).
 	 * <p>A <code>null</code> source value will be converted to an

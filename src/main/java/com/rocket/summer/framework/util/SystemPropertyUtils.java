@@ -20,6 +20,9 @@ public abstract class SystemPropertyUtils {
     /** Suffix for system property placeholders: "}" */
     public static final String PLACEHOLDER_SUFFIX = "}";
 
+    /** Value separator for system property placeholders: ":" */
+    public static final String VALUE_SEPARATOR = ":";
+
 
     /**
      * Resolve ${...} placeholders in the given text,

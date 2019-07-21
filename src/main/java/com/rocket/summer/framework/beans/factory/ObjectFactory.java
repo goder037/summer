@@ -19,7 +19,7 @@ import com.rocket.summer.framework.context.BeansException;
  * @since 1.0.2
  * @see FactoryBean
  */
-public interface ObjectFactory {
+public interface ObjectFactory<T> {
 
     /**
      * Return an instance (possibly shared or independent)

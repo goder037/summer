@@ -73,11 +73,31 @@ public abstract class MessageSourceSupport {
      * array as-is. Can be overridden in subclasses in order to resolve
      * special argument types.
      * @param args the original argument array
-     * @param locale the Locale to resolve against
      * @return the resolved argument array
      */
     protected Object[] resolveArguments(Object[] args) {
         return args;
+    }
+
+    /**
+     * Template method for resolving argument objects.
+     * <p>The default implementation simply returns the given argument
+     * array as-is. Can be overridden in subclasses in order to resolve
+     * special argument types.
+     * @param args the original argument array
+     * @param locale the Locale to resolve against
+     * @return the resolved argument array
+     */
+    protected Object[] resolveArguments(Object[] args, Locale locale) {
+        return args;
+    }
+
+    /**
+     * Return whether to always apply the MessageFormat rules, parsing even
+     * messages without arguments.
+     */
+    protected boolean isAlwaysUseMessageFormat() {
+        return this.alwaysUseMessageFormat;
     }
 
     /**

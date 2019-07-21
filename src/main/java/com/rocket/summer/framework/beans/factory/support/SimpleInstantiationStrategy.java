@@ -42,7 +42,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
                     throw new BeanInstantiationException(clazz, "No default constructor found", ex);
                 }
             }
-            return BeanUtils.instantiateClass(constructorToUse, null);
+            return BeanUtils.instantiateClass(constructorToUse);
         }
         else {
             // Must generate CGLIB subclass.

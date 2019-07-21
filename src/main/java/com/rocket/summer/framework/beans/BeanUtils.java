@@ -33,13 +33,13 @@ public abstract class BeanUtils {
      * @return the new instance
      * @throws BeanInstantiationException if the bean cannot be instantiated
      */
-    public static Object instantiateClass(Class clazz) throws BeanInstantiationException {
+    public static <T> T instantiateClass(Class<T> clazz) throws BeanInstantiationException {
         Assert.notNull(clazz, "Class must not be null");
         if (clazz.isInterface()) {
             throw new BeanInstantiationException(clazz, "Specified class is an interface");
         }
         try {
-            return instantiateClass(clazz.getDeclaredConstructor((Class[]) null), null);
+            return instantiateClass(clazz.getDeclaredConstructor());
         }
         catch (NoSuchMethodException ex) {
             throw new BeanInstantiationException(clazz, "No default constructor found", ex);
@@ -57,7 +57,7 @@ public abstract class BeanUtils {
      * @return the new instance
      * @throws BeanInstantiationException if the bean cannot be instantiated
      */
-    public static Object instantiateClass(Constructor ctor, Object[] args) throws BeanInstantiationException {
+    public static <T> T instantiateClass(Constructor<T> ctor, Object... args) throws BeanInstantiationException {
         Assert.notNull(ctor, "Constructor must not be null");
         try {
             ReflectionUtils.makeAccessible(ctor);
@@ -69,7 +69,7 @@ public abstract class BeanUtils {
         }
         catch (IllegalAccessException ex) {
             throw new BeanInstantiationException(ctor.getDeclaringClass(),
-                    "Has the class definition changed? Is the constructor accessible?", ex);
+                    "Is the constructor accessible?", ex);
         }
         catch (IllegalArgumentException ex) {
             throw new BeanInstantiationException(ctor.getDeclaringClass(),

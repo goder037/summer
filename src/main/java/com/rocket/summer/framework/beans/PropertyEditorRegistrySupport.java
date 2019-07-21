@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans;
 
 import com.rocket.summer.framework.beans.propertyeditors.*;
+import com.rocket.summer.framework.core.convert.ConversionService;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.support.ResourceArrayPropertyEditor;
 import com.rocket.summer.framework.util.ClassUtils;
@@ -35,6 +36,8 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
     private boolean configValueEditorsActive = false;
 
     private boolean propertySpecificEditorsRegistered = false;
+
+    private ConversionService conversionService;
 
     private Map defaultEditors;
 
@@ -168,6 +171,13 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
             this.defaultEditors.put(int[].class, sae);
             this.defaultEditors.put(long[].class, sae);
         }
+    }
+
+    /**
+     * Return the associated ConversionService, if any.
+     */
+    public ConversionService getConversionService() {
+        return this.conversionService;
     }
 
     /**
