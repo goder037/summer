@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.core;
 
+import com.rocket.summer.framework.util.LinkedMultiValueMap;
+import com.rocket.summer.framework.util.MultiValueMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -9,11 +11,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public abstract class CollectionFactory {
 
-    private static final Log logger = LogFactory.getLog(CollectionFactory.class);
+    private static Class navigableSetClass = null;
 
-    private static final Set approximableCollectionTypes = new HashSet(10);
+    private static Class navigableMapClass = null;
 
-    private static final Set approximableMapTypes = new HashSet(6);
+    private static final Set<Class> approximableCollectionTypes = new HashSet<Class>(10);
+
+    private static final Set<Class> approximableMapTypes = new HashSet<Class>(6);
 
     /**
      * Create a concurrent Map if possible: that is, if running on JDK >= 1.5
@@ -26,6 +30,46 @@ public abstract class CollectionFactory {
      */
     public static Map createConcurrentMapIfPossible(int initialCapacity) {
         return new ConcurrentHashMap(initialCapacity);
+    }
+
+    /**
+     * Create the most appropriate collection for the given collection type.
+     * <p>Creates an ArrayList, TreeSet or linked Set for a List, SortedSet
+     * or Set, respectively.
+     * @param collectionType the desired type of the target Collection
+     * @param initialCapacity the initial capacity
+     * @return the new Collection instance
+     * @see java.util.ArrayList
+     * @see java.util.TreeSet
+     * @see java.util.LinkedHashSet
+     */
+    public static Collection createCollection(Class<?> collectionType, int initialCapacity) {
+        if (collectionType.isInterface()) {
+            if (List.class.equals(collectionType)) {
+                return new ArrayList(initialCapacity);
+            }
+            else if (SortedSet.class.equals(collectionType) || collectionType.equals(navigableSetClass)) {
+                return new TreeSet();
+            }
+            else if (Set.class.equals(collectionType) || Collection.class.equals(collectionType)) {
+                return new LinkedHashSet(initialCapacity);
+            }
+            else {
+                throw new IllegalArgumentException("Unsupported Collection interface: " + collectionType.getName());
+            }
+        }
+        else {
+            if (!Collection.class.isAssignableFrom(collectionType)) {
+                throw new IllegalArgumentException("Unsupported Collection type: " + collectionType.getName());
+            }
+            try {
+                return (Collection) collectionType.newInstance();
+            }
+            catch (Exception ex) {
+                throw new IllegalArgumentException("Could not instantiate Collection type: " +
+                        collectionType.getName(), ex);
+            }
+        }
     }
 
     /**
@@ -104,6 +148,44 @@ public abstract class CollectionFactory {
         }
         else {
             return new LinkedHashSet(initialCapacity);
+        }
+    }
+
+    /**
+     * Create the most approximate map for the given map.
+     * <p>Creates a TreeMap or linked Map for a SortedMap or Map, respectively.
+     * @param mapType the desired type of the target Map
+     * @param initialCapacity the initial capacity
+     * @return the new Map instance
+     * @see java.util.TreeMap
+     * @see java.util.LinkedHashMap
+     */
+    public static Map createMap(Class<?> mapType, int initialCapacity) {
+        if (mapType.isInterface()) {
+            if (Map.class.equals(mapType)) {
+                return new LinkedHashMap(initialCapacity);
+            }
+            else if (SortedMap.class.equals(mapType) || mapType.equals(navigableMapClass)) {
+                return new TreeMap();
+            }
+            else if (MultiValueMap.class.equals(mapType)) {
+                return new LinkedMultiValueMap();
+            }
+            else {
+                throw new IllegalArgumentException("Unsupported Map interface: " + mapType.getName());
+            }
+        }
+        else {
+            if (!Map.class.isAssignableFrom(mapType)) {
+                throw new IllegalArgumentException("Unsupported Map type: " + mapType.getName());
+            }
+            try {
+                return (Map) mapType.newInstance();
+            }
+            catch (Exception ex) {
+                throw new IllegalArgumentException("Could not instantiate Map type: " +
+                        mapType.getName(), ex);
+            }
         }
     }
 }

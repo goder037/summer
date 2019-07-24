@@ -3,7 +3,6 @@ package com.rocket.summer.framework.web.context;
 import com.rocket.summer.framework.beans.BeanUtils;
 import com.rocket.summer.framework.beans.factory.access.BeanFactoryLocator;
 import com.rocket.summer.framework.beans.factory.access.BeanFactoryReference;
-import com.rocket.summer.framework.beans.factory.access.ContextSingletonBeanFactoryLocator;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextException;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
@@ -503,13 +502,13 @@ public class ContextLoader {
 
         if (parentContextKey != null) {
             // locatorFactorySelector may be null, indicating the default "classpath*:beanRefContext.xml"
-            BeanFactoryLocator locator = ContextSingletonBeanFactoryLocator.getInstance(locatorFactorySelector);
+            //BeanFactoryLocator locator = ContextSingletonBeanFactoryLocator.getInstance(locatorFactorySelector);
             Log logger = LogFactory.getLog(ContextLoader.class);
             if (logger.isDebugEnabled()) {
                 logger.debug("Getting parent context definition: using parent context key of '" +
                         parentContextKey + "' with BeanFactoryLocator");
             }
-            this.parentContextRef = locator.useBeanFactory(parentContextKey);
+            //this.parentContextRef = locator.useBeanFactory(parentContextKey);
             parentContext = (ApplicationContext) this.parentContextRef.getFactory();
         }
 

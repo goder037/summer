@@ -1,10 +1,7 @@
 package com.rocket.summer.framework.util;
 
 import java.beans.Introspector;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.*;
 
 public abstract class ClassUtils {
@@ -97,6 +94,26 @@ public abstract class ClassUtils {
         }
         else {
             return clazz.getName();
+        }
+    }
+
+    /**
+     * Return a public static method of a class.
+     * @param methodName the static method name
+     * @param clazz	the class which defines the method
+     * @param args the parameter types to the method
+     * @return the static method, or <code>null</code> if no static method was found
+     * @throws IllegalArgumentException if the method name is blank or the clazz is null
+     */
+    public static Method getStaticMethod(Class<?> clazz, String methodName, Class<?>... args) {
+        Assert.notNull(clazz, "Class must not be null");
+        Assert.notNull(methodName, "Method name must not be null");
+        try {
+            Method method = clazz.getMethod(methodName, args);
+            return Modifier.isStatic(method.getModifiers()) ? method : null;
+        }
+        catch (NoSuchMethodException ex) {
+            return null;
         }
     }
 

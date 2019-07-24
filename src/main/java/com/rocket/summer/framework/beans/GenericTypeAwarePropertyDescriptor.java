@@ -5,10 +5,12 @@ import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.MethodParameter;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
+import org.apache.commons.logging.LogFactory;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 /**
  * Extension of the standard JavaBeans PropertyDescriptor class,
@@ -27,6 +29,8 @@ class GenericTypeAwarePropertyDescriptor extends PropertyDescriptor {
     private final Method writeMethod;
 
     private final Class propertyEditorClass;
+
+    private volatile Set<Method> ambiguousWriteMethods;
 
     private Class propertyType;
 
@@ -53,6 +57,17 @@ class GenericTypeAwarePropertyDescriptor extends PropertyDescriptor {
         this.propertyEditorClass = propertyEditorClass;
     }
 
+    public Method getWriteMethodForActualAccess() {
+        Set<Method> ambiguousCandidates = this.ambiguousWriteMethods;
+        if (ambiguousCandidates != null) {
+            this.ambiguousWriteMethods = null;
+            LogFactory.getLog(GenericTypeAwarePropertyDescriptor.class).warn("Invalid JavaBean property '" +
+                    getName() + "' being accessed! Ambiguous write methods found next to actually used [" +
+                    this.writeMethod + "]: " + ambiguousCandidates);
+        }
+        return this.writeMethod;
+    }
+
 
     public Method getReadMethod() {
         return this.readMethod;
@@ -64,6 +79,10 @@ class GenericTypeAwarePropertyDescriptor extends PropertyDescriptor {
 
     public Class getPropertyEditorClass() {
         return this.propertyEditorClass;
+    }
+
+    public Class<?> getBeanClass() {
+        return this.beanClass;
     }
 
     public synchronized Class getPropertyType() {

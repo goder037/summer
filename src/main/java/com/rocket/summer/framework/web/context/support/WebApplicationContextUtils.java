@@ -2,6 +2,10 @@ package com.rocket.summer.framework.web.context.support;
 
 import com.rocket.summer.framework.beans.factory.ObjectFactory;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
+import com.rocket.summer.framework.context.support.ServletConfigPropertySource;
+import com.rocket.summer.framework.context.support.ServletContextPropertySource;
+import com.rocket.summer.framework.core.env.MutablePropertySources;
+import com.rocket.summer.framework.core.env.PropertySource;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext;
 import com.rocket.summer.framework.web.context.WebApplicationContext;
@@ -16,6 +20,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.rocket.summer.framework.web.context.support.StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME;
+import static com.rocket.summer.framework.web.context.support.StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME;
 
 /**
  * Convenience methods for retrieving the root
@@ -68,6 +75,28 @@ public abstract class WebApplicationContextUtils {
      */
     public static WebApplicationContext getWebApplicationContext(ServletContext sc) {
         return getWebApplicationContext(sc, WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+    }
+
+    /**
+     * Replace {@code Servlet}-based stub property sources with actual instances
+     * populated with the given context and config objects.
+     * @see org.springframework.core.env.PropertySource.StubPropertySource
+     * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
+     * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
+     */
+    public static void initServletPropertySources(
+            MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
+        Assert.notNull(propertySources, "propertySources must not be null");
+        if(servletContext != null &&
+                propertySources.contains(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) &&
+                propertySources.get(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
+            propertySources.replace(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, new ServletContextPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
+        }
+        if(servletConfig != null &&
+                propertySources.contains(SERVLET_CONFIG_PROPERTY_SOURCE_NAME) &&
+                propertySources.get(SERVLET_CONFIG_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
+            propertySources.replace(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, new ServletConfigPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, servletConfig));
+        }
     }
 
     /**

@@ -32,6 +32,8 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 
     private Object source;
 
+    private boolean optional = false;
+
     private boolean converted = false;
 
     private Object convertedValue;
@@ -101,6 +103,9 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
         }
     }
 
+    public boolean isOptional() {
+        return this.optional;
+    }
 
     /**
      * Return the name of the property.

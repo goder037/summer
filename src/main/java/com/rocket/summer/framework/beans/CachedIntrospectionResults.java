@@ -99,6 +99,17 @@ public class CachedIntrospectionResults {
         }
     }
 
+    PropertyDescriptor[] getPropertyDescriptors() {
+        PropertyDescriptor[] pds = new PropertyDescriptor[this.propertyDescriptorCache.size()];
+        int i = 0;
+        for (PropertyDescriptor pd : this.propertyDescriptorCache.values()) {
+            pds[i] = (pd instanceof GenericTypeAwarePropertyDescriptor ? pd :
+                    buildGenericTypeAwarePropertyDescriptor(getBeanClass(), pd));
+            i++;
+        }
+        return pds;
+    }
+
     /**
      * Create CachedIntrospectionResults for the given bean class.
      * <P>We don't want to use synchronization here. Object references are atomic,
@@ -182,7 +193,7 @@ public class CachedIntrospectionResults {
     private final BeanInfo beanInfo;
 
     /** PropertyDescriptor objects keyed by property name String */
-    private final Map propertyDescriptorCache;
+    private final Map<String, PropertyDescriptor> propertyDescriptorCache;
 
 
     /**
@@ -250,6 +261,16 @@ public class CachedIntrospectionResults {
 
     PropertyDescriptor getPropertyDescriptor(String propertyName) {
         return (PropertyDescriptor) this.propertyDescriptorCache.get(propertyName);
+    }
+
+    private PropertyDescriptor buildGenericTypeAwarePropertyDescriptor(Class beanClass, PropertyDescriptor pd) {
+        try {
+            return new GenericTypeAwarePropertyDescriptor(beanClass, pd.getName(), pd.getReadMethod(),
+                    pd.getWriteMethod(), pd.getPropertyEditorClass());
+        }
+        catch (IntrospectionException ex) {
+            throw new FatalBeanException("Failed to re-introspect class [" + beanClass.getName() + "]", ex);
+        }
     }
 
 }

@@ -5,8 +5,7 @@ import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,35 +14,25 @@ import java.util.Map;
  * a Method or Constructor plus a parameter index and a nested type index for
  * a declared generic type. Useful as a specification object to pass along.
  *
- * <p>Used by {@link GenericCollectionTypeResolver},
- * {@link org.springframework.beans.BeanWrapperImpl} and
- * {@link org.springframework.beans.factory.support.AbstractBeanFactory}.
- *
- * <p>Note that this class does not depend on JDK 1.5 API artifacts, in order
- * to remain compatible with JDK 1.4. Concrete generic type resolution
- * via JDK 1.5 API happens in {@link GenericCollectionTypeResolver} only.
- *
  * @author Juergen Hoeller
  * @author Rob Harrop
+ * @author Andy Clement
  * @since 2.0
  * @see GenericCollectionTypeResolver
  */
 public class MethodParameter {
 
-    private static final Method methodParameterAnnotationsMethod =
-            ClassUtils.getMethodIfAvailable(Method.class, "getParameterAnnotations", new Class[0]);
+    private final Method method;
 
-    private static final Method constructorParameterAnnotationsMethod =
-            ClassUtils.getMethodIfAvailable(Constructor.class, "getParameterAnnotations", new Class[0]);
-
-
-    private Method method;
-
-    private Constructor constructor;
+    private final Constructor constructor;
 
     private final int parameterIndex;
 
-    private Class parameterType;
+    private Class<?> parameterType;
+
+    private Type genericParameterType;
+
+    private Annotation[] parameterAnnotations;
 
     private ParameterNameDiscoverer parameterNameDiscoverer;
 
@@ -51,12 +40,12 @@ public class MethodParameter {
 
     private int nestingLevel = 1;
 
-    private Annotation[] parameterAnnotations;
-
     /** Map from Integer level to Integer type index */
-    private Map typeIndexesPerLevel;
+    Map<Integer, Integer> typeIndexesPerLevel;
 
-    Map typeVariableMap;
+    Map<TypeVariable, Type> typeVariableMap;
+
+    private int hash = 0;
 
 
     /**
@@ -83,6 +72,7 @@ public class MethodParameter {
         this.method = method;
         this.parameterIndex = parameterIndex;
         this.nestingLevel = nestingLevel;
+        this.constructor = null;
     }
 
     /**
@@ -107,6 +97,7 @@ public class MethodParameter {
         this.constructor = constructor;
         this.parameterIndex = parameterIndex;
         this.nestingLevel = nestingLevel;
+        this.method = null;
     }
 
     /**
@@ -120,8 +111,14 @@ public class MethodParameter {
         this.constructor = original.constructor;
         this.parameterIndex = original.parameterIndex;
         this.parameterType = original.parameterType;
+        this.genericParameterType = original.genericParameterType;
         this.parameterAnnotations = original.parameterAnnotations;
+        this.parameterNameDiscoverer = original.parameterNameDiscoverer;
+        this.parameterName = original.parameterName;
+        this.nestingLevel = original.nestingLevel;
+        this.typeIndexesPerLevel = original.typeIndexesPerLevel;
         this.typeVariableMap = original.typeVariableMap;
+        this.hash = original.hash;
     }
 
 
@@ -144,6 +141,29 @@ public class MethodParameter {
     }
 
     /**
+     * Returns the wrapped member.
+     * @return the member
+     */
+    private Member getMember() {
+        return this.method != null ? this.method : this.constructor;
+    }
+
+    /**
+     * Returns the wrapped annotated element.
+     * @return the annotated element
+     */
+    private AnnotatedElement getAnnotatedElement() {
+        return this.method != null ? this.method : this.constructor;
+    }
+
+    /**
+     * Return the class that declares the underlying Method or Constructor.
+     */
+    public Class getDeclaringClass() {
+        return getMember().getDeclaringClass();
+    }
+
+    /**
      * Return the index of the method/constructor parameter.
      * @return the parameter index (never negative)
      */
@@ -154,7 +174,7 @@ public class MethodParameter {
     /**
      * Set a resolved (generic) parameter type.
      */
-    void setParameterType(Class parameterType) {
+    void setParameterType(Class<?> parameterType) {
         this.parameterType = parameterType;
     }
 
@@ -162,20 +182,75 @@ public class MethodParameter {
      * Return the type of the method/constructor parameter.
      * @return the parameter type (never <code>null</code>)
      */
-    public Class getParameterType() {
+    public Class<?> getParameterType() {
         if (this.parameterType == null) {
-            this.parameterType = (this.method != null ?
-                    this.method.getParameterTypes()[this.parameterIndex] :
-                    this.constructor.getParameterTypes()[this.parameterIndex]);
+            if (this.parameterIndex < 0) {
+                this.parameterType = (this.method != null ? this.method.getReturnType() : null);
+            }
+            else {
+                this.parameterType = (this.method != null ?
+                        this.method.getParameterTypes()[this.parameterIndex] :
+                        this.constructor.getParameterTypes()[this.parameterIndex]);
+            }
         }
         return this.parameterType;
+    }
+
+    /**
+     * Return the generic type of the method/constructor parameter.
+     * @return the parameter type (never <code>null</code>)
+     */
+    public Type getGenericParameterType() {
+        if (this.genericParameterType == null) {
+            if (this.parameterIndex < 0) {
+                this.genericParameterType = (this.method != null ? this.method.getGenericReturnType() : null);
+            }
+            else {
+                this.genericParameterType = (this.method != null ?
+                        this.method.getGenericParameterTypes()[this.parameterIndex] :
+                        this.constructor.getGenericParameterTypes()[this.parameterIndex]);
+            }
+        }
+        return this.genericParameterType;
+    }
+
+    public Class<?> getNestedParameterType() {
+        if (this.nestingLevel > 1) {
+            Type type = getGenericParameterType();
+            if (type instanceof ParameterizedType) {
+                Integer index = getTypeIndexForCurrentLevel();
+                Type arg = ((ParameterizedType) type).getActualTypeArguments()[index != null ? index : 0];
+                if (arg instanceof Class) {
+                    return (Class) arg;
+                }
+                else if (arg instanceof ParameterizedType) {
+                    arg = ((ParameterizedType) arg).getRawType();
+                    if (arg instanceof Class) {
+                        return (Class) arg;
+                    }
+                }
+            }
+            return Object.class;
+        }
+        else {
+            return getParameterType();
+        }
     }
 
     /**
      * Return the annotations associated with the target method/constructor itself.
      */
     public Annotation[] getMethodAnnotations() {
-        return (this.method != null ? this.method.getAnnotations() : this.constructor.getAnnotations());
+        return getAnnotatedElement().getAnnotations();
+    }
+
+    /**
+     * Return the method/constructor annotation of the given type, if available.
+     * @param annotationType the annotation type to look for
+     * @return the annotation object, or <code>null</code> if not found
+     */
+    public <T extends Annotation> T getMethodAnnotation(Class<T> annotationType) {
+        return getAnnotatedElement().getAnnotation(annotationType);
     }
 
     /**
@@ -193,6 +268,36 @@ public class MethodParameter {
             }
         }
         return this.parameterAnnotations;
+    }
+
+    /**
+     * Return the parameter annotation of the given type, if available.
+     * @param annotationType the annotation type to look for
+     * @return the annotation object, or <code>null</code> if not found
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Annotation> T getParameterAnnotation(Class<T> annotationType) {
+        Annotation[] anns = getParameterAnnotations();
+        for (Annotation ann : anns) {
+            if (annotationType.isInstance(ann)) {
+                return (T) ann;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return true if the parameter has at least one annotation, false if it has none.
+     */
+    public boolean hasParameterAnnotations() {
+        return (getParameterAnnotations().length != 0);
+    }
+
+    /**
+     * Return true if the parameter has the given annotation type, and false if it doesn't.
+     */
+    public <T extends Annotation> boolean hasParameterAnnotation(Class<T> annotationType) {
+        return (getParameterAnnotation(annotationType) != null);
     }
 
     /**
@@ -238,7 +343,7 @@ public class MethodParameter {
      * @see #getNestingLevel()
      */
     public void decreaseNestingLevel() {
-        getTypeIndexesPerLevel().remove(new Integer(this.nestingLevel));
+        getTypeIndexesPerLevel().remove(this.nestingLevel);
         this.nestingLevel--;
     }
 
@@ -258,7 +363,7 @@ public class MethodParameter {
      * @see #getNestingLevel()
      */
     public void setTypeIndexForCurrentLevel(int typeIndex) {
-        getTypeIndexesPerLevel().put(new Integer(this.nestingLevel), new Integer(typeIndex));
+        getTypeIndexesPerLevel().put(this.nestingLevel, typeIndex);
     }
 
     /**
@@ -278,17 +383,49 @@ public class MethodParameter {
      * if none specified (indicating the default type index)
      */
     public Integer getTypeIndexForLevel(int nestingLevel) {
-        return (Integer) getTypeIndexesPerLevel().get(new Integer(nestingLevel));
+        return getTypeIndexesPerLevel().get(nestingLevel);
     }
 
     /**
      * Obtain the (lazily constructed) type-indexes-per-level Map.
      */
-    private Map getTypeIndexesPerLevel() {
+    private Map<Integer, Integer> getTypeIndexesPerLevel() {
         if (this.typeIndexesPerLevel == null) {
-            this.typeIndexesPerLevel = new HashMap(4);
+            this.typeIndexesPerLevel = new HashMap<Integer, Integer>(4);
         }
         return this.typeIndexesPerLevel;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj != null && obj instanceof MethodParameter) {
+            MethodParameter other = (MethodParameter) obj;
+
+            if (this.parameterIndex != other.parameterIndex) {
+                return false;
+            }
+            else if (this.getMember().equals(other.getMember())) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.hash;
+        if (result == 0) {
+            result = getMember().hashCode();
+            result = 31 * result + this.parameterIndex;
+            this.hash = result;
+        }
+        return result;
     }
 
 
@@ -312,6 +449,5 @@ public class MethodParameter {
                     "Given object [" + methodOrConstructor + "] is neither a Method nor a Constructor");
         }
     }
-
 }
 

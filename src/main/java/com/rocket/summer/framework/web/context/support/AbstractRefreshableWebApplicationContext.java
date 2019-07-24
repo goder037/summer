@@ -2,9 +2,12 @@ package com.rocket.summer.framework.web.context.support;
 
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.context.support.AbstractRefreshableConfigApplicationContext;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
+import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext;
+import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
 import com.rocket.summer.framework.web.context.ServletConfigAware;
 import com.rocket.summer.framework.web.context.ServletContextAware;
 import com.rocket.summer.framework.web.ui.context.Theme;
@@ -155,6 +158,16 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 
     public Theme getTheme(String themeName) {
         return this.themeSource.getTheme(themeName);
+    }
+
+
+    @Override
+    public ConfigurableWebEnvironment getEnvironment() {
+        ConfigurableEnvironment env = super.getEnvironment();
+        Assert.isInstanceOf(ConfigurableWebEnvironment.class, env,
+                "ConfigurableWebApplicationContext environment must be of type " +
+                        "ConfigurableWebEnvironment");
+        return (ConfigurableWebEnvironment) env;
     }
 
 }

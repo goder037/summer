@@ -3,6 +3,7 @@ package com.rocket.summer.framework.context;
 import com.rocket.summer.framework.beans.factory.ListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.HierarchicalBeanFactory;
 import com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory;
+import com.rocket.summer.framework.core.env.EnvironmentCapable;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
 /**
  * Central interface to provide configuration for an application.
@@ -36,7 +37,7 @@ import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
  */
-public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory,
+public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
 	
 	/**

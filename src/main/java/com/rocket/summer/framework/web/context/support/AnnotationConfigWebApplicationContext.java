@@ -5,7 +5,10 @@ import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
 import com.rocket.summer.framework.context.annotation.AnnotatedBeanDefinitionReader;
 import com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner;
+import com.rocket.summer.framework.context.annotation.Configuration;
 import com.rocket.summer.framework.context.annotation.ScopeMetadataResolver;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
 
 /**
  * {@link org.springframework.web.context.WebApplicationContext} implementation
@@ -40,6 +43,14 @@ import com.rocket.summer.framework.context.annotation.ScopeMetadataResolver;
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWebApplicationContext {
+
+    private Class<?>[] annotatedClasses;
+
+    private String[] basePackages;
+
+    private BeanNameGenerator beanNameGenerator;
+
+    private ScopeMetadataResolver scopeMetadataResolver;
 
     /**
      * Register a {@link BeanDefinition} for each class specified by {@link #getConfigLocations()},
@@ -117,6 +128,30 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
     protected ScopeMetadataResolver getScopeMetadataResolver() {
         return null;
     }
+
+    /**
+     * Register one or more annotated classes to be processed.
+     * Note that {@link #refresh()} must be called in order for the context to fully
+     * process the new class.
+     * <p>Calls to {@link #register} are idempotent; adding the same
+     * annotated class more than once has no additional effect.
+     * @param annotatedClasses one or more annotated classes,
+     * e.g. {@link Configuration @Configuration} classes
+     * @see #scan(String...)
+     * @see #loadBeanDefinitions(DefaultListableBeanFactory)
+     * @see #setConfigLocation(String)
+     * @see #refresh()
+     */
+    public void register(Class<?>... annotatedClasses) {
+        Assert.notEmpty(annotatedClasses, "At least one annotated class must be specified");
+        this.annotatedClasses = annotatedClasses;
+    }
+
+    @Override
+    public ConfigurableWebEnvironment getEnvironment() {
+        return null;
+    }
+
 
 }
 

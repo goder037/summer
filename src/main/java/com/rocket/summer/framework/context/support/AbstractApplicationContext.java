@@ -28,6 +28,7 @@ import com.rocket.summer.framework.core.JdkVersion;
 import com.rocket.summer.framework.core.OrderComparator;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.PriorityOrdered;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.core.io.DefaultResourceLoader;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
@@ -148,6 +149,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     /** Statically specified listeners */
     private List applicationListeners = new ArrayList();
 
+    /** Environment used by this context; initialized by {@link #createEnvironment()} */
+    private ConfigurableEnvironment environment;
+
 
     /**
      * Create a new AbstractApplicationContext with no parent.
@@ -163,6 +167,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     public AbstractApplicationContext(ApplicationContext parent) {
         this.parent = parent;
         this.resourcePatternResolver = getResourcePatternResolver();
+    }
+
+    public ConfigurableEnvironment getEnvironment() {
+        return this.environment;
     }
 
 

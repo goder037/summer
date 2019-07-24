@@ -33,6 +33,19 @@ public abstract class CollectionUtils {
     }
 
     /**
+     * Marshal the elements from the given enumeration into an array of the given type.
+     * Enumeration elements must be assignable to the type of the given array. The array
+     * returned will be a different instance than the array given.
+     */
+    public static <A,E extends A> A[] toArray(Enumeration<E> enumeration, A[] array) {
+        ArrayList<A> elements = new ArrayList<A>();
+        while (enumeration.hasMoreElements()) {
+            elements.add(enumeration.nextElement());
+        }
+        return elements.toArray(array);
+    }
+
+    /**
      * Iterator wrapping an Enumeration.
      */
     private static class EnumerationIterator<E> implements Iterator<E> {

@@ -57,17 +57,17 @@ public abstract class ReflectionUtils {
         return invokeMethod(method, target, null);
     }
 
-    /**
-     * Invoke the specified {@link Method} against the supplied target object
-     * with the supplied arguments. The target object can be <code>null</code>
-     * when invoking a static {@link Method}.
+      /**
+     * Invoke the specified {@link Method} against the supplied target object with the
+     * supplied arguments. The target object can be <code>null</code> when invoking a
+     * static {@link Method}.
      * <p>Thrown exceptions are handled via a call to {@link #handleReflectionException}.
      * @param method the method to invoke
      * @param target the target object to invoke the method on
      * @param args the invocation arguments (may be <code>null</code>)
      * @return the invocation result, if any
      */
-    public static Object invokeMethod(Method method, Object target, Object[] args) {
+    public static Object invokeMethod(Method method, Object target, Object... args) {
         try {
             return method.invoke(target, args);
         }

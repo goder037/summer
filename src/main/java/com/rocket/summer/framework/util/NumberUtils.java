@@ -37,74 +37,65 @@ public abstract class NumberUtils {
      * @see java.lang.Double
      * @see java.math.BigDecimal
      */
-    public static Number convertNumberToTargetClass(Number number, Class targetClass)
+    @SuppressWarnings("unchecked")
+    public static <T extends Number> T convertNumberToTargetClass(Number number, Class<T> targetClass)
             throws IllegalArgumentException {
 
         Assert.notNull(number, "Number must not be null");
         Assert.notNull(targetClass, "Target class must not be null");
 
         if (targetClass.isInstance(number)) {
-            return number;
+            return (T) number;
         }
         else if (targetClass.equals(Byte.class)) {
             long value = number.longValue();
             if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return new Byte(number.byteValue());
+            return (T) new Byte(number.byteValue());
         }
         else if (targetClass.equals(Short.class)) {
             long value = number.longValue();
             if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return new Short(number.shortValue());
+            return (T) new Short(number.shortValue());
         }
         else if (targetClass.equals(Integer.class)) {
             long value = number.longValue();
             if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return new Integer(number.intValue());
+            return (T) new Integer(number.intValue());
         }
         else if (targetClass.equals(Long.class)) {
-            return new Long(number.longValue());
+            return (T) new Long(number.longValue());
         }
         else if (targetClass.equals(BigInteger.class)) {
             if (number instanceof BigDecimal) {
                 // do not lose precision - use BigDecimal's own conversion
-                return ((BigDecimal) number).toBigInteger();
+                return (T) ((BigDecimal) number).toBigInteger();
             }
             else {
                 // original value is not a Big* number - use standard long conversion
-                return BigInteger.valueOf(number.longValue());
+                return (T) BigInteger.valueOf(number.longValue());
             }
         }
         else if (targetClass.equals(Float.class)) {
-            return new Float(number.floatValue());
+            return (T) new Float(number.floatValue());
         }
         else if (targetClass.equals(Double.class)) {
-            return new Double(number.doubleValue());
+            return (T) new Double(number.doubleValue());
         }
         else if (targetClass.equals(BigDecimal.class)) {
             // always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
             // (see BigDecimal javadoc for details)
-            return new BigDecimal(number.toString());
+            return (T) new BigDecimal(number.toString());
         }
         else {
             throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
                     number.getClass().getName() + "] to unknown target class [" + targetClass.getName() + "]");
         }
-    }
-
-    /**
-     * Raise an overflow exception for the given number and target class.
-     * @param number the number we tried to convert
-     * @param targetClass the target class we tried to convert to
-     */
-    private static void raiseOverflowException(Number number, Class targetClass) {
-        throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
-                number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
     }
 
     /**
@@ -126,39 +117,50 @@ public abstract class NumberUtils {
      * @see java.lang.Double#valueOf
      * @see java.math.BigDecimal#BigDecimal(String)
      */
-    public static Number parseNumber(String text, Class targetClass) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Number> T parseNumber(String text, Class<T> targetClass) {
         Assert.notNull(text, "Text must not be null");
         Assert.notNull(targetClass, "Target class must not be null");
         String trimmed = StringUtils.trimAllWhitespace(text);
 
         if (targetClass.equals(Byte.class)) {
-            return (isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
+            return (T) (isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
         }
         else if (targetClass.equals(Short.class)) {
-            return (isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
+            return (T) (isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
         }
         else if (targetClass.equals(Integer.class)) {
-            return (isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
+            return (T) (isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
         }
         else if (targetClass.equals(Long.class)) {
-            return (isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
+            return (T) (isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
         }
         else if (targetClass.equals(BigInteger.class)) {
-            return (isHexNumber(trimmed) ? decodeBigInteger(trimmed) : new BigInteger(trimmed));
+            return (T) (isHexNumber(trimmed) ? decodeBigInteger(trimmed) : new BigInteger(trimmed));
         }
         else if (targetClass.equals(Float.class)) {
-            return Float.valueOf(trimmed);
+            return (T) Float.valueOf(trimmed);
         }
         else if (targetClass.equals(Double.class)) {
-            return Double.valueOf(trimmed);
+            return (T) Double.valueOf(trimmed);
         }
         else if (targetClass.equals(BigDecimal.class) || targetClass.equals(Number.class)) {
-            return new BigDecimal(trimmed);
+            return (T) new BigDecimal(trimmed);
         }
         else {
             throw new IllegalArgumentException(
                     "Cannot convert String [" + text + "] to target class [" + targetClass.getName() + "]");
         }
+    }
+
+    /**
+     * Raise an overflow exception for the given number and target class.
+     * @param number the number we tried to convert
+     * @param targetClass the target class we tried to convert to
+     */
+    private static void raiseOverflowException(Number number, Class targetClass) {
+        throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
+                number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
     }
 
     /**
