@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans;
 
 import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.core.convert.TypeDescriptor;
 
 import java.util.Map;
 
@@ -71,6 +72,18 @@ public interface PropertyAccessor {
      * accessor method failed
      */
     Class getPropertyType(String propertyName) throws BeansException;
+
+    /**
+     * Return a type descriptor for the specified property:
+     * preferably from the read method, falling back to the write method.
+     * @param propertyName the property to check
+     * (may be a nested path and/or an indexed/mapped property)
+     * @return the property type for the particular property,
+     * or <code>null</code> if not determinable
+     * @throws InvalidPropertyException if there is no such property or
+     * if the property isn't readable
+     */
+    TypeDescriptor getPropertyTypeDescriptor(String propertyName) throws BeansException;
 
     /**
      * Get the current value of the specified property.

@@ -37,6 +37,13 @@ public interface Resource extends InputStreamSource {
     boolean exists();
 
     /**
+     * Determine the content length for this resource.
+     * @throws IOException if the resource cannot be resolved
+     * (in the file system or as some other known physical resource type)
+     */
+    long contentLength() throws IOException;
+
+    /**
      * Return whether the contents of this resource can be read,
      * e.g. via {@link #getInputStream()} or {@link #getFile()}.
      * <p>Will be <code>true</code> for typical resource descriptors;

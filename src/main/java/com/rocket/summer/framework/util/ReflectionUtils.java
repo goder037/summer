@@ -425,7 +425,6 @@ public abstract class ReflectionUtils {
         void doWith(Field field) throws IllegalArgumentException, IllegalAccessException;
     }
 
-
     /**
      * Callback optionally used to filter fields to be operated on by a field callback.
      */
@@ -437,5 +436,16 @@ public abstract class ReflectionUtils {
          */
         boolean matches(Field field);
     }
+
+    /**
+     * Pre-built MethodFilter that matches all non-bridge methods
+     * which are not declared on <code>java.lang.Object</code>.
+     */
+    public static MethodFilter USER_DECLARED_METHODS = new MethodFilter() {
+
+        public boolean matches(Method method) {
+            return (!method.isBridge() && method.getDeclaringClass() != Object.class);
+        }
+    };
 
 }

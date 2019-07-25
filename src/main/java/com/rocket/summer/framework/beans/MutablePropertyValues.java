@@ -91,6 +91,17 @@ public class MutablePropertyValues implements PropertyValues, Serializable {
         this.propertyValueList = (propertyValueList != null ? propertyValueList : new ArrayList());
     }
 
+    /**
+     * Add a PropertyValue object, replacing any existing one for the
+     * corresponding property or getting merged with it (if applicable).
+     * @param propertyName name of the property
+     * @param propertyValue value of the property
+     * @return this in order to allow for adding multiple property values in a chain
+     */
+    public MutablePropertyValues add(String propertyName, Object propertyValue) {
+        addPropertyValue(new PropertyValue(propertyName, propertyValue));
+        return this;
+    }
 
     /**
      * Return the underlying List of PropertyValue objects in its raw form.

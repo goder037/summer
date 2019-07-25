@@ -17,9 +17,6 @@ import java.beans.PropertyDescriptor;
  *
  * <p>This interface supports <b>nested properties</b> enabling the setting
  * of properties on subproperties to an unlimited depth.
- * A <code>BeanWrapper</code> instance can be used repeatedly, with its
- * {@link #setWrappedInstance(Object) target object} (the wrapped JavaBean
- * instance) changing as required.
  *
  * <p>A BeanWrapper's default for the "extractOldValueForEditor" setting
  * is "false", to avoid side effects caused by getter method invocations.
@@ -28,7 +25,6 @@ import java.beans.PropertyDescriptor;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 13 April 2001
- * @see #setExtractOldValueForEditor
  * @see PropertyAccessor
  * @see PropertyEditorRegistry
  * @see PropertyAccessorFactory#forBeanPropertyAccess
@@ -37,14 +33,6 @@ import java.beans.PropertyDescriptor;
  * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
  */
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
-
-    /**
-     * Change the wrapped JavaBean object.
-     * @param obj the bean instance to wrap
-     * @deprecated as of Spring 2.5,
-     * in favor of recreating a BeanWrapper per target instance
-     */
-    void setWrappedInstance(Object obj);
 
     /**
      * Return the bean instance wrapped by this object, if any.
@@ -74,7 +62,31 @@ public interface BeanWrapper extends ConfigurablePropertyAccessor {
      * @return the property descriptor for the specified property
      * @throws InvalidPropertyException if there is no such property
      */
-    PropertyDescriptor getPropertyDescriptor(String propertyName) throws BeansException;
+    PropertyDescriptor getPropertyDescriptor(String propertyName) throws InvalidPropertyException;
+
+    /**
+     * Set whether this BeanWrapper should attempt to "auto-grow" a nested path that contains a null value.
+     * <p>If "true", a null path location will be populated with a default object value and traversed
+     * instead of resulting in a {@link NullValueInNestedPathException}. Turning this flag on also
+     * enables auto-growth of collection elements when accessing an out-of-bounds index.
+     * <p>Default is "false" on a plain BeanWrapper.
+     */
+    void setAutoGrowNestedPaths(boolean autoGrowNestedPaths);
+
+    /**
+     * Return whether "auto-growing" of nested paths has been activated.
+     */
+    boolean isAutoGrowNestedPaths();
+
+    /**
+     * Specify a limit for array and collection auto-growing.
+     * <p>Default is unlimited on a plain BeanWrapper.
+     */
+    void setAutoGrowCollectionLimit(int autoGrowCollectionLimit);
+
+    /**
+     * Return the limit for array and collection auto-growing.
+     */
+    int getAutoGrowCollectionLimit();
 
 }
-

@@ -66,6 +66,27 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Determine whether the given class has a method with the given signature,
+     * and return it if available (else return <code>null</code>).
+     * <p>Essentially translates <code>NoSuchMethodException</code> to <code>null</code>.
+     * @param clazz	the clazz to analyze
+     * @param methodName the name of the method
+     * @param paramTypes the parameter types of the method
+     * @return the method, or <code>null</code> if not found
+     * @see java.lang.Class#getMethod
+     */
+    public static Method getMethodIfAvailable(Class<?> clazz, String methodName, Class<?>... paramTypes) {
+        Assert.notNull(clazz, "Class must not be null");
+        Assert.notNull(methodName, "Method name must not be null");
+        try {
+            return clazz.getMethod(methodName, paramTypes);
+        }
+        catch (NoSuchMethodException ex) {
+            return null;
+        }
+    }
+
+    /**
      * Return a descriptive name for the given object's type: usually simply
      * the class name, but component type class name + "[]" for arrays,
      * and an appended list of implemented interfaces for JDK proxies.
@@ -115,6 +136,19 @@ public abstract class ClassUtils {
         catch (NoSuchMethodException ex) {
             return null;
         }
+    }
+
+    /**
+     * Determine the name of the class file, relative to the containing
+     * package: e.g. "String.class"
+     * @param clazz the class
+     * @return the file name of the ".class" file
+     */
+    public static String getClassFileName(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        String className = clazz.getName();
+        int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
+        return className.substring(lastDotIndex + 1) + CLASS_FILE_SUFFIX;
     }
 
     /**
@@ -193,27 +227,6 @@ public abstract class ClassUtils {
         }
         else {
             return clazz.getName();
-        }
-    }
-
-    /**
-     * Determine whether the given class has a method with the given signature,
-     * and return it if available (else return <code>null</code>).
-     * <p>Essentially translates <code>NoSuchMethodException</code> to <code>null</code>.
-     * @param clazz	the clazz to analyze
-     * @param methodName the name of the method
-     * @param paramTypes the parameter types of the method
-     * @return the method, or <code>null</code> if not found
-     * @see Class#getMethod
-     */
-    public static Method getMethodIfAvailable(Class clazz, String methodName, Class[] paramTypes) {
-        Assert.notNull(clazz, "Class must not be null");
-        Assert.notNull(methodName, "Method name must not be null");
-        try {
-            return clazz.getMethod(methodName, paramTypes);
-        }
-        catch (NoSuchMethodException ex) {
-            return null;
         }
     }
 

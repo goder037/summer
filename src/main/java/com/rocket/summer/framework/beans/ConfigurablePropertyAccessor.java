@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.beans;
 
+import com.rocket.summer.framework.core.convert.ConversionService;
+
 /**
  * Interface that encapsulates configuration methods for a PropertyAccessor.
  * Also extends the PropertyEditorRegistry interface, which defines methods
@@ -12,6 +14,17 @@ package com.rocket.summer.framework.beans;
  * @see BeanWrapper
  */
 public interface ConfigurablePropertyAccessor extends PropertyAccessor, PropertyEditorRegistry, TypeConverter {
+
+    /**
+     * Specify a Spring 3.0 ConversionService to use for converting
+     * property values, as an alternative to JavaBeans PropertyEditors.
+     */
+    void setConversionService(ConversionService conversionService);
+
+    /**
+     * Return the associated ConversionService, if any.
+     */
+    ConversionService getConversionService();
 
     /**
      * Set whether to extract the old property value when applying a

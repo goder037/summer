@@ -110,11 +110,31 @@ public class DispatcherServlet extends FrameworkServlet {
     public static final String THEME_RESOLVER_BEAN_NAME = "themeResolver";
 
     /**
+     * Name of request attribute that holds a read-only {@code Map<String,?>}
+     * with "input" flash attributes saved by a previous request, if any.
+     * @see org.springframework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
+     */
+    public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
+
+    /**
+     * Name of request attribute that holds the "output" {@link FlashMap} with
+     * attributes to save for a subsequent request.
+     * @see org.springframework.web.servlet.support.RequestContextUtils#getOutputFlashMap(HttpServletRequest)
+     */
+    public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
+
+    /**
      * Well-known name for the HandlerMapping object in the bean factory for this namespace.
      * Only used when "detectAllHandlerMappings" is turned off.
      * @see #setDetectAllHandlerMappings
      */
     public static final String HANDLER_MAPPING_BEAN_NAME = "handlerMapping";
+
+    /**
+     * Name of request attribute that holds the {@link FlashMapManager}.
+     * @see org.springframework.web.servlet.support.RequestContextUtils#getFlashMapManager(HttpServletRequest)
+     */
+    public static final String FLASH_MAP_MANAGER_ATTRIBUTE = DispatcherServlet.class.getName() + ".FLASH_MAP_MANAGER";
 
     /**
      * Well-known name for the HandlerAdapter object in the bean factory for this namespace.
