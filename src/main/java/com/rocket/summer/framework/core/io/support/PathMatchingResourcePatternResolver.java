@@ -283,12 +283,11 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
         String subPattern = locationPattern.substring(rootDirPath.length());
         Resource[] rootDirResources = getResources(rootDirPath);
         Set result = new LinkedHashSet(16);
-        for (int i = 0; i < rootDirResources.length; i++) {
-            Resource rootDirResource = resolveRootDirResource(rootDirResources[i]);
+        for (Resource dirResource : rootDirResources) {
+            Resource rootDirResource = resolveRootDirResource(dirResource);
             if (isJarResource(rootDirResource)) {
                 result.addAll(doFindPathMatchingJarResources(rootDirResource, subPattern));
-            }
-            else {
+            } else {
                 result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));
             }
         }
@@ -373,8 +372,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
         }
         Set matchingFiles = retrieveMatchingFiles(rootDir, subPattern);
         Set result = new LinkedHashSet(matchingFiles.size());
-        for (Iterator it = matchingFiles.iterator(); it.hasNext();) {
-            File file = (File) it.next();
+        for (Object matchingFile : matchingFiles) {
+            File file = (File) matchingFile;
             result.add(new FileSystemResource(file));
         }
         return result;
@@ -421,8 +420,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
         if (dirContents == null) {
             throw new IOException("Could not retrieve contents of directory [" + dir.getAbsolutePath() + "]");
         }
-        for (int i = 0; i < dirContents.length; i++) {
-            File content = dirContents[i];
+        for (File content : dirContents) {
             String currPath = StringUtils.replace(content.getAbsolutePath(), File.separator, "/");
             if (content.isDirectory() && getPathMatcher().matchStart(fullPattern, currPath + "/")) {
                 doRetrieveMatchingFiles(fullPattern, content, result);

@@ -260,8 +260,7 @@ public abstract class ReflectionUtils {
         Class searchType = clazz;
         while (!Object.class.equals(searchType) && searchType != null) {
             Method[] methods = (searchType.isInterface() ? searchType.getMethods() : searchType.getDeclaredMethods());
-            for (int i = 0; i < methods.length; i++) {
-                Method method = methods[i];
+            for (Method method : methods) {
                 if (name.equals(method.getName()) &&
                         (paramTypes == null || Arrays.equals(paramTypes, method.getParameterTypes()))) {
                     return method;
@@ -310,17 +309,16 @@ public abstract class ReflectionUtils {
         do {
             // Copy each field declared on this class unless it's static or file.
             Field[] fields = targetClass.getDeclaredFields();
-            for (int i = 0; i < fields.length; i++) {
+            for (Field field : fields) {
                 // Skip static and final fields.
-                if (ff != null && !ff.matches(fields[i])) {
+                if (ff != null && !ff.matches(field)) {
                     continue;
                 }
                 try {
-                    fc.doWith(fields[i]);
-                }
-                catch (IllegalAccessException ex) {
+                    fc.doWith(field);
+                } catch (IllegalAccessException ex) {
                     throw new IllegalStateException(
-                            "Shouldn't be illegal to access field '" + fields[i].getName() + "': " + ex);
+                            "Shouldn't be illegal to access field '" + field.getName() + "': " + ex);
                 }
             }
             targetClass = targetClass.getSuperclass();
@@ -370,16 +368,15 @@ public abstract class ReflectionUtils {
         // Keep backing up the inheritance hierarchy.
         do {
             Method[] methods = targetClass.getDeclaredMethods();
-            for (int i = 0; i < methods.length; i++) {
-                if (mf != null && !mf.matches(methods[i])) {
+            for (Method method : methods) {
+                if (mf != null && !mf.matches(method)) {
                     continue;
                 }
                 try {
-                    mc.doWith(methods[i]);
-                }
-                catch (IllegalAccessException ex) {
+                    mc.doWith(method);
+                } catch (IllegalAccessException ex) {
                     throw new IllegalStateException(
-                            "Shouldn't be illegal to access method '" + methods[i].getName() + "': " + ex);
+                            "Shouldn't be illegal to access method '" + method.getName() + "': " + ex);
                 }
             }
             targetClass = targetClass.getSuperclass();

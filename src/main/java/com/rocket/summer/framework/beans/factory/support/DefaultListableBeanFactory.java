@@ -149,8 +149,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
         // Check singletons too, to catch manually registered singletons.
         String[] singletonNames = getSingletonNames();
-        for (int i = 0; i < singletonNames.length; i++) {
-            String beanName = singletonNames[i];
+        for (String singletonName : singletonNames) {
+            String beanName = singletonName;
             // Only check if manually registered.
             if (!containsBeanDefinition(beanName)) {
                 // In case of FactoryBean, match object created by FactoryBean.
@@ -219,12 +219,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
         String[] beanNames = getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
         Map result = new LinkedHashMap(beanNames.length);
-        for (int i = 0; i < beanNames.length; i++) {
-            String beanName = beanNames[i];
+        for (String beanName : beanNames) {
             try {
                 result.put(beanName, getBean(beanName));
-            }
-            catch (BeanCreationException ex) {
+            } catch (BeanCreationException ex) {
                 Throwable rootCause = ex.getMostSpecificCause();
                 if (rootCause instanceof BeanCurrentlyInCreationException) {
                     BeanCreationException bce = (BeanCreationException) rootCause;
@@ -582,8 +580,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                 }
             }
         }
-        for (int i = 0; i < candidateNames.length; i++) {
-            String candidateName = candidateNames[i];
+        for (String candidateName : candidateNames) {
             if (!candidateName.equals(beanName) && isAutowireCandidate(candidateName, descriptor)) {
                 result.put(candidateName, getBean(candidateName));
             }

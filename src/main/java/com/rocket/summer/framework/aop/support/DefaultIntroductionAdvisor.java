@@ -55,8 +55,8 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
             if (introducedInterfaces.length == 0) {
                 throw new IllegalArgumentException("IntroductionAdviceSupport implements no interfaces");
             }
-            for (int i = 0; i < introducedInterfaces.length; i++) {
-                addInterface(introducedInterfaces[i]);
+            for (Class introducedInterface : introducedInterfaces) {
+                addInterface(introducedInterface);
             }
         }
     }

@@ -1,7 +1,5 @@
 package com.rocket.summer.framework.beans;
 
-import com.rocket.summer.framework.context.BeansException;
-
 import java.beans.PropertyDescriptor;
 
 /**

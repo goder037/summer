@@ -61,8 +61,7 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
     protected void copyAttributesFrom(AttributeAccessor source) {
         Assert.notNull(source, "Source must not be null");
         String[] attributeNames = source.attributeNames();
-        for (int i = 0; i < attributeNames.length; i++) {
-            String attributeName = attributeNames[i];
+        for (String attributeName : attributeNames) {
             setAttribute(attributeName, source.getAttribute(attributeName));
         }
     }

@@ -31,7 +31,6 @@ import javax.xml.ws.WebServiceRef;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -185,36 +184,6 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
     public void setFallbackToDefaultTypeMatch(boolean fallbackToDefaultTypeMatch) {
         this.fallbackToDefaultTypeMatch = fallbackToDefaultTypeMatch;
     }
-
-    /**
-     * Set whether to always use JNDI lookups equivalent to standard Java EE 5 resource
-     * injection, <b>even for <code>name</code> attributes and default names</b>.
-     * <p>Default is "false": Resource names are used for Spring bean lookups in the
-     * containing BeanFactory; only <code>mappedName</code> attributes point directly
-     * into JNDI. Switch this flag to "true" for enforcing Java EE style JNDI lookups
-     * in any case, even for <code>name</code> attributes and default names.
-     * @see #setJndiFactory
-     * @see #setResourceFactory
-     */
-//    public void setAlwaysUseJndiLookup(boolean alwaysUseJndiLookup) {
-//        this.alwaysUseJndiLookup = alwaysUseJndiLookup;
-//    }
-
-    /**
-     * Specify the factory for objects to be injected into <code>@Resource</code> /
-     * <code>@WebServiceRef</code> / <code>@EJB</code> annotated fields and setter methods,
-     * <b>for <code>mappedName</code> attributes that point directly into JNDI</b>.
-     * This factory will also be used if "alwaysUseJndiLookup" is set to "true" in order
-     * to enforce JNDI lookups even for <code>name</code> attributes and default names.
-     * <p>The default is a {@link com.rocket.summer.framework.jndi.support.SimpleJndiBeanFactory}
-     * for JNDI lookup behavior equivalent to standard Java EE 5 resource injection.
-     * @see #setResourceFactory
-     * @see #setAlwaysUseJndiLookup
-     */
-//    public void setJndiFactory(BeanFactory jndiFactory) {
-//        Assert.notNull(jndiFactory, "BeanFactory must not be null");
-//        this.jndiFactory = jndiFactory;
-//    }
 
     /**
      * Specify the factory for objects to be injected into <code>@Resource</code> /
@@ -596,66 +565,6 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
             return service.getPort(this.elementType);
         }
     }
-
-
-    /**
-     * Class representing injection information about an annotated field
-     * or setter method, supporting the @EJB annotation.
-     */
-//    private class EjbRefElement extends LookupElement {
-//
-//        private String beanName;
-//
-//        public EjbRefElement(Member member, PropertyDescriptor pd) {
-//            super(member, pd);
-//        }
-//
-//        protected void initAnnotation(AnnotatedElement ae) {
-//            EJB resource = ae.getAnnotation(EJB.class);
-//            String resourceBeanName = resource.beanName();
-//            String resourceName = resource.name();
-//            this.isDefaultName = !StringUtils.hasLength(resourceName);
-//            if (this.isDefaultName) {
-//                resourceName = this.member.getName();
-//                if (this.member instanceof Method && resourceName.startsWith("set") && resourceName.length() > 3) {
-//                    resourceName = Introspector.decapitalize(resourceName.substring(3));
-//                }
-//            }
-//            Class resourceType = resource.beanInterface();
-//            if (resourceType != null && !Object.class.equals(resourceType)) {
-//                checkResourceType(resourceType);
-//            }
-//            else {
-//                // No resource type specified... check field/method.
-//                resourceType = getResourceType();
-//            }
-//            this.beanName = resourceBeanName;
-//            this.name = resourceName;
-//            this.lookupType = resourceType;
-//            this.mappedName = resource.mappedName();
-//        }
-//
-//        @Override
-//        protected Object getResourceToInject(Object target, String requestingBeanName) {
-//            if (StringUtils.hasLength(this.beanName)) {
-//                if (beanFactory != null && beanFactory.containsBean(this.beanName)) {
-//                    // Local match found for explicitly specified local bean name.
-//                    Object bean = beanFactory.getBean(this.beanName, this.lookupType);
-//                    if (beanFactory instanceof ConfigurableBeanFactory) {
-//                        ((ConfigurableBeanFactory) beanFactory).registerDependentBean(this.beanName, requestingBeanName);
-//                    }
-//                    return bean;
-//                }
-//                else if (this.isDefaultName && !StringUtils.hasLength(this.mappedName)) {
-//                    throw new NoSuchBeanDefinitionException(this.beanName,
-//                            "Cannot resolve 'beanName' in local BeanFactory. Consider specifying a general 'name' value instead.");
-//                }
-//            }
-//            // JNDI name lookup - may still go to a local BeanFactory.
-//            return getResource(this, requestingBeanName);
-//        }
-//    }
-
 
     /**
      * Extension of the DependencyDescriptor class,

@@ -5,7 +5,6 @@ import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextException;
 import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
-import com.rocket.summer.framework.context.event.ApplicationEvent;
 import com.rocket.summer.framework.context.event.ContextRefreshedEvent;
 import com.rocket.summer.framework.context.event.SourceFilteringListener;
 import com.rocket.summer.framework.context.i18n.LocaleContext;

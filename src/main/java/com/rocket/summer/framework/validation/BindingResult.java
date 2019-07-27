@@ -56,8 +56,6 @@ public interface BindingResult extends Errors {
      * @see #getObjectName()
      * @see #MODEL_KEY_PREFIX
      * @see com.rocket.summer.framework.web.servlet.ModelAndView
-     * @see com.rocket.summer.framework.web.servlet.tags.BindTag
-     * @see com.rocket.summer.framework.web.servlet.mvc.SimpleFormController
      */
     Map<String, Object> getModel();
 

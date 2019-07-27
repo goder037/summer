@@ -51,27 +51,24 @@ public abstract class AbstractPropertyAccessor extends PropertyEditorRegistrySup
         List propertyAccessExceptions = null;
         List propertyValues = (pvs instanceof MutablePropertyValues ?
                 ((MutablePropertyValues) pvs).getPropertyValueList() : Arrays.asList(pvs.getPropertyValues()));
-        for (Iterator it = propertyValues.iterator(); it.hasNext();) {
-            PropertyValue pv = (PropertyValue) it.next();
+        for (Object propertyValue : propertyValues) {
+            PropertyValue pv = (PropertyValue) propertyValue;
             try {
                 // This method may throw any BeansException, which won't be caught
                 // here, if there is a critical failure such as no matching field.
                 // We can attempt to deal only with less serious exceptions.
                 setPropertyValue(pv);
-            }
-            catch (NotWritablePropertyException ex) {
+            } catch (NotWritablePropertyException ex) {
                 if (!ignoreUnknown) {
                     throw ex;
                 }
                 // Otherwise, just ignore it and continue...
-            }
-            catch (NullValueInNestedPathException ex) {
+            } catch (NullValueInNestedPathException ex) {
                 if (!ignoreInvalid) {
                     throw ex;
                 }
                 // Otherwise, just ignore it and continue...
-            }
-            catch (PropertyAccessException ex) {
+            } catch (PropertyAccessException ex) {
                 if (propertyAccessExceptions == null) {
                     propertyAccessExceptions = new LinkedList();
                 }

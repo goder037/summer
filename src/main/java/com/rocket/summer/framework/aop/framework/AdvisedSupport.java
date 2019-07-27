@@ -170,8 +170,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     public void setInterfaces(Class[] interfaces) {
         Assert.notNull(interfaces, "Interfaces must not be null");
         this.interfaces.clear();
-        for (int i = 0; i < interfaces.length; i++) {
-            addInterface(interfaces[i]);
+        for (Class anInterface : interfaces) {
+            addInterface(anInterface);
         }
     }
 
@@ -206,8 +206,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     }
 
     public boolean isInterfaceProxied(Class intf) {
-        for (Iterator it = this.interfaces.iterator(); it.hasNext();) {
-            Class proxyIntf = (Class) it.next();
+        for (Object anInterface : this.interfaces) {
+            Class proxyIntf = (Class) anInterface;
             if (intf.isAssignableFrom(proxyIntf)) {
                 return true;
             }
@@ -292,8 +292,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
             throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
         }
         if (!ObjectUtils.isEmpty(advisors)) {
-            for (int i = 0; i < advisors.length; i++) {
-                Advisor advisor = advisors[i];
+            for (Advisor advisor : advisors) {
                 if (advisor instanceof IntroductionAdvisor) {
                     validateIntroductionAdvisor((IntroductionAdvisor) advisor);
                 }
@@ -309,8 +308,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         advisor.validateInterfaces();
         // If the advisor passed validation, we can make the change.
         Class[] ifcs = advisor.getInterfaces();
-        for (int i = 0; i < ifcs.length; i++) {
-            addInterface(ifcs[i]);
+        for (Class ifc : ifcs) {
+            addInterface(ifc);
         }
     }
 
@@ -398,8 +397,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      */
     public boolean adviceIncluded(Advice advice) {
         Assert.notNull(advice, "Advice must not be null");
-        for (int i = 0; i < this.advisors.size(); i++) {
-            Advisor advisor = (Advisor) this.advisors.get(i);
+        for (Object o : this.advisors) {
+            Advisor advisor = (Advisor) o;
             if (advisor.getAdvice() == advice) {
                 return true;
             }
@@ -415,8 +414,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     public int countAdvicesOfType(Class adviceClass) {
         Assert.notNull(adviceClass, "Advice class must not be null");
         int count = 0;
-        for (int i = 0; i < this.advisors.size(); i++) {
-            Advisor advisor = (Advisor) this.advisors.get(i);
+        for (Object o : this.advisors) {
+            Advisor advisor = (Advisor) o;
             if (advisor.getAdvice() != null &&
                     adviceClass.isAssignableFrom(advisor.getAdvice().getClass())) {
                 count++;
@@ -474,8 +473,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         this.targetSource = targetSource;
         this.advisorChainFactory = other.advisorChainFactory;
         this.interfaces = new ArrayList(other.interfaces);
-        for (Iterator it = advisors.iterator(); it.hasNext();) {
-            Advisor advisor = (Advisor) it.next();
+        for (Object o : advisors) {
+            Advisor advisor = (Advisor) o;
             if (advisor instanceof IntroductionAdvisor) {
                 validateIntroductionAdvisor((IntroductionAdvisor) advisor);
             }

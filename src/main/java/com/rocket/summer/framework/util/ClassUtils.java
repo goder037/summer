@@ -29,7 +29,7 @@ public abstract class ClassUtils {
      * Map with primitive wrapper type as key and corresponding primitive
      * type as value, for example: Integer.class -> int.class.
      */
-    private static final Map primitiveWrapperTypeMap = new HashMap(8);
+    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap<Class<?>, Class<?>>(8);
 
     /**
      * Map with primitive type name as key and corresponding primitive

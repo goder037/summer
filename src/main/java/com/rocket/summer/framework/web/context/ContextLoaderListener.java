@@ -1,8 +1,5 @@
 package com.rocket.summer.framework.web.context;
 
-import com.rocket.summer.framework.context.ConfigurableApplicationContext;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

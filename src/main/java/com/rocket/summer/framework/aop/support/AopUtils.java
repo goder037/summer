@@ -176,13 +176,13 @@ public abstract class AopUtils {
 
         Set classes = new HashSet(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
         classes.add(targetClass);
-        for (Iterator it = classes.iterator(); it.hasNext();) {
-            Class clazz = (Class) it.next();
+        for (Object aClass : classes) {
+            Class clazz = (Class) aClass;
             Method[] methods = clazz.getMethods();
-            for (int j = 0; j < methods.length; j++) {
+            for (Method method : methods) {
                 if ((introductionAwareMethodMatcher != null &&
-                        introductionAwareMethodMatcher.matches(methods[j], targetClass, hasIntroductions)) ||
-                        methodMatcher.matches(methods[j], targetClass)) {
+                        introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions)) ||
+                        methodMatcher.matches(method, targetClass)) {
                     return true;
                 }
             }
@@ -240,15 +240,15 @@ public abstract class AopUtils {
             return candidateAdvisors;
         }
         List eligibleAdvisors = new LinkedList();
-        for (Iterator it = candidateAdvisors.iterator(); it.hasNext();) {
-            Advisor candidate = (Advisor) it.next();
+        for (Object candidateAdvisor : candidateAdvisors) {
+            Advisor candidate = (Advisor) candidateAdvisor;
             if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
                 eligibleAdvisors.add(candidate);
             }
         }
         boolean hasIntroductions = !eligibleAdvisors.isEmpty();
-        for (Iterator it = candidateAdvisors.iterator(); it.hasNext();) {
-            Advisor candidate = (Advisor) it.next();
+        for (Object candidateAdvisor : candidateAdvisors) {
+            Advisor candidate = (Advisor) candidateAdvisor;
             if (candidate instanceof IntroductionAdvisor) {
                 // already processed
                 continue;

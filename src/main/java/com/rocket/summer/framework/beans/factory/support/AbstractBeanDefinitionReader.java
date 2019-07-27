@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -119,8 +120,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     public int loadBeanDefinitions(Resource[] resources) throws BeanDefinitionStoreException {
         Assert.notNull(resources, "Resource array must not be null");
         int counter = 0;
-        for (int i = 0; i < resources.length; i++) {
-            counter += loadBeanDefinitions(resources[i]);
+        for (Resource resource : resources) {
+            counter += loadBeanDefinitions(resource);
         }
         return counter;
     }
@@ -157,9 +158,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
                 Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
                 int loadCount = loadBeanDefinitions(resources);
                 if (actualResources != null) {
-                    for (int i = 0; i < resources.length; i++) {
-                        actualResources.add(resources[i]);
-                    }
+                    Collections.addAll(actualResources, resources);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("Loaded " + loadCount + " bean definitions from location pattern [" + location + "]");
@@ -188,8 +187,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     public int loadBeanDefinitions(String[] locations) throws BeanDefinitionStoreException {
         Assert.notNull(locations, "Location array must not be null");
         int counter = 0;
-        for (int i = 0; i < locations.length; i++) {
-            counter += loadBeanDefinitions(locations[i]);
+        for (String location : locations) {
+            counter += loadBeanDefinitions(location);
         }
         return counter;
     }

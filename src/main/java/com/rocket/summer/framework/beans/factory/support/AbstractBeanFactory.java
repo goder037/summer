@@ -495,8 +495,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             aliases.add(fullBeanName);
         }
         String[] retrievedAliases = super.getAliases(beanName);
-        for (int i = 0; i < retrievedAliases.length; i++) {
-            String alias = (factoryPrefix ? FACTORY_BEAN_PREFIX : "") + retrievedAliases[i];
+        for (String retrievedAlias : retrievedAliases) {
+            String alias = (factoryPrefix ? FACTORY_BEAN_PREFIX : "") + retrievedAlias;
             if (!alias.equals(name)) {
                 aliases.add(alias);
             }
@@ -884,12 +884,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             registrySupport.useConfigValueEditors();
         }
         if (!this.propertyEditorRegistrars.isEmpty()) {
-            for (Iterator it = this.propertyEditorRegistrars.iterator(); it.hasNext();) {
-                PropertyEditorRegistrar registrar = (PropertyEditorRegistrar) it.next();
+            for (Object propertyEditorRegistrar : this.propertyEditorRegistrars) {
+                PropertyEditorRegistrar registrar = (PropertyEditorRegistrar) propertyEditorRegistrar;
                 try {
                     registrar.registerCustomEditors(registry);
-                }
-                catch (BeanCreationException ex) {
+                } catch (BeanCreationException ex) {
                     Throwable rootCause = ex.getMostSpecificCause();
                     if (rootCause instanceof BeanCurrentlyInCreationException) {
                         BeanCreationException bce = (BeanCreationException) rootCause;
@@ -908,8 +907,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             }
         }
         if (!this.customEditors.isEmpty()) {
-            for (Iterator it = this.customEditors.entrySet().iterator(); it.hasNext();) {
-                Map.Entry entry = (Map.Entry) it.next();
+            for (Object o : this.customEditors.entrySet()) {
+                Map.Entry entry = (Map.Entry) o;
                 Class requiredType = (Class) entry.getKey();
                 Object value = entry.getValue();
                 if (value instanceof PropertyEditor) {
@@ -918,16 +917,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
                     // to make it clear that it might be used concurrently.
                     if (registrySupport != null) {
                         registrySupport.registerSharedEditor(requiredType, editor);
-                    }
-                    else {
+                    } else {
                         registry.registerCustomEditor(requiredType, editor);
                     }
-                }
-                else if (value instanceof Class) {
+                } else if (value instanceof Class) {
                     Class editorClass = (Class) value;
                     registry.registerCustomEditor(requiredType, (PropertyEditor) BeanUtils.instantiateClass(editorClass));
-                }
-                else {
+                } else {
                     throw new IllegalStateException("Illegal custom editor value type: " + value.getClass().getName());
                 }
             }
@@ -1108,8 +1104,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
                 if (tempClassLoader != null) {
                     if (tempClassLoader instanceof DecoratingClassLoader) {
                         DecoratingClassLoader dcl = (DecoratingClassLoader) tempClassLoader;
-                        for (int i = 0; i < typesToMatch.length; i++) {
-                            dcl.excludeClass(typesToMatch[i].getName());
+                        for (Class toMatch : typesToMatch) {
+                            dcl.excludeClass(toMatch.getName());
                         }
                     }
                     String className = mbd.getBeanClassName();

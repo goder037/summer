@@ -258,15 +258,14 @@ public abstract class BeanUtils {
 
         Method targetMethod = null;
         int numMethodsFoundWithCurrentMinimumArgs = 0;
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].getName().equals(methodName)) {
-                int numParams = methods[i].getParameterTypes().length;
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) {
+                int numParams = method.getParameterTypes().length;
                 if (targetMethod == null ||
                         numParams < targetMethod.getParameterTypes().length) {
-                    targetMethod = methods[i];
+                    targetMethod = method;
                     numMethodsFoundWithCurrentMinimumArgs = 1;
-                }
-                else {
+                } else {
                     if (targetMethod.getParameterTypes().length == numParams) {
                         // Additional candidate with same length.
                         numMethodsFoundWithCurrentMinimumArgs++;

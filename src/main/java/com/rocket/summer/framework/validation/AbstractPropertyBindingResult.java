@@ -5,7 +5,6 @@ import com.rocket.summer.framework.beans.ConfigurablePropertyAccessor;
 import com.rocket.summer.framework.beans.PropertyAccessorUtils;
 import com.rocket.summer.framework.beans.PropertyEditorRegistry;
 import com.rocket.summer.framework.core.convert.ConversionService;
-import com.rocket.summer.framework.core.convert.TypeDescriptor;
 import com.rocket.summer.framework.util.Assert;
 
 import java.beans.PropertyEditor;
@@ -22,12 +21,9 @@ import java.beans.PropertyEditor;
  * @see com.rocket.summer.framework.beans.PropertyAccessor
  * @see com.rocket.summer.framework.beans.ConfigurablePropertyAccessor
  */
-@SuppressWarnings("serial")
 public abstract class AbstractPropertyBindingResult extends AbstractBindingResult {
 
     private ConversionService conversionService;
-
-
     /**
      * Create a new AbstractPropertyBindingResult instance.
      * @param objectName the name of the target object
@@ -37,6 +33,13 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
         super(objectName);
     }
 
+    public void initConversion(ConversionService conversionService) {
+        Assert.notNull(conversionService, "ConversionService must not be null");
+        this.conversionService = conversionService;
+        if (getTarget() != null) {
+            getPropertyAccessor().setConversionService(conversionService);
+        }
+    }
     /**
      * Provide the PropertyAccessor to work with, according to the
      * concrete strategy of access.
@@ -96,14 +99,6 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
             editor = BeanUtils.findEditorByConvention(targetType);
         }
         return editor;
-    }
-
-    public void initConversion(ConversionService conversionService) {
-        Assert.notNull(conversionService, "ConversionService must not be null");
-        this.conversionService = conversionService;
-        if (getTarget() != null) {
-            getPropertyAccessor().setConversionService(conversionService);
-        }
     }
 
 }

@@ -205,6 +205,20 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
     }
 
     /**
+     * Close this DataBinder, which may result in throwing
+     * a BindException if it encountered any errors.
+     * @return the model Map, containing target object and Errors instance
+     * @throws BindException if there were any errors in the bind operation
+     * @see BindingResult#getModel()
+     */
+    public Map<?, ?> close() throws BindException {
+        if (getBindingResult().hasErrors()) {
+            throw new BindException(getBindingResult());
+        }
+        return getBindingResult().getModel();
+    }
+
+    /**
      * Return the internal BindingResult held by this DataBinder,
      * as AbstractPropertyBindingResult.
      */

@@ -4,10 +4,8 @@ import com.rocket.summer.framework.core.io.DefaultResourceLoader;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.util.ClassUtils;
-import org.objectweb.asm.ClassReader;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Simple implementation of the {@link MetadataReaderFactory} interface,

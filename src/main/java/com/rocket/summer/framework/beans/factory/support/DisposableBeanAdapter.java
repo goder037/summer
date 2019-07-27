@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -102,8 +101,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
         List filteredPostProcessors = null;
         if (postProcessors != null && !postProcessors.isEmpty()) {
             filteredPostProcessors = new ArrayList(postProcessors.size());
-            for (Iterator it = postProcessors.iterator(); it.hasNext();) {
-                Object postProcessor = it.next();
+            for (Object postProcessor : postProcessors) {
                 if (postProcessor instanceof DestructionAwareBeanPostProcessor) {
                     filteredPostProcessors.add(postProcessor);
                 }
@@ -223,8 +221,7 @@ class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {
         List serializablePostProcessors = null;
         if (this.beanPostProcessors != null) {
             serializablePostProcessors = new ArrayList();
-            for (Iterator it = this.beanPostProcessors.iterator(); it.hasNext();) {
-                Object postProcessor = it.next();
+            for (Object postProcessor : this.beanPostProcessors) {
                 if (postProcessor instanceof Serializable) {
                     serializablePostProcessors.add(postProcessor);
                 }

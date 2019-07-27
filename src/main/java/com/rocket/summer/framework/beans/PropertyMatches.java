@@ -140,7 +140,7 @@ final class PropertyMatches {
         if (s2.length() == 0) {
             return s1.length();
         }
-        int d[][] = new int[s1.length() + 1][s2.length() + 1];
+        int[][] d = new int[s1.length() + 1][s2.length() + 1];
 
         for (int i = 0; i <= s1.length(); i++) {
             d[i][0] = i;

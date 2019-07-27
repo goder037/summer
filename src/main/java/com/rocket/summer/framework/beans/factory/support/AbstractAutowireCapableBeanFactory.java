@@ -295,8 +295,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throws BeansException {
 
         Object result = existingBean;
-        for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-            BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+        for (Object o : getBeanPostProcessors()) {
+            BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
             result = beanProcessor.postProcessBeforeInitialization(result, beanName);
         }
         return result;
@@ -306,8 +306,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throws BeansException {
 
         Object result = existingBean;
-        for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-            BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+        for (Object o : getBeanPostProcessors()) {
+            BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
             result = beanProcessor.postProcessAfterInitialization(result, beanName);
         }
         return result;
@@ -440,8 +440,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
                     String[] dependentBeans = getDependentBeans(beanName);
                     Set actualDependentBeans = new LinkedHashSet(dependentBeans.length);
-                    for (int i = 0; i < dependentBeans.length; i++) {
-                        String dependentBean = dependentBeans[i];
+                    for (String dependentBean : dependentBeans) {
                         if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
                             actualDependentBeans.add(dependentBean);
                         }
@@ -476,8 +475,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // Apply SmartInstantiationAwareBeanPostProcessors to predict the
         // eventual type after a before-instantiation shortcut.
         if (beanClass != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-            for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext(); ) {
-                BeanPostProcessor bp = (BeanPostProcessor) it.next();
+            for (Object o : getBeanPostProcessors()) {
+                BeanPostProcessor bp = (BeanPostProcessor) o;
                 if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
                     SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
                     Class processedType = ibp.predictBeanType(beanClass, beanName);
@@ -532,8 +531,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         int minNrOfArgs = mbd.getConstructorArgumentValues().getArgumentCount();
         Method[] candidates = ReflectionUtils.getAllDeclaredMethods(factoryClass);
         Set returnTypes = new HashSet(1);
-        for (int i = 0; i < candidates.length; i++) {
-            Method factoryMethod = candidates[i];
+        for (Method factoryMethod : candidates) {
             if (Modifier.isStatic(factoryMethod.getModifiers()) == isStatic &&
                     factoryMethod.getName().equals(mbd.getFactoryMethodName()) &&
                     factoryMethod.getParameterTypes().length >= minNrOfArgs) {
@@ -588,8 +586,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
         Object exposedObject = bean;
         if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-            for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext(); ) {
-                BeanPostProcessor bp = (BeanPostProcessor) it.next();
+            for (Object o : getBeanPostProcessors()) {
+                BeanPostProcessor bp = (BeanPostProcessor) o;
                 if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
                     SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
                     exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);
@@ -688,8 +686,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class beanType, String beanName)
             throws BeansException {
 
-        for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-            BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+        for (Object o : getBeanPostProcessors()) {
+            BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
             if (beanProcessor instanceof MergedBeanDefinitionPostProcessor) {
                 MergedBeanDefinitionPostProcessor bdp = (MergedBeanDefinitionPostProcessor) beanProcessor;
                 bdp.postProcessMergedBeanDefinition(mbd, beanType, beanName);
@@ -734,8 +732,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName)
             throws BeansException {
 
-        for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-            BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+        for (Object o : getBeanPostProcessors()) {
+            BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
             if (beanProcessor instanceof InstantiationAwareBeanPostProcessor) {
                 InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) beanProcessor;
                 Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
@@ -802,8 +800,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throws BeansException {
 
         if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
-            for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-                BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+            for (Object o : getBeanPostProcessors()) {
+                BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
                 if (beanProcessor instanceof SmartInstantiationAwareBeanPostProcessor) {
                     SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) beanProcessor;
                     Constructor[] ctors = ibp.determineCandidateConstructors(beanClass, beanName);
@@ -902,8 +900,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         boolean continueWithPropertyPopulation = true;
 
         if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-            for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext();) {
-                BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+            for (Object o : getBeanPostProcessors()) {
+                BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
                 if (beanProcessor instanceof InstantiationAwareBeanPostProcessor) {
                     InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) beanProcessor;
                     if (!ibp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {
@@ -941,8 +939,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         if (hasInstAwareBpps || needsDepCheck) {
             PropertyDescriptor[] filteredPds = filterPropertyDescriptorsForDependencyCheck(bw);
             if (hasInstAwareBpps) {
-                for (Iterator it = getBeanPostProcessors().iterator(); it.hasNext(); ) {
-                    BeanPostProcessor beanProcessor = (BeanPostProcessor) it.next();
+                for (Object o : getBeanPostProcessors()) {
+                    BeanPostProcessor beanProcessor = (BeanPostProcessor) o;
                     if (beanProcessor instanceof InstantiationAwareBeanPostProcessor) {
                         InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) beanProcessor;
                         pvs = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
@@ -973,8 +971,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
         String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
-        for (int i = 0; i < propertyNames.length; i++) {
-            String propertyName = propertyNames[i];
+        for (String propertyName : propertyNames) {
             if (containsBean(propertyName)) {
                 Object bean = getBean(propertyName);
                 pvs.addPropertyValue(propertyName, bean);
@@ -983,8 +980,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     logger.debug("Added autowiring by name from bean name '" + beanName +
                             "' via property '" + propertyName + "' to bean named '" + propertyName + "'");
                 }
-            }
-            else {
+            } else {
                 if (logger.isTraceEnabled()) {
                     logger.trace("Not autowiring property '" + propertyName + "' of bean '" + beanName +
                             "' by name: no matching bean found");
@@ -1014,8 +1010,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         Set autowiredBeanNames = new LinkedHashSet(4);
         String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
-        for (int i = 0; i < propertyNames.length; i++) {
-            String propertyName = propertyNames[i];
+        for (String propertyName : propertyNames) {
             try {
                 PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
                 MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
@@ -1027,8 +1022,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 if (autowiredArgument != null) {
                     pvs.addPropertyValue(propertyName, autowiredArgument);
                 }
-                for (Iterator it = autowiredBeanNames.iterator(); it.hasNext();) {
-                    String autowiredBeanName = (String) it.next();
+                for (Object name : autowiredBeanNames) {
+                    String autowiredBeanName = (String) name;
                     registerDependentBean(autowiredBeanName, beanName);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Autowiring by type from bean name '" + beanName + "' via property '" +
@@ -1036,8 +1031,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     }
                 }
                 autowiredBeanNames.clear();
-            }
-            catch (BeansException ex) {
+            } catch (BeansException ex) {
                 throw new UnsatisfiedDependencyException(mbd.getResourceDescription(), beanName, propertyName, ex);
             }
         }
@@ -1057,10 +1051,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Set result = new TreeSet();
         PropertyValues pvs = mbd.getPropertyValues();
         PropertyDescriptor[] pds = bw.getPropertyDescriptors();
-        for (int i = 0; i < pds.length; i++) {
-            if (pds[i].getWriteMethod() != null && !isExcludedFromDependencyCheck(pds[i]) &&
-                    !pvs.contains(pds[i].getName()) && !BeanUtils.isSimpleProperty(pds[i].getPropertyType())) {
-                result.add(pds[i].getName());
+        for (PropertyDescriptor pd : pds) {
+            if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) &&
+                    !pvs.contains(pd.getName()) && !BeanUtils.isSimpleProperty(pd.getPropertyType())) {
+                result.add(pd.getName());
             }
         }
         return StringUtils.toStringArray(result);
@@ -1124,15 +1118,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throws UnsatisfiedDependencyException {
 
         int dependencyCheck = mbd.getDependencyCheck();
-        for (int i = 0; i < pds.length; i++) {
-            if (pds[i].getWriteMethod() != null && !pvs.contains(pds[i].getName())) {
-                boolean isSimple = BeanUtils.isSimpleProperty(pds[i].getPropertyType());
+        for (PropertyDescriptor pd : pds) {
+            if (pd.getWriteMethod() != null && !pvs.contains(pd.getName())) {
+                boolean isSimple = BeanUtils.isSimpleProperty(pd.getPropertyType());
                 boolean unsatisfied = (dependencyCheck == RootBeanDefinition.DEPENDENCY_CHECK_ALL) ||
                         (isSimple && dependencyCheck == RootBeanDefinition.DEPENDENCY_CHECK_SIMPLE) ||
                         (!isSimple && dependencyCheck == RootBeanDefinition.DEPENDENCY_CHECK_OBJECTS);
                 if (unsatisfied) {
                     throw new UnsatisfiedDependencyException(
-                            mbd.getResourceDescription(), beanName, pds[i].getName(),
+                            mbd.getResourceDescription(), beanName, pd.getName(),
                             "Set this property value or disable dependency checking for this bean.");
                 }
             }
@@ -1184,12 +1178,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // Create a deep copy, resolving any references for values.
         List deepCopy = new ArrayList(original.size());
         boolean resolveNecessary = false;
-        for (Iterator it = original.iterator(); it.hasNext();) {
-            PropertyValue pv = (PropertyValue) it.next();
+        for (Object o : original) {
+            PropertyValue pv = (PropertyValue) o;
             if (pv.isConverted()) {
                 deepCopy.add(pv);
-            }
-            else {
+            } else {
                 String propertyName = pv.getName();
                 Object originalValue = pv.getValue();
                 Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
@@ -1206,12 +1199,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                         pv.setConvertedValue(convertedValue);
                     }
                     deepCopy.add(pv);
-                }
-                else if (originalValue instanceof TypedStringValue && convertible) {
+                } else if (originalValue instanceof TypedStringValue && convertible) {
                     pv.setConvertedValue(convertedValue);
                     deepCopy.add(pv);
-                }
-                else {
+                } else {
                     resolveNecessary = true;
                     deepCopy.add(new PropertyValue(pv, convertedValue));
                 }

@@ -7,7 +7,6 @@ import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.RootBeanDefinition;
-import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.util.ClassUtils;
 
 import java.util.LinkedHashSet;

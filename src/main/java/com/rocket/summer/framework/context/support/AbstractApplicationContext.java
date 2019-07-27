@@ -483,15 +483,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         List priorityOrderedPostProcessors = new ArrayList();
         List orderedPostProcessorNames = new ArrayList();
         List nonOrderedPostProcessorNames = new ArrayList();
-        for (int i = 0; i < postProcessorNames.length; i++) {
-            if (isTypeMatch(postProcessorNames[i], PriorityOrdered.class)) {
-                priorityOrderedPostProcessors.add(beanFactory.getBean(postProcessorNames[i]));
-            }
-            else if (isTypeMatch(postProcessorNames[i], Ordered.class)) {
-                orderedPostProcessorNames.add(postProcessorNames[i]);
-            }
-            else {
-                nonOrderedPostProcessorNames.add(postProcessorNames[i]);
+        for (String processorName : postProcessorNames) {
+            if (isTypeMatch(processorName, PriorityOrdered.class)) {
+                priorityOrderedPostProcessors.add(beanFactory.getBean(processorName));
+            } else if (isTypeMatch(processorName, Ordered.class)) {
+                orderedPostProcessorNames.add(processorName);
+            } else {
+                nonOrderedPostProcessorNames.add(processorName);
             }
         }
 
@@ -510,8 +508,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
         // Finally, invoke all other BeanFactoryPostProcessors.
         List nonOrderedPostProcessors = new ArrayList();
-        for (Iterator it = nonOrderedPostProcessorNames.iterator(); it.hasNext();) {
-            String postProcessorName = (String) it.next();
+        for (Object nonOrderedPostProcessorName : nonOrderedPostProcessorNames) {
+            String postProcessorName = (String) nonOrderedPostProcessorName;
             nonOrderedPostProcessors.add(getBean(postProcessorName));
         }
         invokeBeanFactoryPostProcessors(beanFactory, nonOrderedPostProcessors);
@@ -562,8 +560,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
         // Next, register the BeanPostProcessors that implement Ordered.
         List orderedPostProcessors = new ArrayList();
-        for (Iterator it = orderedPostProcessorNames.iterator(); it.hasNext();) {
-            String postProcessorName = (String) it.next();
+        for (Object orderedPostProcessorName : orderedPostProcessorNames) {
+            String postProcessorName = (String) orderedPostProcessorName;
             orderedPostProcessors.add(getBean(postProcessorName));
         }
         Collections.sort(orderedPostProcessors, new OrderComparator());
@@ -571,8 +569,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
         // Finally, register all other BeanPostProcessors.
         List nonOrderedPostProcessors = new ArrayList();
-        for (Iterator it = nonOrderedPostProcessorNames.iterator(); it.hasNext();) {
-            String postProcessorName = (String) it.next();
+        for (Object nonOrderedPostProcessorName : nonOrderedPostProcessorNames) {
+            String postProcessorName = (String) nonOrderedPostProcessorName;
             nonOrderedPostProcessors.add(getBean(postProcessorName));
         }
         registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
@@ -582,8 +580,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * Register the given BeanPostProcessor beans.
      */
     private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, List postProcessors) {
-        for (Iterator it = postProcessors.iterator(); it.hasNext();) {
-            BeanPostProcessor postProcessor = (BeanPostProcessor) it.next();
+        for (Object processor : postProcessors) {
+            BeanPostProcessor postProcessor = (BeanPostProcessor) processor;
             beanFactory.addBeanPostProcessor(postProcessor);
         }
     }
@@ -664,14 +662,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     protected void registerListeners() {
         // Register statically specified listeners first.
-        for (Iterator it = getApplicationListeners().iterator(); it.hasNext();) {
-            addListener((ApplicationListener) it.next());
+        for (Object o : getApplicationListeners()) {
+            addListener((ApplicationListener) o);
         }
         // Do not initialize FactoryBeans here: We need to leave all regular beans
         // uninitialized to let post-processors apply to them!
         Collection listenerBeans = getBeansOfType(ApplicationListener.class, true, false).values();
-        for (Iterator it = listenerBeans.iterator(); it.hasNext();) {
-            addListener((ApplicationListener) it.next());
+        for (Object listenerBean : listenerBeans) {
+            addListener((ApplicationListener) listenerBean);
         }
     }
 
@@ -794,8 +792,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
             }
             // Stop all Lifecycle beans, to avoid delays during individual destruction.
             Map lifecycleBeans = getLifecycleBeans();
-            for (Iterator it = new LinkedHashSet(lifecycleBeans.keySet()).iterator(); it.hasNext();) {
-                String beanName = (String) it.next();
+            for (Object o : new LinkedHashSet(lifecycleBeans.keySet())) {
+                String beanName = (String) o;
                 doStop(lifecycleBeans, beanName);
             }
             // Destroy all cached singletons in the context's BeanFactory.
@@ -1000,8 +998,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
     public void start() {
         Map lifecycleBeans = getLifecycleBeans();
-        for (Iterator it = new LinkedHashSet(lifecycleBeans.keySet()).iterator(); it.hasNext();) {
-            String beanName = (String) it.next();
+        for (Object o : new LinkedHashSet(lifecycleBeans.keySet())) {
+            String beanName = (String) o;
             doStart(lifecycleBeans, beanName);
         }
         publishEvent(new ContextStartedEvent(this));
@@ -1009,8 +1007,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
     public void stop() {
         Map lifecycleBeans = getLifecycleBeans();
-        for (Iterator it = new LinkedHashSet(lifecycleBeans.keySet()).iterator(); it.hasNext();) {
-            String beanName = (String) it.next();
+        for (Object o : new LinkedHashSet(lifecycleBeans.keySet())) {
+            String beanName = (String) o;
             doStop(lifecycleBeans, beanName);
         }
         publishEvent(new ContextStoppedEvent(this));
@@ -1036,10 +1034,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
         String[] beanNames = beanFactory.getSingletonNames();
         Map beans = new LinkedHashMap();
-        for (int i = 0; i < beanNames.length; i++) {
-            Object bean = beanFactory.getSingleton(beanNames[i]);
+        for (String beanName : beanNames) {
+            Object bean = beanFactory.getSingleton(beanName);
             if (bean instanceof Lifecycle) {
-                beans.put(beanNames[i], bean);
+                beans.put(beanName, bean);
             }
         }
         return beans;
@@ -1055,8 +1053,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         Lifecycle bean = (Lifecycle) lifecycleBeans.get(beanName);
         if (bean != null) {
             String[] dependenciesForBean = getBeanFactory().getDependenciesForBean(beanName);
-            for (int i = 0; i < dependenciesForBean.length; i++) {
-                doStart(lifecycleBeans, dependenciesForBean[i]);
+            for (String s : dependenciesForBean) {
+                doStart(lifecycleBeans, s);
             }
             if (!bean.isRunning()) {
                 bean.start();
@@ -1075,8 +1073,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         Lifecycle bean = (Lifecycle) lifecycleBeans.get(beanName);
         if (bean != null) {
             String[] dependentBeans = getBeanFactory().getDependentBeans(beanName);
-            for (int i = 0; i < dependentBeans.length; i++) {
-                doStop(lifecycleBeans, dependentBeans[i]);
+            for (String dependentBean : dependentBeans) {
+                doStop(lifecycleBeans, dependentBean);
             }
             if (bean.isRunning()) {
                 bean.stop();

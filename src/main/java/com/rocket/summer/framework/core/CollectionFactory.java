@@ -2,8 +2,6 @@ package com.rocket.summer.framework.core;
 
 import com.rocket.summer.framework.util.LinkedMultiValueMap;
 import com.rocket.summer.framework.util.MultiValueMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
