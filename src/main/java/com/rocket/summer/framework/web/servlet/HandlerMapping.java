@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
  * requests and handler objects.
  *
  * <p>This class can be implemented by application developers, although this is not
- * necessary, as {@link org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping}
- * and {@link org.springframework.web.servlet.handler.SimpleUrlHandlerMapping}
+ * necessary, as {@link com.rocket.summer.framework.web.servlet.handler.BeanNameUrlHandlerMapping}
+ * and {@link com.rocket.summer.framework.web.servlet.handler.SimpleUrlHandlerMapping}
  * are included in the framework. The former is the default if no
  * HandlerMapping bean is registered in the application context.
  *
@@ -24,16 +24,16 @@ import javax.servlet.http.HttpServletRequest;
  * a custom mapping based on session state, cookie state or many other
  * variables. No other MVC framework seems to be equally flexible.
  *
- * <p>Note: Implementations can implement the {@link org.springframework.core.Ordered}
+ * <p>Note: Implementations can implement the {@link com.rocket.summer.framework.core.Ordered}
  * interface to be able to specify a sorting order and thus a priority for getting
  * applied by DispatcherServlet. Non-Ordered instances get treated as lowest priority.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.core.Ordered
- * @see org.springframework.web.servlet.handler.AbstractHandlerMapping
- * @see org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping
- * @see org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
+ * @see com.rocket.summer.framework.core.Ordered
+ * @see com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMapping
+ * @see com.rocket.summer.framework.web.servlet.handler.BeanNameUrlHandlerMapping
+ * @see com.rocket.summer.framework.web.servlet.handler.SimpleUrlHandlerMapping
  */
 public interface HandlerMapping {
 

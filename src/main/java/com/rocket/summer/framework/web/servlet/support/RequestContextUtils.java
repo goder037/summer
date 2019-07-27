@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Utility class for easy access to request-specific state which has been
- * set by the {@link org.springframework.web.servlet.DispatcherServlet}.
+ * set by the {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}.
  *
  * <p>Supports lookup of current WebApplicationContext, LocaleResolver,
  * Locale, ThemeResolver, Theme, and MultipartResolver.
@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Juergen Hoeller
  * @since 03.03.2003
  * @see RequestContext
- * @see org.springframework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
  */
 public abstract class RequestContextUtils {
 

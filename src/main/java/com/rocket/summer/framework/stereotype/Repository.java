@@ -15,9 +15,9 @@ import java.lang.annotation.*;
  * may narrow their semantics and use as appropriate.
  *
  * <p>A class thus annotated is eligible for Spring
- * {@link org.springframework.dao.DataAccessException DataAccessException} translation
+ * {@link com.rocket.summer.framework.dao.DataAccessException DataAccessException} translation
  * when used in conjunction with a {@link
- * org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
+ * com.rocket.summer.framework.dao.annotation.PersistenceExceptionTranslationPostProcessor
  * PersistenceExceptionTranslationPostProcessor}. The annotated class is also clarified as
  * to its role in the overall application architecture for the purpose of tooling,
  * aspects, etc.
@@ -31,8 +31,8 @@ import java.lang.annotation.*;
  * @since 2.0
  * @see Component
  * @see Service
- * @see org.springframework.dao.DataAccessException
- * @see org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor
+ * @see com.rocket.summer.framework.dao.DataAccessException
+ * @see com.rocket.summer.framework.dao.annotation.PersistenceExceptionTranslationPostProcessor
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

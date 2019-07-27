@@ -23,10 +23,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Jean-Pierre Pawlak
  * @author Juergen Hoeller
  * @since 17.06.2003
- * @see org.springframework.web.servlet.theme.FixedThemeResolver
- * @see org.springframework.ui.context.Theme
- * @see org.springframework.ui.context.ThemeSource
- * @see org.springframework.web.servlet.support.RequestContext#getTheme
+ * @see com.rocket.summer.framework.web.servlet.theme.FixedThemeResolver
+ * @see com.rocket.summer.framework.ui.context.Theme
+ * @see com.rocket.summer.framework.ui.context.ThemeSource
+ * @see com.rocket.summer.framework.web.servlet.support.RequestContext#getTheme
  */
 public interface ThemeResolver {
 

@@ -14,11 +14,11 @@ import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter
 import com.rocket.summer.framework.http.converter.xml.XmlAwareFormHttpMessageConverter;
 import com.rocket.summer.framework.util.CollectionUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
+import com.rocket.summer.framework.web.bind.annotation.InitBinder;
+import com.rocket.summer.framework.web.bind.annotation.ModelAttribute;
+import com.rocket.summer.framework.web.bind.annotation.PathVariableMethodArgumentResolver;
 import com.rocket.summer.framework.web.bind.annotation.RequestMapping;
-import com.rocket.summer.framework.web.bind.support.DefaultSessionAttributeStore;
-import com.rocket.summer.framework.web.bind.support.SessionAttributeStore;
-import com.rocket.summer.framework.web.bind.support.WebBindingInitializer;
-import com.rocket.summer.framework.web.bind.support.WebDataBinderFactory;
+import com.rocket.summer.framework.web.bind.support.*;
 import com.rocket.summer.framework.web.context.request.ServletWebRequest;
 import com.rocket.summer.framework.web.context.request.WebRequest;
 import com.rocket.summer.framework.web.method.HandlerMethod;
@@ -268,7 +268,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 
     /**
      * Specify the strategy to store session attributes with. The default is
-     * {@link org.springframework.web.bind.support.DefaultSessionAttributeStore},
+     * {@link com.rocket.summer.framework.web.bind.support.DefaultSessionAttributeStore},
      * storing session attributes in the HttpSession with the same attribute
      * name as in the model.
      */
@@ -283,7 +283,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
      * handlers (but not to <code>@SessionAttributes</code> annotated handlers),
      * this setting will apply to <code>@SessionAttributes</code> handlers only.
      * @see #setCacheSeconds
-     * @see org.springframework.web.bind.annotation.SessionAttributes
+     * @see com.rocket.summer.framework.web.bind.annotation.SessionAttributes
      */
     public void setCacheSecondsForSessionAttributeHandlers(int cacheSecondsForSessionAttributeHandlers) {
         this.cacheSecondsForSessionAttributeHandlers = cacheSecondsForSessionAttributeHandlers;
@@ -304,8 +304,8 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
      * as well, since it will always be the same object reference for the
      * same active logical session. However, this is not guaranteed across
      * different servlet containers; the only 100% safe way is a session mutex.
-     * @see org.springframework.web.util.HttpSessionMutexListener
-     * @see org.springframework.web.util.WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
+     * @see com.rocket.summer.framework.web.util.HttpSessionMutexListener
+     * @see com.rocket.summer.framework.web.util.WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
      */
     public void setSynchronizeOnSession(boolean synchronizeOnSession) {
         this.synchronizeOnSession = synchronizeOnSession;
@@ -314,7 +314,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
     /**
      * Set the ParameterNameDiscoverer to use for resolving method parameter
      * names if needed (e.g. for default attribute names). Default is a
-     * {@link org.springframework.core.LocalVariableTableParameterNameDiscoverer}.
+     * {@link com.rocket.summer.framework.core.LocalVariableTableParameterNameDiscoverer}.
      */
     public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
         this.parameterNameDiscoverer = parameterNameDiscoverer;
@@ -660,7 +660,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
     /**
      * MethodFilter that matches {@link ModelAttribute @ModelAttribute} methods.
      */
-    public static final MethodFilter MODEL_ATTRIBUTE_METHODS = new MethodFilter() {
+    public static final ReflectionUtils.MethodFilter MODEL_ATTRIBUTE_METHODS = new ReflectionUtils.MethodFilter() {
 
         public boolean matches(Method method) {
             return ((AnnotationUtils.findAnnotation(method, RequestMapping.class) == null) &&

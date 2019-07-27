@@ -45,7 +45,7 @@ public interface WebMvcConfigurer {
     /**
      * Provide a custom {@link Validator} instead of the one created by default.
      * The default implementation, assuming JSR-303 is on the classpath, is:
-     * {@link org.springframework.validation.beanvalidation.LocalValidatorFactoryBean}.
+     * {@link com.rocket.summer.framework.validation.beanvalidation.LocalValidatorFactoryBean}.
      * Leave the return value as {@code null} to keep the default.
      */
     Validator getValidator();

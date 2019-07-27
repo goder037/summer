@@ -6,7 +6,7 @@ import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.util.ObjectUtils;
 
 /**
- * Abstract implementation of the {@link org.springframework.web.servlet.HandlerMapping}
+ * Abstract implementation of the {@link com.rocket.summer.framework.web.servlet.HandlerMapping}
  * interface, detecting URL mappings for handler beans through introspection of all
  * defined beans in the application context.
  *
@@ -47,7 +47,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
      * <p>The actual URL determination for a handler is up to the concrete
      * {@link #determineUrlsForHandler(String)} implementation. A bean for
      * which no such URLs could be determined is simply not considered a handler.
-     * @throws org.springframework.beans.BeansException if the handler couldn't be registered
+     * @throws com.rocket.summer.framework.beans.BeansException if the handler couldn't be registered
      * @see #determineUrlsForHandler(String)
      */
     protected void detectHandlers() throws BeansException {

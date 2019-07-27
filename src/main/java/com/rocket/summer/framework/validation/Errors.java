@@ -30,11 +30,10 @@ public interface Errors {
      * The separator between path elements in a nested path,
      * for example in "customer.name" or "customer.address.street".
      * <p>"." = same as the
-     * {@link org.springframework.beans.PropertyAccessor#NESTED_PROPERTY_SEPARATOR nested property separator}
+     * {@link com.rocket.summer.framework.beans.PropertyAccessor#NESTED_PROPERTY_SEPARATOR nested property separator}
      * in the beans package.
      */
     String NESTED_PATH_SEPARATOR = PropertyAccessor.NESTED_PROPERTY_SEPARATOR;
-
 
     /**
      * Return the name of the bound root object.
@@ -96,6 +95,25 @@ public interface Errors {
     void reject(String errorCode, String defaultMessage);
 
     /**
+     * Get all errors, both global and field ones.
+     * @return List of {@link ObjectError} instances
+     */
+    List<ObjectError> getAllErrors();
+
+    /**
+     * Add all errors from the given <code>Errors</code> instance to this
+     * <code>Errors</code> instance.
+     * <p>This is a onvenience method to avoid repeated <code>reject(..)</code>
+     * calls for merging an <code>Errors</code> instance into another
+     * <code>Errors</code> instance.
+     * <p>Note that the passed-in <code>Errors</code> instance is supposed
+     * to refer to the same target object, or at least contain compatible errors
+     * that apply to the target object of this <code>Errors</code> instance.
+     * @param errors the <code>Errors</code> instance to merge in
+     */
+    void addAllErrors(Errors errors);
+
+    /**
      * Register a global error for the entire target object,
      * using the given error description.
      * @param errorCode error code, interpretable as a message key
@@ -152,19 +170,6 @@ public interface Errors {
     void rejectValue(String field, String errorCode, Object[] errorArgs, String defaultMessage);
 
     /**
-     * Add all errors from the given <code>Errors</code> instance to this
-     * <code>Errors</code> instance.
-     * <p>This is a onvenience method to avoid repeated <code>reject(..)</code>
-     * calls for merging an <code>Errors</code> instance into another
-     * <code>Errors</code> instance.
-     * <p>Note that the passed-in <code>Errors</code> instance is supposed
-     * to refer to the same target object, or at least contain compatible errors
-     * that apply to the target object of this <code>Errors</code> instance.
-     * @param errors the <code>Errors</code> instance to merge in
-     */
-    void addAllErrors(Errors errors);
-
-    /**
      * Return if there were any errors.
      */
     boolean hasErrors();
@@ -173,12 +178,6 @@ public interface Errors {
      * Return the total number of errors.
      */
     int getErrorCount();
-
-    /**
-     * Get all errors, both global and field ones.
-     * @return List of {@link ObjectError} instances
-     */
-    List<ObjectError> getAllErrors();
 
     /**
      * Are there any global errors?
@@ -207,11 +206,10 @@ public interface Errors {
     ObjectError getGlobalError();
 
     /**
-     * Are there any field errors?
-     * @return <code>true</code> if there are any errors associated with a field
-     * @see #hasGlobalErrors()
+     * Get all errors associated with a field.
+     * @return a List of {@link FieldError} instances
      */
-    boolean hasFieldErrors();
+    List<FieldError> getFieldErrors();
 
     /**
      * Return the number of errors associated with a field.
@@ -221,46 +219,17 @@ public interface Errors {
     int getFieldErrorCount();
 
     /**
-     * Get all errors associated with a field.
-     * @return a List of {@link FieldError} instances
-     */
-    List<FieldError> getFieldErrors();
-
-    /**
      * Get the <i>first</i> error associated with a field, if any.
      * @return the field-specific error, or <code>null</code>
      */
     FieldError getFieldError();
 
     /**
-     * Are there any errors associated with the given field?
-     * @param field the field name
-     * @return <code>true</code> if there were any errors associated with the given field
+     * Are there any field errors?
+     * @return <code>true</code> if there are any errors associated with a field
+     * @see #hasGlobalErrors()
      */
-    boolean hasFieldErrors(String field);
-
-    /**
-     * Return the number of errors associated with the given field.
-     * @param field the field name
-     * @return the number of errors associated with the given field
-     */
-    int getFieldErrorCount(String field);
-
-    /**
-     * Get all errors associated with the given field.
-     * <p>Implementations should support not only full field names like
-     * "name" but also pattern matches like "na*" or "address.*".
-     * @param field the field name
-     * @return a List of {@link FieldError} instances
-     */
-    List<FieldError> getFieldErrors(String field);
-
-    /**
-     * Get the first error associated with the given field, if any.
-     * @param field the field name
-     * @return the field-specific error, or <code>null</code>
-     */
-    FieldError getFieldError(String field);
+    boolean hasFieldErrors();
 
     /**
      * Return the current value of the given field, either the current
@@ -282,5 +251,33 @@ public interface Errors {
      */
     Class<?> getFieldType(String field);
 
-}
+    /**
+     * Get all errors associated with the given field.
+     * <p>Implementations should support not only full field names like
+     * "name" but also pattern matches like "na*" or "address.*".
+     * @param field the field name
+     * @return a List of {@link FieldError} instances
+     */
+    List<FieldError> getFieldErrors(String field);
 
+    /**
+     * Get the first error associated with the given field, if any.
+     * @param field the field name
+     * @return the field-specific error, or <code>null</code>
+     */
+    FieldError getFieldError(String field);
+
+    /**
+     * Are there any errors associated with the given field?
+     * @param field the field name
+     * @return <code>true</code> if there were any errors associated with the given field
+     */
+    boolean hasFieldErrors(String field);
+
+    /**
+     * Return the number of errors associated with the given field.
+     * @param field the field name
+     * @return the number of errors associated with the given field
+     */
+    int getFieldErrorCount(String field);
+}

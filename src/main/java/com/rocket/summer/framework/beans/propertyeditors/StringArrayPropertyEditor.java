@@ -12,8 +12,8 @@ import java.beans.PropertyEditorSupport;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.util.StringUtils#delimitedListToStringArray
- * @see org.springframework.util.StringUtils#arrayToDelimitedString
+ * @see com.rocket.summer.framework.util.StringUtils#delimitedListToStringArray
+ * @see com.rocket.summer.framework.util.StringUtils#arrayToDelimitedString
  */
 public class StringArrayPropertyEditor extends PropertyEditorSupport {
 

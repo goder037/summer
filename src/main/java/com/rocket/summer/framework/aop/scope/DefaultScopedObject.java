@@ -13,8 +13,8 @@ import com.rocket.summer.framework.util.Assert;
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.beans.factory.BeanFactory#getBean
- * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#destroyScopedBean
+ * @see com.rocket.summer.framework.beans.factory.BeanFactory#getBean
+ * @see com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory#destroyScopedBean
  */
 public class DefaultScopedObject implements ScopedObject {
 

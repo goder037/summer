@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Simple implementation of the {@link AliasRegistry} interface.
  * Serves as base class for
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
+ * {@link com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry}
  * implementations.
  *
  * @author Juergen Hoeller

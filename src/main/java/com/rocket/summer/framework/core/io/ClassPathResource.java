@@ -28,7 +28,7 @@ public class ClassPathResource extends AbstractResource {
      * loading the resource.
      * @param path the absolute path within the class path
      * @see java.lang.ClassLoader#getResourceAsStream(String)
-     * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
+     * @see com.rocket.summer.framework.util.ClassUtils#getDefaultClassLoader()
      */
     public ClassPathResource(String path) {
         this(path, (ClassLoader) null);
@@ -133,7 +133,7 @@ public class ClassPathResource extends AbstractResource {
     /**
      * This implementation returns a File reference for the underlying class path
      * resource, provided that it refers to a file in the file system.
-     * @see org.springframework.util.ResourceUtils#getFile(java.net.URL, String)
+     * @see com.rocket.summer.framework.util.ResourceUtils#getFile(java.net.URL, String)
      */
     @Override
     public File getFile() throws IOException {

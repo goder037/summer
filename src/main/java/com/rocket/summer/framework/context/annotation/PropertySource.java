@@ -4,8 +4,8 @@ import java.lang.annotation.*;
 
 /**
  * Annotation providing a convenient and declarative mechanism for adding a
- * {@link org.springframework.core.env.PropertySource PropertySource} to Spring's
- * {@link org.springframework.core.env.Environment Environment}. To be used in
+ * {@link com.rocket.summer.framework.core.env.PropertySource PropertySource} to Spring's
+ * {@link com.rocket.summer.framework.core.env.Environment Environment}. To be used in
  * conjunction with @{@link Configuration} classes.
  *
  * <h3>Example usage</h3>
@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  * }</pre>
  *
  * Notice that the {@code Environment} object is @{@link
- * org.springframework.beans.factory.annotation.Autowired Autowired} into the
+ * com.rocket.summer.framework.beans.factory.annotation.Autowired Autowired} into the
  * configuration class and then used when populating the {@code TestBean} object. Given
  * the configuration above, a call to {@code testBean.getName()} will return "myTestBean".
  *
@@ -107,16 +107,16 @@ import java.lang.annotation.*;
  * if the {@code @Configuration} classes above were registered via component-scanning,
  * the ordering is difficult to predict.  In such cases - and if overriding is important -
  * it is recommended that the user fall back to using the programmatic PropertySource API.
- * See {@link org.springframework.core.env.ConfigurableEnvironment ConfigurableEnvironment}
- * and {@link org.springframework.core.env.MutablePropertySources MutablePropertySources}
+ * See {@link com.rocket.summer.framework.core.env.ConfigurableEnvironment ConfigurableEnvironment}
+ * and {@link com.rocket.summer.framework.core.env.MutablePropertySources MutablePropertySources}
  * Javadoc for details.
  *
  * @author Chris Beams
  * @since 3.1
  * @see Configuration
- * @see org.springframework.core.env.PropertySource
- * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
- * @see org.springframework.core.env.MutablePropertySources
+ * @see com.rocket.summer.framework.core.env.PropertySource
+ * @see com.rocket.summer.framework.core.env.ConfigurableEnvironment#getPropertySources()
+ * @see com.rocket.summer.framework.core.env.MutablePropertySources
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -127,8 +127,8 @@ public @interface PropertySource {
      * Indicate the name of this property source. If omitted, a name
      * will be generated based on the description of the underlying
      * resource.
-     * @see org.springframework.core.env.PropertySource#getName()
-     * @see org.springframework.core.io.Resource#getDescription()
+     * @see com.rocket.summer.framework.core.env.PropertySource#getName()
+     * @see com.rocket.summer.framework.core.io.Resource#getDescription()
      */
     String name() default "";
 

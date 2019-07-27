@@ -33,8 +33,8 @@ public interface BeanPostProcessor {
      * @param bean the new bean instance
      * @param beanName the name of the bean
      * @return the bean instance to use, either the original or a wrapped one
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.factory.InitializingBean#afterPropertiesSet
      */
     Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
@@ -53,9 +53,9 @@ public interface BeanPostProcessor {
      * @param bean the new bean instance
      * @param beanName the name of the bean
      * @return the bean instance to use, either the original or a wrapped one
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
-     * @see org.springframework.beans.factory.FactoryBean
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.factory.InitializingBean#afterPropertiesSet
+     * @see com.rocket.summer.framework.beans.factory.FactoryBean
      */
     Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 

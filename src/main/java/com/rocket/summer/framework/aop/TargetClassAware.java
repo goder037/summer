@@ -4,12 +4,12 @@ package com.rocket.summer.framework.aop;
  * Minimal interface for exposing the target class behind a proxy.
  *
  * <p>Implemented by AOP proxy objects and proxy factories
- * (via {@link org.springframework.aop.framework.Advised}}
+ * (via {@link com.rocket.summer.framework.aop.framework.Advised}}
  * as well as by {@link TargetSource TargetSources}.
  *
  * @author Juergen Hoeller
  * @since 2.0.3
- * @see org.springframework.aop.support.AopUtils#getTargetClass(Object)
+ * @see com.rocket.summer.framework.aop.support.AopUtils#getTargetClass(Object)
  */
 public interface TargetClassAware {
 

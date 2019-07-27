@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor} implementation
  * that enforces required JavaBean properties to have been configured.
  * Required bean properties are detected through a Java 5 annotation:
  * by default, Spring's {@link Required} annotation.

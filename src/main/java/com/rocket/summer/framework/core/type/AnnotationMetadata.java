@@ -11,7 +11,7 @@ import java.util.Set;
  * @author Mark Fisher
  * @since 2.5
  * @see StandardAnnotationMetadata
- * @see org.springframework.core.type.classreading.MetadataReader#getAnnotationMetadata()
+ * @see com.rocket.summer.framework.core.type.classreading.MetadataReader#getAnnotationMetadata()
  */
 public interface AnnotationMetadata extends ClassMetadata {
 

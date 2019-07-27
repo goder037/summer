@@ -15,7 +15,7 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 
     /**
      * Ensure that all non-lazy-init singletons are instantiated, also considering
-     * {@link org.springframework.beans.factory.FactoryBean FactoryBeans}.
+     * {@link com.rocket.summer.framework.beans.factory.FactoryBean FactoryBeans}.
      * Typically invoked at the end of factory setup, if desired.
      * @throws BeansException if one of the singleton beans could not be created.
      * Note: This may have left the factory with some beans already initialized!
@@ -48,8 +48,8 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
      * <p>By default, only the BeanFactoryAware interface is ignored.
      * For further types to ignore, invoke this method for each type.
      * @param ifc the dependency interface to ignore
-     * @see org.springframework.beans.factory.BeanFactoryAware
-     * @see org.springframework.context.ApplicationContextAware
+     * @see com.rocket.summer.framework.beans.factory.BeanFactoryAware
+     * @see com.rocket.summer.framework.context.ApplicationContextAware
      */
     void ignoreDependencyInterface(Class ifc);
 
@@ -66,7 +66,7 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
      * as well if declared as an autowiring dependency (e.g. ListableBeanFactory),
      * as long as the given value actually implements the extended interface.
      * @param autowiredValue the corresponding autowired value. This may also be an
-     * implementation of the {@link org.springframework.beans.factory.ObjectFactory}
+     * implementation of the {@link com.rocket.summer.framework.beans.factory.ObjectFactory}
      * interface, which allows for lazy resolution of the actual target value.
      */
     void registerResolvableDependency(Class dependencyType, Object autowiredValue);

@@ -5,14 +5,14 @@ import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 
 /**
- * Extended {@link org.springframework.beans.factory.config.BeanDefinition}
- * interface that exposes {@link org.springframework.core.type.AnnotationMetadata}
+ * Extended {@link com.rocket.summer.framework.beans.factory.config.BeanDefinition}
+ * interface that exposes {@link com.rocket.summer.framework.core.type.AnnotationMetadata}
  * about its bean class - without requiring the class to be loaded yet.
  *
  * @author Juergen Hoeller
  * @since 2.5
  * @see AnnotatedGenericBeanDefinition
- * @see org.springframework.core.type.AnnotationMetadata
+ * @see com.rocket.summer.framework.core.type.AnnotationMetadata
  */
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 

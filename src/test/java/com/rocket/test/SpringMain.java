@@ -1,6 +1,6 @@
 package com.rocket.test;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.rocket.summer.framework.context.annotation.AnnotationConfigApplicationContext;
 
 public class SpringMain {
 

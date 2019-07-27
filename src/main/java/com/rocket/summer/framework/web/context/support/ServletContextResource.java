@@ -17,7 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * {@link org.springframework.core.io.Resource} implementation for
+ * {@link com.rocket.summer.framework.core.io.Resource} implementation for
  * {@link javax.servlet.ServletContext} resources, interpreting
  * relative paths within the web application root directory.
  *
@@ -142,7 +142,7 @@ public class ServletContextResource extends AbstractFileResolvingResource implem
     /**
      * This implementation creates a ServletContextResource, applying the given path
      * relative to the path of the underlying file of this resource descriptor.
-     * @see org.springframework.util.StringUtils#applyRelativePath(String, String)
+     * @see com.rocket.summer.framework.util.StringUtils#applyRelativePath(String, String)
      */
     @Override
     public Resource createRelative(String relativePath) {
@@ -153,7 +153,7 @@ public class ServletContextResource extends AbstractFileResolvingResource implem
     /**
      * This implementation returns the name of the file that this ServletContext
      * resource refers to.
-     * @see org.springframework.util.StringUtils#getFilename(String)
+     * @see com.rocket.summer.framework.util.StringUtils#getFilename(String)
      */
     @Override
     public String getFilename() {

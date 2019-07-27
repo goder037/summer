@@ -10,19 +10,19 @@ import com.rocket.summer.framework.core.NamedThreadLocal;
  * <code>inheritable<code> flag is set to <code>true</code>.
  *
  * <p>Use {@link RequestContextListener} or
- * {@link org.springframework.web.filter.RequestContextFilter} to expose
+ * {@link com.rocket.summer.framework.web.filter.RequestContextFilter} to expose
  * the current web request. Note that
- * {@link org.springframework.web.servlet.DispatcherServlet} and
- * {@link org.springframework.web.portlet.DispatcherPortlet} already
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet} and
+ * {@link com.rocket.summer.framework.web.portlet.DispatcherPortlet} already
  * expose the current request by default.
  *
  * @author Juergen Hoeller
  * @author Rod Johnson
  * @since 2.0
  * @see RequestContextListener
- * @see org.springframework.web.filter.RequestContextFilter
- * @see org.springframework.web.servlet.DispatcherServlet
- * @see org.springframework.web.portlet.DispatcherPortlet
+ * @see com.rocket.summer.framework.web.filter.RequestContextFilter
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.portlet.DispatcherPortlet
  */
 public abstract class RequestContextHolder  {
 

@@ -31,6 +31,20 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void registerScope(String scopeName, Scope scope);
 
     /**
+     * Return the resolution strategy for expressions in bean definition values.
+     * @since 3.0
+     */
+    BeanExpressionResolver getBeanExpressionResolver();
+
+    /**
+     * Resolve the given embedded value, e.g. an annotation attribute.
+     * @param value the value to resolve
+     * @return the resolved value (may be the original value as-is)
+     * @since 3.0
+     */
+    String resolveEmbeddedValue(String value);
+
+    /**
      * Destroy all singleton beans in this factory, including inner beans that have
      * been registered as disposable. To be called on shutdown of a factory.
      * <p>Any exception that arises during destruction should be caught
@@ -132,7 +146,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * by this factory. To be invoked during factory configuration.
      * <p>Note: Post-processors submitted here will be applied in the order of
      * registration; any ordering semantics expressed through implementing the
-     * {@link org.springframework.core.Ordered} interface will be ignored. Note
+     * {@link com.rocket.summer.framework.core.Ordered} interface will be ignored. Note
      * that autodetected post-processors (e.g. as beans in an ApplicationContext)
      * will always be applied after programmatically registered ones.
      * @param beanPostProcessor the post-processor to register

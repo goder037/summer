@@ -9,7 +9,7 @@ import com.rocket.summer.framework.util.Assert;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see BeanDefinition#getPropertyValues()
- * @see org.springframework.beans.factory.BeanFactory#getBean
+ * @see com.rocket.summer.framework.beans.factory.BeanFactory#getBean
  */
 public class RuntimeBeanReference implements BeanReference {
 

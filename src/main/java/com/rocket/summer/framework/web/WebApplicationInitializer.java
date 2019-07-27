@@ -23,7 +23,7 @@ import javax.servlet.ServletException;
  * <servlet>
  *   <servlet-name>dispatcher</servlet-name>
  *   <servlet-class>
- *     org.springframework.web.servlet.DispatcherServlet
+ *     com.rocket.summer.framework.web.servlet.DispatcherServlet
  *   </servlet-class>
  *   <init-param>
  *     <param-name>contextConfigLocation</param-name>
@@ -80,9 +80,9 @@ import javax.servlet.ServletException;
  * {@code dispatcher-config.xml} Spring configuration remained XML-based.
  * {@code WebApplicationInitializer} is a perfect fit for use with Spring's code-based
  * {@code @Configuration} classes. See @{@link
- * org.springframework.context.annotation.Configuration Configuration} Javadoc for
+ * com.rocket.summer.framework.context.annotation.Configuration Configuration} Javadoc for
  * complete details, but the following example demonstrates refactoring to use Spring's
- * {@link org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+ * {@link com.rocket.summer.framework.web.context.support.AnnotationConfigWebApplicationContext
  * AnnotationConfigWebApplicationContext} in lieu of {@code XmlWebApplicationContext}, and
  * user-defined {@code @Configuration} classes {@code AppConfig} and
  * {@code DispatcherConfig} instead of Spring XML files. This example also goes a bit
@@ -121,8 +121,8 @@ import javax.servlet.ServletException;
  *
  * <h2>Ordering {@code WebApplicationInitializer} execution</h2>
  * {@code WebApplicationInitializer} implementations may optionally be annotated at the
- * class level with Spring's @{@link org.springframework.core.annotation.Order Order}
- * annotation or may implement Spring's {@link org.springframework.core.Ordered Ordered}
+ * class level with Spring's @{@link com.rocket.summer.framework.core.annotation.Order Order}
+ * annotation or may implement Spring's {@link com.rocket.summer.framework.core.Ordered Ordered}
  * interface. If so, the initializers will be ordered prior to invocation. This provides
  * a mechanism for users to ensure the order in which servlet container initialization
  * occurs. Use of this feature is expected to be rare, as typical applications will likely

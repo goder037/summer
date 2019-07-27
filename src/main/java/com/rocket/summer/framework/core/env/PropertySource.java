@@ -3,7 +3,7 @@ package com.rocket.summer.framework.core.env;
 import com.rocket.summer.framework.util.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.env.PropertySources;
+import com.rocket.summer.framework.core.env.PropertySources;
 
 /**
  * Abstract base class representing a source of name/value property pairs. The underlying
@@ -25,8 +25,8 @@ import org.springframework.core.env.PropertySources;
  * as well as the {@link #named(String)} and {@link #toString()} methods for details.
  *
  * <p>Note that when working with @{@link
- * org.springframework.context.annotation.Configuration Configuration} classes that
- * the @{@link org.springframework.context.annotation.PropertySource PropertySource}
+ * com.rocket.summer.framework.context.annotation.Configuration Configuration} classes that
+ * the @{@link com.rocket.summer.framework.context.annotation.PropertySource PropertySource}
  * annotation provides a convenient and declarative way of adding property sources to the
  * enclosing {@code Environment}.
  *
@@ -36,7 +36,7 @@ import org.springframework.core.env.PropertySources;
  * @see PropertyResolver
  * @see PropertySourcesPropertyResolver
  * @see MutablePropertySources
- * @see org.springframework.context.annotation.PropertySource
+ * @see com.rocket.summer.framework.context.annotation.PropertySource
  */
 public abstract class PropertySource<T> {
 
@@ -195,9 +195,9 @@ public abstract class PropertySource<T> {
      * intended default position/order of the property source, then be replaced
      * during context refresh.
      *
-     * @see org.springframework.context.support.AbstractApplicationContext#initPropertySources()
-     * @see org.springframework.web.context.support.StandardServletEnvironment
-     * @see org.springframework.web.context.support.ServletContextPropertySource
+     * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#initPropertySources()
+     * @see com.rocket.summer.framework.web.context.support.StandardServletEnvironment
+     * @see com.rocket.summer.framework.web.context.support.ServletContextPropertySource
      */
     public static class StubPropertySource extends PropertySource<Object> {
 

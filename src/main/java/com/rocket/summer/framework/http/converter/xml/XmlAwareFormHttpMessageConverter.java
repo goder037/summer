@@ -3,7 +3,7 @@ package com.rocket.summer.framework.http.converter.xml;
 import com.rocket.summer.framework.http.converter.FormHttpMessageConverter;
 
 /**
- * Extension of {@link org.springframework.http.converter.FormHttpMessageConverter},
+ * Extension of {@link com.rocket.summer.framework.http.converter.FormHttpMessageConverter},
  * adding support for XML-based parts through a {@link SourceHttpMessageConverter}.
  *
  * @author Juergen Hoeller

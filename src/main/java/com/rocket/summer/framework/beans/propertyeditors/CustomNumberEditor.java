@@ -25,8 +25,8 @@ import java.text.NumberFormat;
  * @since 06.06.2003
  * @see java.lang.Number
  * @see java.text.NumberFormat
- * @see org.springframework.validation.DataBinder#registerCustomEditor
- * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
+ * @see com.rocket.summer.framework.validation.DataBinder#registerCustomEditor
+ * @see com.rocket.summer.framework.web.servlet.mvc.BaseCommandController#initBinder
  */
 public class CustomNumberEditor extends PropertyEditorSupport {
 
@@ -47,7 +47,7 @@ public class CustomNumberEditor extends PropertyEditorSupport {
      * @param numberClass Number subclass to generate
      * @param allowEmpty if empty strings should be allowed
      * @throws IllegalArgumentException if an invalid numberClass has been specified
-     * @see org.springframework.util.NumberUtils#parseNumber(String, Class)
+     * @see com.rocket.summer.framework.util.NumberUtils#parseNumber(String, Class)
      * @see Integer#valueOf
      * @see Integer#toString
      */
@@ -65,7 +65,7 @@ public class CustomNumberEditor extends PropertyEditorSupport {
      * @param numberFormat NumberFormat to use for parsing and rendering
      * @param allowEmpty if empty strings should be allowed
      * @throws IllegalArgumentException if an invalid numberClass has been specified
-     * @see org.springframework.util.NumberUtils#parseNumber(String, Class, java.text.NumberFormat)
+     * @see com.rocket.summer.framework.util.NumberUtils#parseNumber(String, Class, java.text.NumberFormat)
      * @see java.text.NumberFormat#parse
      * @see java.text.NumberFormat#format
      */

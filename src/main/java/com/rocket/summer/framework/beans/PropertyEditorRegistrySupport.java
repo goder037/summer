@@ -62,7 +62,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
     /**
      * Activate config value editors which are only intended for configuration purposes,
-     * such as {@link org.springframework.beans.propertyeditors.StringArrayPropertyEditor}.
+     * such as {@link com.rocket.summer.framework.beans.propertyeditors.StringArrayPropertyEditor}.
      * <p>Those editors are not registered by default simply because they are in
      * general inappropriate for data binding purposes. Of course, you may register
      * them individually in any case, through {@link #registerCustomEditor}.
@@ -90,24 +90,24 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
     /**
      * Actually register the default editors for this registry instance.
-     * @see org.springframework.beans.propertyeditors.ByteArrayPropertyEditor
-     * @see org.springframework.beans.propertyeditors.ClassEditor
-     * @see org.springframework.beans.propertyeditors.CharacterEditor
-     * @see org.springframework.beans.propertyeditors.CustomBooleanEditor
-     * @see org.springframework.beans.propertyeditors.CustomNumberEditor
-     * @see org.springframework.beans.propertyeditors.CustomCollectionEditor
-     * @see org.springframework.beans.propertyeditors.CustomMapEditor
-     * @see org.springframework.beans.propertyeditors.FileEditor
-     * @see org.springframework.beans.propertyeditors.InputStreamEditor
-     * @see org.springframework.jndi.JndiTemplateEditor
-     * @see org.springframework.beans.propertyeditors.LocaleEditor
-     * @see org.springframework.beans.propertyeditors.PropertiesEditor
-     * @see org.springframework.beans.PropertyValuesEditor
-     * @see org.springframework.core.io.support.ResourceArrayPropertyEditor
-     * @see org.springframework.core.io.ResourceEditor
-     * @see org.springframework.transaction.interceptor.TransactionAttributeEditor
-     * @see org.springframework.transaction.interceptor.TransactionAttributeSourceEditor
-     * @see org.springframework.beans.propertyeditors.URLEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.ByteArrayPropertyEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.ClassEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.CharacterEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.CustomBooleanEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.CustomNumberEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.CustomCollectionEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.CustomMapEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.FileEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.InputStreamEditor
+     * @see com.rocket.summer.framework.jndi.JndiTemplateEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.LocaleEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.PropertiesEditor
+     * @see com.rocket.summer.framework.beans.PropertyValuesEditor
+     * @see com.rocket.summer.framework.core.io.support.ResourceArrayPropertyEditor
+     * @see com.rocket.summer.framework.core.io.ResourceEditor
+     * @see com.rocket.summer.framework.transaction.interceptor.TransactionAttributeEditor
+     * @see com.rocket.summer.framework.transaction.interceptor.TransactionAttributeSourceEditor
+     * @see com.rocket.summer.framework.beans.propertyeditors.URLEditor
      */
     private void doRegisterDefaultEditors() {
         this.defaultEditors = new HashMap(64);

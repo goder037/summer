@@ -36,7 +36,7 @@ import java.security.Principal;
  *
  * <p>This class offers the following functionality:
  * <ul>
- * <li>Manages a {@link org.springframework.web.context.WebApplicationContext}
+ * <li>Manages a {@link com.rocket.summer.framework.web.context.WebApplicationContext}
  * instance per servlet. The servlet's configuration is determined by beans
  * in the servlet's namespace.
  * <li>Publishes events on request processing, whether or not a request is
@@ -50,10 +50,10 @@ import java.security.Principal;
  *
  * <p>Detects a "contextClass" parameter at the servlet init-param level,
  * falling back to the default context class,
- * {@link org.springframework.web.context.support.XmlWebApplicationContext},
+ * {@link com.rocket.summer.framework.web.context.support.XmlWebApplicationContext},
  * if not found. Note that, with the default FrameworkServlet,
  * a custom context class needs to implement the
- * {@link org.springframework.web.context.ConfigurableWebApplicationContext} SPI.
+ * {@link com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext} SPI.
  *
  * <p>Passes a "contextConfigLocation" servlet init-param to the context instance,
  * parsing it into potentially multiple file paths which can be separated by any
@@ -90,7 +90,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Default context class for FrameworkServlet.
-     * @see org.springframework.web.context.support.XmlWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
      */
     public static final Class DEFAULT_CONTEXT_CLASS = AnnotationConfigWebApplicationContext.class;
 
@@ -156,10 +156,10 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Set a custom context class. This class must be of type
-     * {@link org.springframework.web.context.WebApplicationContext}.
+     * {@link com.rocket.summer.framework.web.context.WebApplicationContext}.
      * <p>When using the default FrameworkServlet implementation,
      * the context class must also implement the
-     * {@link org.springframework.web.context.ConfigurableWebApplicationContext}
+     * {@link com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext}
      * interface.
      * @see #createWebApplicationContext
      */
@@ -235,7 +235,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
      * Set whether this servlet should publish a ServletRequestHandledEvent at the end
      * of each request. Default is "true"; can be turned off for a slight performance
      * improvement, provided that no ApplicationListeners rely on such events.
-     * @see org.springframework.web.context.support.ServletRequestHandledEvent
+     * @see com.rocket.summer.framework.web.context.support.ServletRequestHandledEvent
      */
     public void setPublishEvents(boolean publishEvents) {
         this.publishEvents = publishEvents;
@@ -387,18 +387,18 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Instantiate the WebApplicationContext for this servlet, either a default
-     * {@link org.springframework.web.context.support.XmlWebApplicationContext}
+     * {@link com.rocket.summer.framework.web.context.support.XmlWebApplicationContext}
      * or a {@link #setContextClass custom context class}, if set.
      * <p>This implementation expects custom contexts to implement the
-     * {@link org.springframework.web.context.ConfigurableWebApplicationContext}
+     * {@link com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext}
      * interface. Can be overridden in subclasses.
      * <p>Do not forget to register this servlet instance as application listener on the
      * created context (for triggering its {@link #onRefresh callback}, and to call
-     * {@link org.springframework.context.ConfigurableApplicationContext#refresh()}
+     * {@link com.rocket.summer.framework.context.ConfigurableApplicationContext#refresh()}
      * before returning the context instance.
      * @param parent the parent ApplicationContext to use, or <code>null</code> if none
      * @return the WebApplicationContext for this servlet
-     * @see org.springframework.web.context.support.XmlWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
      */
     protected WebApplicationContext createWebApplicationContext(ApplicationContext parent) {
         Class<?> contextClass = getContextClass();
@@ -456,12 +456,12 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Instantiate the WebApplicationContext for this servlet, either a default
-     * {@link org.springframework.web.context.support.XmlWebApplicationContext}
+     * {@link com.rocket.summer.framework.web.context.support.XmlWebApplicationContext}
      * or a {@link #setContextClass custom context class}, if set.
      * Delegates to #createWebApplicationContext(ApplicationContext).
      * @param parent the parent WebApplicationContext to use, or <code>null</code> if none
      * @return the WebApplicationContext for this servlet
-     * @see org.springframework.web.context.support.XmlWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
      * @see #createWebApplicationContext(ApplicationContext)
      */
     protected WebApplicationContext createWebApplicationContext(WebApplicationContext parent) {
@@ -512,7 +512,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
      * Refresh this servlet's application context, as well as the
      * dependent state of the servlet.
      * @see #getWebApplicationContext()
-     * @see org.springframework.context.ConfigurableApplicationContext#refresh()
+     * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#refresh()
      */
     public void refresh() {
         WebApplicationContext wac = getWebApplicationContext();
@@ -738,7 +738,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Close the WebApplicationContext of this servlet.
-     * @see org.springframework.context.ConfigurableApplicationContext#close()
+     * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#close()
      */
     @Override
     public void destroy() {

@@ -25,15 +25,15 @@ import javax.servlet.http.HttpServletResponse;
  * After a <cde>DispatcherServlet</code> has received a request and has
  * done its work to resolve locales, themes and suchlike, it then tries
  * to resolve a Controller, using a
- * {@link org.springframework.web.servlet.HandlerMapping HandlerMapping}.
+ * {@link com.rocket.summer.framework.web.servlet.HandlerMapping HandlerMapping}.
  * When a Controller has been found to handle the request, the
  * {@link #handleRequest(HttpServletRequest, HttpServletResponse) handleRequest}
  * method of the located Controller will be invoked; the located Controller
  * is then responsible for handling the actual request and - if applicable -
  * returning an appropriate
- * {@link org.springframework.web.servlet.ModelAndView ModelAndView}.
+ * {@link com.rocket.summer.framework.web.servlet.ModelAndView ModelAndView}.
  * So actually, this method is the main entrypoint for the
- * {@link org.springframework.web.servlet.DispatcherServlet DispatcherServlet}
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet DispatcherServlet}
  * which delegates requests to controllers.</p>
  *
  * <p>So basically any <i>direct</i> implementation of the Controller interface
@@ -64,9 +64,9 @@ import javax.servlet.http.HttpServletResponse;
  * choose to implement specific awareness interfaces, just like any other bean in a
  * Spring (web) application context can do, for example:</p>
  * <ul>
- * <li><code>org.springframework.context.ApplicationContextAware</code></li>
- * <li><code>org.springframework.context.ResourceLoaderAware</code></li>
- * <li><code>org.springframework.web.context.ServletContextAware</code></li>
+ * <li><code>com.rocket.summer.framework.context.ApplicationContextAware</code></li>
+ * <li><code>com.rocket.summer.framework.context.ResourceLoaderAware</code></li>
+ * <li><code>com.rocket.summer.framework.web.context.ServletContextAware</code></li>
  * </ul>
  *
  * <p>Such environment references can easily be passed in testing environments,
@@ -84,12 +84,12 @@ import javax.servlet.http.HttpServletResponse;
  * @see LastModified
  * @see SimpleControllerHandlerAdapter
  * @see AbstractController
- * @see org.springframework.mock.web.MockHttpServletRequest
- * @see org.springframework.mock.web.MockHttpServletResponse
- * @see org.springframework.context.ApplicationContextAware
- * @see org.springframework.context.ResourceLoaderAware
- * @see org.springframework.web.context.ServletContextAware
- * @see org.springframework.web.context.support.WebApplicationObjectSupport
+ * @see com.rocket.summer.framework.mock.web.MockHttpServletRequest
+ * @see com.rocket.summer.framework.mock.web.MockHttpServletResponse
+ * @see com.rocket.summer.framework.context.ApplicationContextAware
+ * @see com.rocket.summer.framework.context.ResourceLoaderAware
+ * @see com.rocket.summer.framework.web.context.ServletContextAware
+ * @see com.rocket.summer.framework.web.context.support.WebApplicationObjectSupport
  */
 public interface Controller {
 

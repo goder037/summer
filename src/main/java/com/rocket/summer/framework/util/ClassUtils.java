@@ -432,7 +432,7 @@ public abstract class ClassUtils {
                 lhsType.equals(primitiveWrapperTypeMap.get(rhsType)));
     }
 
-    /**
+   /**
      * Determine whether the given class has a method with the given signature.
      * <p>Essentially translates <code>NoSuchMethodException</code> to "false".
      * @param clazz	the clazz to analyze
@@ -441,7 +441,7 @@ public abstract class ClassUtils {
      * @return whether the class has a corresponding method
      * @see java.lang.Class#getMethod
      */
-    public static boolean hasMethod(Class clazz, String methodName, Class[] paramTypes) {
+    public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
         return (getMethodIfAvailable(clazz, methodName, paramTypes) != null);
     }
 
@@ -713,9 +713,9 @@ public abstract class ClassUtils {
      * if there is one. E.g. the method may be <code>IFoo.bar()</code> and the
      * target class may be <code>DefaultFoo</code>. In this case, the method may be
      * <code>DefaultFoo.bar()</code>. This enables attributes on that method to be found.
-     * <p><b>NOTE:</b> In contrast to {@link org.springframework.aop.support.AopUtils#getMostSpecificMethod},
+     * <p><b>NOTE:</b> In contrast to {@link com.rocket.summer.framework.aop.support.AopUtils#getMostSpecificMethod},
      * this method does <i>not</i> resolve Java 5 bridge methods automatically.
-     * Call {@link org.springframework.core.BridgeMethodResolver#findBridgedMethod}
+     * Call {@link com.rocket.summer.framework.core.BridgeMethodResolver#findBridgedMethod}
      * if bridge method resolution is desirable (e.g. for obtaining metadata from
      * the original method definition).
      * @param method the method to be invoked, which may come from an interface
@@ -723,7 +723,7 @@ public abstract class ClassUtils {
      * May be <code>null</code> or may not even implement the method.
      * @return the specific target method, or the original method if the
      * <code>targetClass</code> doesn't implement it or is <code>null</code>
-     * @see org.springframework.aop.support.AopUtils#getMostSpecificMethod
+     * @see com.rocket.summer.framework.aop.support.AopUtils#getMostSpecificMethod
      */
     public static Method getMostSpecificMethod(Method method, Class targetClass) {
         if (method != null && targetClass != null && !targetClass.equals(method.getDeclaringClass())) {

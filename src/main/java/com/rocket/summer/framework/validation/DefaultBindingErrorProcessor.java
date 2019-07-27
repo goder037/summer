@@ -22,9 +22,9 @@ import com.rocket.summer.framework.util.StringUtils;
  * @see DataBinder#setBindingErrorProcessor
  * @see BeanPropertyBindingResult#addError
  * @see BeanPropertyBindingResult#resolveMessageCodes
- * @see org.springframework.beans.PropertyAccessException#getErrorCode
- * @see org.springframework.beans.TypeMismatchException#ERROR_CODE
- * @see org.springframework.beans.MethodInvocationException#ERROR_CODE
+ * @see com.rocket.summer.framework.beans.PropertyAccessException#getErrorCode
+ * @see com.rocket.summer.framework.beans.TypeMismatchException#ERROR_CODE
+ * @see com.rocket.summer.framework.beans.MethodInvocationException#ERROR_CODE
  */
 public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
 
@@ -35,7 +35,7 @@ public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
      */
     public static final String MISSING_FIELD_ERROR_CODE = "required";
 
-
+    @Override
     public void processMissingFieldError(String missingField, BindingResult bindingResult) {
         // Create field error with code "required".
         String fixedField = bindingResult.getNestedPath() + missingField;
@@ -68,13 +68,11 @@ public class DefaultBindingErrorProcessor implements BindingErrorProcessor {
      * @param objectName the name of the target object
      * @param field the field that caused the binding error
      * @return the Object array that represents the FieldError arguments
-     * @see org.springframework.validation.FieldError#getArguments
-     * @see org.springframework.context.support.DefaultMessageSourceResolvable
+     * @see com.rocket.summer.framework.validation.FieldError#getArguments
+     * @see com.rocket.summer.framework.context.support.DefaultMessageSourceResolvable
      */
     protected Object[] getArgumentsForBindError(String objectName, String field) {
         String[] codes = new String[] {objectName + Errors.NESTED_PATH_SEPARATOR + field, field};
         return new Object[] {new DefaultMessageSourceResolvable(codes, field)};
     }
-
 }
-

@@ -2,7 +2,7 @@ package com.rocket.summer.framework.beans.factory.config;
 
 /**
  * Interface that defines a registry for shared bean instances.
- * Can be implemented by {@link org.springframework.beans.factory.BeanFactory}
+ * Can be implemented by {@link com.rocket.summer.framework.beans.factory.BeanFactory}
  * implementations in order to expose their singleton management facility
  * in a uniform manner.
  *
@@ -11,8 +11,8 @@ package com.rocket.summer.framework.beans.factory.config;
  * @author Juergen Hoeller
  * @since 2.0
  * @see ConfigurableBeanFactory
- * @see org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
- * @see org.springframework.beans.factory.support.AbstractBeanFactory
+ * @see com.rocket.summer.framework.beans.factory.support.DefaultSingletonBeanRegistry
+ * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanFactory
  */
 public interface SingletonBeanRegistry {
 
@@ -33,9 +33,9 @@ public interface SingletonBeanRegistry {
      * this anyway if it supports a BeanFactory's lazy initialization of singletons.
      * @param beanName the name of the bean
      * @param singletonObject the existing singleton object
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
-     * @see org.springframework.beans.factory.DisposableBean#destroy
-     * @see org.springframework.beans.factory.support.BeanDefinitionRegistry#registerBeanDefinition
+     * @see com.rocket.summer.framework.beans.factory.InitializingBean#afterPropertiesSet
+     * @see com.rocket.summer.framework.beans.factory.DisposableBean#destroy
+     * @see com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry#registerBeanDefinition
      */
     void registerSingleton(String beanName, Object singletonObject);
 
@@ -69,8 +69,8 @@ public interface SingletonBeanRegistry {
      * @param beanName the name of the bean to look for
      * @return if this bean factory contains a singleton instance with the given name
      * @see #registerSingleton
-     * @see org.springframework.beans.factory.ListableBeanFactory#containsBeanDefinition
-     * @see org.springframework.beans.factory.BeanFactory#containsBean
+     * @see com.rocket.summer.framework.beans.factory.ListableBeanFactory#containsBeanDefinition
+     * @see com.rocket.summer.framework.beans.factory.BeanFactory#containsBean
      */
     boolean containsSingleton(String beanName);
 
@@ -83,8 +83,8 @@ public interface SingletonBeanRegistry {
      * singletons defined by a bean definition have already been created.
      * @return the list of names as String array (never <code>null</code>)
      * @see #registerSingleton
-     * @see org.springframework.beans.factory.support.BeanDefinitionRegistry#getBeanDefinitionNames
-     * @see org.springframework.beans.factory.ListableBeanFactory#getBeanDefinitionNames
+     * @see com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry#getBeanDefinitionNames
+     * @see com.rocket.summer.framework.beans.factory.ListableBeanFactory#getBeanDefinitionNames
      */
     String[] getSingletonNames();
 
@@ -97,8 +97,8 @@ public interface SingletonBeanRegistry {
      * singletons defined by a bean definition that have already been created.
      * @return the number of singleton beans
      * @see #registerSingleton
-     * @see org.springframework.beans.factory.support.BeanDefinitionRegistry#getBeanDefinitionCount
-     * @see org.springframework.beans.factory.ListableBeanFactory#getBeanDefinitionCount
+     * @see com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry#getBeanDefinitionCount
+     * @see com.rocket.summer.framework.beans.factory.ListableBeanFactory#getBeanDefinitionCount
      */
     int getSingletonCount();
 

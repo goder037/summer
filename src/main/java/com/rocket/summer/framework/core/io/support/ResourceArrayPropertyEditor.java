@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Editor for {@link org.springframework.core.io.Resource} arrays, to
+ * Editor for {@link com.rocket.summer.framework.core.io.Resource} arrays, to
  * automatically convert <code>String</code> location patterns
  * (e.g. <code>"file:C:/my*.txt"</code> or <code>"classpath*:myfile.txt"</code>)
  * to <code>Resource</code> array properties. Can also translate a collection
@@ -22,10 +22,10 @@ import java.util.*;
  *
  * @author Juergen Hoeller
  * @since 1.1.2
- * @see org.springframework.core.io.Resource
+ * @see com.rocket.summer.framework.core.io.Resource
  * @see ResourcePatternResolver
  * @see PathMatchingResourcePatternResolver
- * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
+ * @see com.rocket.summer.framework.util.SystemPropertyUtils#resolvePlaceholders
  * @see System#getProperty(String)
  */
 public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
@@ -119,7 +119,7 @@ public class ResourceArrayPropertyEditor extends PropertyEditorSupport {
      * corresponding system property values if necessary.
      * @param path the original file path
      * @return the resolved file path
-     * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
+     * @see com.rocket.summer.framework.util.SystemPropertyUtils#resolvePlaceholders
      */
     protected String resolvePath(String path) {
         return SystemPropertyUtils.resolvePlaceholders(path);

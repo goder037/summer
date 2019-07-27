@@ -8,14 +8,14 @@ import java.lang.annotation.*;
  * <p>This annotation serves as a specialization of {@link Component @Component},
  * allowing for implementation classes to be autodetected through classpath scanning.
  * It is typically used in combination with annotated handler methods based on the
- * {@link org.springframework.web.bind.annotation.RequestMapping} annotation.
+ * {@link com.rocket.summer.framework.web.bind.annotation.RequestMapping} annotation.
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 2.5
  * @see Component
- * @see org.springframework.web.bind.annotation.RequestMapping
- * @see org.springframework.context.annotation.ClassPathBeanDefinitionScanner
+ * @see com.rocket.summer.framework.web.bind.annotation.RequestMapping
+ * @see com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

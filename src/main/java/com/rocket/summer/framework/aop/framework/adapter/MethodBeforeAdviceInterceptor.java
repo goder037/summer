@@ -8,7 +8,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.io.Serializable;
 
 /**
- * Interceptor to wrap am {@link org.springframework.aop.MethodBeforeAdvice}.
+ * Interceptor to wrap am {@link com.rocket.summer.framework.aop.MethodBeforeAdvice}.
  * Used internally by the AOP framework; application developers should not need
  * to use this class directly.
  *

@@ -24,8 +24,8 @@ import java.beans.PropertyDescriptor;
  * @author Juergen Hoeller
  * @author Rod Johnson
  * @since 1.2
- * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#setCustomTargetSourceCreators
- * @see org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator
+ * @see com.rocket.summer.framework.aop.framework.autoproxy.AbstractAutoProxyCreator#setCustomTargetSourceCreators
+ * @see com.rocket.summer.framework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator
  */
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
@@ -46,9 +46,9 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * @param beanName the name of the bean
      * @return the bean object to expose instead of a default instance of the target bean,
      * or <code>null</code> to proceed with default instantiation
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.factory.support.AbstractBeanDefinition#hasBeanClass
-     * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getFactoryMethodName
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition#hasBeanClass
+     * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition#getFactoryMethodName
      */
     Object postProcessBeforeInstantiation(Class beanClass, String beanName) throws BeansException;
 
@@ -56,7 +56,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * Perform operations after the bean has been instantiated, via a constructor or factory method,
      * but before Spring property population (from explicit properties or autowiring) occurs.
      * <p>This is the ideal callback for performing field injection on the given bean instance.
-     * See Spring's own {@link org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor}
+     * See Spring's own {@link com.rocket.summer.framework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor}
      * for a typical example.
      * @param bean the bean instance created, with properties not having been set yet
      * @param beanName the name of the bean
@@ -64,7 +64,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * if property population should be skipped. Normal implementations should return <code>true</code>.
      * Returning <code>false</code> will also prevent any subsequent InstantiationAwareBeanPostProcessor
      * instances being invoked on this bean instance.
-     * @throws org.springframework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      */
     boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
@@ -83,8 +83,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
      * @return the actual property values to apply to to the given bean
      * (can be the passed-in PropertyValues instance), or <code>null</code>
      * to skip property population
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.MutablePropertyValues
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.MutablePropertyValues
      */
     PropertyValues postProcessPropertyValues(
             PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)

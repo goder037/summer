@@ -14,12 +14,12 @@ import java.io.IOException;
  *
  * <p>The easiest way to expose an HttpRequestHandler bean in Spring style
  * is to define it in Spring's root web application context and define
- * an {@link org.springframework.web.context.support.HttpRequestHandlerServlet}
+ * an {@link com.rocket.summer.framework.web.context.support.HttpRequestHandlerServlet}
  * in <code>web.xml</code>, pointing at the target HttpRequestHandler bean
  * through its <code>servlet-name</code> which needs to match the target bean name.
  *
  * <p>Supported as a handler type within Spring's
- * {@link org.springframework.web.servlet.DispatcherServlet}, being able
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}, being able
  * to interact with the dispatcher's advanced mapping and interception
  * facilities. This is the recommended way of exposing an HttpRequestHandler,
  * while keeping the handler implementations free of direct dependencies
@@ -27,19 +27,19 @@ import java.io.IOException;
  *
  * <p>Typically implemented to generate binary responses directly,
  * with no separate view resource involved. This differentiates it from a
- * {@link org.springframework.web.servlet.mvc.Controller} within Spring's Web MVC
- * framework. The lack of a {@link org.springframework.web.servlet.ModelAndView}
+ * {@link com.rocket.summer.framework.web.servlet.mvc.Controller} within Spring's Web MVC
+ * framework. The lack of a {@link com.rocket.summer.framework.web.servlet.ModelAndView}
  * return value gives a clearer signature to callers other than the
  * DispatcherServlet, indicating that there will never be a view to render.
  *
  * <p>As of Spring 2.0, Spring's HTTP-based remote exporters, such as
- * {@link org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter}
- * and {@link org.springframework.remoting.caucho.HessianServiceExporter},
+ * {@link com.rocket.summer.framework.remoting.httpinvoker.HttpInvokerServiceExporter}
+ * and {@link com.rocket.summer.framework.remoting.caucho.HessianServiceExporter},
  * implement this interface rather than the more extensive Controller interface,
  * for minimal dependencies on Spring-specific web infrastructure.
  *
  * <p>Note that HttpRequestHandlers may optionally implement the
- * {@link org.springframework.web.servlet.mvc.LastModified} interface,
+ * {@link com.rocket.summer.framework.web.servlet.mvc.LastModified} interface,
  * just like Controllers can, <i>provided that they run within Spring's
  * DispatcherServlet</i>. However, this is usually not necessary, since
  * HttpRequestHandlers typically only support POST requests to begin with.
@@ -48,15 +48,15 @@ import java.io.IOException;
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.web.context.support.HttpRequestHandlerServlet
- * @see org.springframework.web.servlet.DispatcherServlet
- * @see org.springframework.web.servlet.ModelAndView
- * @see org.springframework.web.servlet.mvc.Controller
- * @see org.springframework.web.servlet.mvc.LastModified
- * @see org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter
- * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
- * @see org.springframework.remoting.caucho.HessianServiceExporter
- * @see org.springframework.remoting.caucho.BurlapServiceExporter
+ * @see com.rocket.summer.framework.web.context.support.HttpRequestHandlerServlet
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.servlet.ModelAndView
+ * @see com.rocket.summer.framework.web.servlet.mvc.Controller
+ * @see com.rocket.summer.framework.web.servlet.mvc.LastModified
+ * @see com.rocket.summer.framework.web.servlet.mvc.HttpRequestHandlerAdapter
+ * @see com.rocket.summer.framework.remoting.httpinvoker.HttpInvokerServiceExporter
+ * @see com.rocket.summer.framework.remoting.caucho.HessianServiceExporter
+ * @see com.rocket.summer.framework.remoting.caucho.BurlapServiceExporter
  */
 public interface HttpRequestHandler {
 

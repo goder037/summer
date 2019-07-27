@@ -8,7 +8,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import java.io.Serializable;
 
 /**
- * Adapter to enable {@link org.springframework.aop.AfterReturningAdvice}
+ * Adapter to enable {@link com.rocket.summer.framework.aop.AfterReturningAdvice}
  * to be used in the Spring AOP framework.
  *
  * @author Rod Johnson

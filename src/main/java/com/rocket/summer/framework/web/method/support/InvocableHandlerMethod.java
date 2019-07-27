@@ -82,7 +82,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 
     /**
      * Set the ParameterNameDiscoverer for resolving parameter names when needed (e.g. default request attribute name).
-     * <p>Default is an {@link org.springframework.core.LocalVariableTableParameterNameDiscoverer} instance.
+     * <p>Default is an {@link com.rocket.summer.framework.core.LocalVariableTableParameterNameDiscoverer} instance.
      */
     public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
         this.parameterNameDiscoverer = parameterNameDiscoverer;

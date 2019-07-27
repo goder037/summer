@@ -18,7 +18,7 @@ import com.rocket.summer.framework.util.StringUtils;
  * @author Rob Harrop
  * @since 1.1
  * @see PropertiesBeanDefinitionReader
- * @see org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader
+ * @see com.rocket.summer.framework.beans.factory.xml.DefaultBeanDefinitionDocumentReader
  */
 public class BeanDefinitionReaderUtils {
 

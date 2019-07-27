@@ -35,7 +35,7 @@ import java.io.IOException;
  * <p>As of Spring 3.1, {@code DelegatingFilterProxy} has been updated to optionally accept
  * constructor parameters when using Servlet 3.0's instance-based filter registration
  * methods, usually in conjunction with Spring 3.1's
- * {@link org.springframework.web.WebApplicationInitializer} SPI. These constructors allow
+ * {@link com.rocket.summer.framework.web.WebApplicationInitializer} SPI. These constructors allow
  * for providing the delegate Filter bean directly, or providing the application context
  * and bean name to fetch, avoiding the need to look up the application context from the
  * ServletContext.
@@ -56,7 +56,7 @@ import java.io.IOException;
  * @see #DelegatingFilterProxy(String)
  * @see #DelegatingFilterProxy(String, WebApplicationContext)
  * @see javax.servlet.ServletContext#addFilter(String, Filter)
- * @see org.springframework.web.WebApplicationInitializer
+ * @see com.rocket.summer.framework.web.WebApplicationInitializer
  */
 public class DelegatingFilterProxy extends GenericFilterBean {
 
@@ -92,7 +92,7 @@ public class DelegatingFilterProxy extends GenericFilterBean {
      * @see #doFilter(ServletRequest, ServletResponse, FilterChain)
      * @see #invokeDelegate(Filter, ServletRequest, ServletResponse, FilterChain)
      * @see #destroy()
-     * @see #setEnvironment(org.springframework.core.env.Environment)
+     * @see #setEnvironment(com.rocket.summer.framework.core.env.Environment)
      */
     public DelegatingFilterProxy(Filter delegate) {
         Assert.notNull(delegate, "delegate Filter object must not be null");
@@ -110,7 +110,7 @@ public class DelegatingFilterProxy extends GenericFilterBean {
      * @param targetBeanName name of the target filter bean to look up in the Spring
      * application context (must not be {@code null}).
      * @see #findWebApplicationContext()
-     * @see #setEnvironment(org.springframework.core.env.Environment)
+     * @see #setEnvironment(com.rocket.summer.framework.core.env.Environment)
      */
     public DelegatingFilterProxy(String targetBeanName) {
         this(targetBeanName, null);
@@ -134,7 +134,7 @@ public class DelegatingFilterProxy extends GenericFilterBean {
      * if {@code null}, an application context will be looked up from {@code ServletContext}
      * as a fallback.
      * @see #findWebApplicationContext()
-     * @see #setEnvironment(org.springframework.core.env.Environment)
+     * @see #setEnvironment(com.rocket.summer.framework.core.env.Environment)
      */
     public DelegatingFilterProxy(String targetBeanName, WebApplicationContext wac) {
         Assert.hasText(targetBeanName, "target Filter bean name must not be null or empty");

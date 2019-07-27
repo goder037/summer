@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Descriptive {@link org.springframework.core.io.Resource} wrapper for
- * a {@link org.springframework.beans.factory.config.BeanDefinition}.
+ * Descriptive {@link com.rocket.summer.framework.core.io.Resource} wrapper for
+ * a {@link com.rocket.summer.framework.beans.factory.config.BeanDefinition}.
  *
  * @author Juergen Hoeller
  * @since 2.5.2
- * @see org.springframework.core.io.DescriptiveResource
+ * @see com.rocket.summer.framework.core.io.DescriptiveResource
  */
 class BeanDefinitionResource extends AbstractResource {
 

@@ -50,7 +50,7 @@ public class ThrowsAdviceInterceptor implements MethodInterceptor, AfterAdvice {
     /**
      * Create a new ThrowsAdviceInterceptor for the given ThrowsAdvice.
      * @param throwsAdvice the advice object that defines the exception
-     * handler methods (usually a {@link org.springframework.aop.ThrowsAdvice}
+     * handler methods (usually a {@link com.rocket.summer.framework.aop.ThrowsAdvice}
      * implementation)
      */
     public ThrowsAdviceInterceptor(Object throwsAdvice) {

@@ -18,7 +18,7 @@ import java.lang.annotation.*;
  * {@literal <beans/>} XML files.  Optionally, the {@link #reader()} attribute may be
  * supplied, allowing the user to specify a different {@link BeanDefinitionReader}
  * implementation, such as
- * {@link org.springframework.beans.factory.support.PropertiesBeanDefinitionReader}.
+ * {@link com.rocket.summer.framework.beans.factory.support.PropertiesBeanDefinitionReader}.
  *
  * @author Chris Beams
  * @since 3.0

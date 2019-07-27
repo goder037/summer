@@ -75,7 +75,7 @@ public abstract class AbstractMessageSource extends MessageSourceSupport impleme
      * In general, it is recommended to just use "useCodeAsDefaultMessage" during
      * development and not rely on it in production in the first place, though.
      * @see #getMessage(String, Object[], Locale)
-     * @see org.springframework.validation.FieldError
+     * @see com.rocket.summer.framework.validation.FieldError
      */
     public void setUseCodeAsDefaultMessage(boolean useCodeAsDefaultMessage) {
         this.useCodeAsDefaultMessage = useCodeAsDefaultMessage;

@@ -11,25 +11,25 @@ import javax.servlet.http.HttpServletRequest;
  * <p>There is only one concrete implementation included in Spring,
  * as of Spring 2.5:
  * <ul>
- * <li>{@link org.springframework.web.multipart.commons.CommonsMultipartResolver} for Jakarta Commons FileUpload
+ * <li>{@link com.rocket.summer.framework.web.multipart.commons.CommonsMultipartResolver} for Jakarta Commons FileUpload
  * </ul>
  *
  * <p>There is no default resolver implementation used for Spring
- * {@link org.springframework.web.servlet.DispatcherServlet DispatcherServlets},
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet DispatcherServlets},
  * as an application might choose to parse its multipart requests itself. To define
  * an implementation, create a bean with the id "multipartResolver" in a
- * {@link org.springframework.web.servlet.DispatcherServlet DispatcherServlet's}
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet DispatcherServlet's}
  * application context. Such a resolver gets applied to all requests handled
- * by that {@link org.springframework.web.servlet.DispatcherServlet}.
+ * by that {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}.
  *
- * <p>If a {@link org.springframework.web.servlet.DispatcherServlet} detects
+ * <p>If a {@link com.rocket.summer.framework.web.servlet.DispatcherServlet} detects
  * a multipart request, it will resolve it via the configured
- * {@link org.springframework.web.multipart.MultipartResolver} and pass on a
+ * {@link com.rocket.summer.framework.web.multipart.MultipartResolver} and pass on a
  * wrapped {@link javax.servlet.http.HttpServletRequest}.
  * Controllers can then cast their given request to the
- * {@link org.springframework.web.multipart.MultipartHttpServletRequest}
+ * {@link com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest}
  * interface, which permits access to any
- * {@link org.springframework.web.multipart.MultipartFile MultipartFiles}.
+ * {@link com.rocket.summer.framework.web.multipart.MultipartFile MultipartFiles}.
  * Note that this cast is only supported in case of an actual multipart request.
  *
  * <pre class="code">
@@ -40,25 +40,25 @@ import javax.servlet.http.HttpServletRequest;
  * }</pre>
  *
  * Instead of direct access, command or form controllers can register a
- * {@link org.springframework.web.multipart.support.ByteArrayMultipartFileEditor}
- * or {@link org.springframework.web.multipart.support.StringMultipartFileEditor}
+ * {@link com.rocket.summer.framework.web.multipart.support.ByteArrayMultipartFileEditor}
+ * or {@link com.rocket.summer.framework.web.multipart.support.StringMultipartFileEditor}
  * with their data binder, to automatically apply multipart content to command
  * bean properties.
  *
  * <p>As an alternative to using a
- * {@link org.springframework.web.multipart.MultipartResolver} with a
- * {@link org.springframework.web.servlet.DispatcherServlet},
- * a {@link org.springframework.web.multipart.support.MultipartFilter} can be
+ * {@link com.rocket.summer.framework.web.multipart.MultipartResolver} with a
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet},
+ * a {@link com.rocket.summer.framework.web.multipart.support.MultipartFilter} can be
  * registered in <code>web.xml</code>. It will delegate to a corresponding
- * {@link org.springframework.web.multipart.MultipartResolver} bean in the root
+ * {@link com.rocket.summer.framework.web.multipart.MultipartResolver} bean in the root
  * application context. This is mainly intended for applications that do not
  * use Spring's own web MVC framework.
  *
  * <p>Note: There is hardly ever a need to access the
- * {@link org.springframework.web.multipart.MultipartResolver} itself
+ * {@link com.rocket.summer.framework.web.multipart.MultipartResolver} itself
  * from application code. It will simply do its work behind the scenes,
  * making
- * {@link org.springframework.web.multipart.MultipartHttpServletRequest MultipartHttpServletRequests}
+ * {@link com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest MultipartHttpServletRequests}
  * available to controllers.
  *
  * @author Juergen Hoeller
@@ -66,10 +66,10 @@ import javax.servlet.http.HttpServletRequest;
  * @since 29.09.2003
  * @see MultipartHttpServletRequest
  * @see MultipartFile
- * @see org.springframework.web.multipart.commons.CommonsMultipartResolver
- * @see org.springframework.web.multipart.support.ByteArrayMultipartFileEditor
- * @see org.springframework.web.multipart.support.StringMultipartFileEditor
- * @see org.springframework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.multipart.commons.CommonsMultipartResolver
+ * @see com.rocket.summer.framework.web.multipart.support.ByteArrayMultipartFileEditor
+ * @see com.rocket.summer.framework.web.multipart.support.StringMultipartFileEditor
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
  */
 public interface MultipartResolver {
 
@@ -85,7 +85,7 @@ public interface MultipartResolver {
     /**
      * Parse the given HTTP request into multipart files and parameters,
      * and wrap the request inside a
-     * {@link org.springframework.web.multipart.MultipartHttpServletRequest} object
+     * {@link com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest} object
      * that provides access to file descriptors and makes contained
      * parameters accessible via the standard ServletRequest methods.
      * @param request the servlet request to wrap (must be of a multipart content type)

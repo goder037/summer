@@ -14,8 +14,8 @@ import java.io.IOException;
  * @since 2.0
  * @see #getMessage
  * @see #printStackTrace
- * @see org.springframework.core.NestedCheckedException
- * @see org.springframework.core.NestedRuntimeException
+ * @see com.rocket.summer.framework.core.NestedCheckedException
+ * @see com.rocket.summer.framework.core.NestedRuntimeException
  */
 public class NestedIOException extends IOException {
 

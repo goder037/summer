@@ -13,7 +13,7 @@ import java.util.Map;
  * Special {@link DataBinder} for data binding from web request parameters
  * to JavaBean objects. Designed for web environments, but not dependent on
  * the Servlet API; serves as base class for more specific DataBinder variants,
- * such as {@link org.springframework.web.bind.ServletRequestDataBinder}.
+ * such as {@link com.rocket.summer.framework.web.bind.ServletRequestDataBinder}.
  *
  * <p>Includes support for field markers which address a common problem with
  * HTML checkboxes and select options: detecting that a field was part of
@@ -103,7 +103,7 @@ public class WebDataBinder extends DataBinder {
      * As the marker parameter is sent in any case, the data binder can
      * detect an empty field and automatically reset its value.
      * @see #DEFAULT_FIELD_MARKER_PREFIX
-     * @see org.springframework.web.servlet.mvc.BaseCommandController#onBind
+     * @see com.rocket.summer.framework.web.servlet.mvc.BaseCommandController#onBind
      */
     public void setFieldMarkerPrefix(String fieldMarkerPrefix) {
         this.fieldMarkerPrefix = fieldMarkerPrefix;
@@ -129,7 +129,7 @@ public class WebDataBinder extends DataBinder {
      * <p>The presence of a default parameter preempts the behavior of a field
      * marker for the given field.
      * @see #DEFAULT_FIELD_DEFAULT_PREFIX
-     * @see org.springframework.web.servlet.mvc.BaseCommandController#onBind
+     * @see com.rocket.summer.framework.web.servlet.mvc.BaseCommandController#onBind
      */
     public void setFieldDefaultPrefix(String fieldDefaultPrefix) {
         this.fieldDefaultPrefix = fieldDefaultPrefix;
@@ -148,7 +148,7 @@ public class WebDataBinder extends DataBinder {
      * when the user resubmits the form without choosing a different file.
      * Else, the already bound MultipartFile will be replaced by an empty
      * MultipartFile holder.
-     * @see org.springframework.web.multipart.MultipartFile
+     * @see com.rocket.summer.framework.web.multipart.MultipartFile
      */
     public void setBindEmptyMultipartFiles(boolean bindEmptyMultipartFiles) {
         this.bindEmptyMultipartFiles = bindEmptyMultipartFiles;
@@ -174,6 +174,8 @@ public class WebDataBinder extends DataBinder {
         checkFieldMarkers(mpvs);
         super.doBind(mpvs);
     }
+
+
 
     /**
      * Check the given property values for field defaults,
@@ -259,7 +261,7 @@ public class WebDataBinder extends DataBinder {
      * are not empty or if we're configured to bind empty multipart files too.
      * @param multipartFiles Map of field name String to MultipartFile object
      * @param mpvs the property values to be bound (can be modified)
-     * @see org.springframework.web.multipart.MultipartFile
+     * @see com.rocket.summer.framework.web.multipart.MultipartFile
      * @see #setBindEmptyMultipartFiles
      * @deprecated as of Spring 3.0, in favor of {@link #bindMultipart} which binds
      * all multipart files, even if more than one sent for the same name
@@ -282,7 +284,7 @@ public class WebDataBinder extends DataBinder {
      * are not empty or if we're configured to bind empty multipart files too.
      * @param multipartFiles Map of field name String to MultipartFile object
      * @param mpvs the property values to be bound (can be modified)
-     * @see org.springframework.web.multipart.MultipartFile
+     * @see com.rocket.summer.framework.web.multipart.MultipartFile
      * @see #setBindEmptyMultipartFiles
      */
     protected void bindMultipart(Map<String, List<MultipartFile>> multipartFiles, MutablePropertyValues mpvs) {

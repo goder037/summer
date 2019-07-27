@@ -20,7 +20,7 @@ public interface ThemeSource {
      * Note that, by convention, a ThemeSource should at least be able to
      * return a default Theme for the default theme name "theme" but may also
      * return default Themes for other theme names.
-     * @see org.springframework.web.servlet.theme.AbstractThemeResolver#ORIGINAL_DEFAULT_THEME_NAME
+     * @see com.rocket.summer.framework.web.servlet.theme.AbstractThemeResolver#ORIGINAL_DEFAULT_THEME_NAME
      */
     Theme getTheme(String themeName);
 

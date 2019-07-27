@@ -42,7 +42,7 @@ public class ProxyConfig implements Serializable {
      * the proxy-target-class behavior will also be applied if no interfaces
      * have been specified (and no interface autodetection is activated).
      *
-     * @see org.springframework.aop.TargetSource#getTargetClass()
+     * @see com.rocket.summer.framework.aop.TargetSource#getTargetClass()
      */
     public void setProxyTargetClass(boolean proxyTargetClass) {
         this.proxyTargetClass = proxyTargetClass;

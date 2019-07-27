@@ -1,8 +1,8 @@
 package com.rocket.summer.framework.http.converter;
 
 /**
- * Thrown by {@link org.springframework.http.converter.HttpMessageConverter} implementations when the
- * {@link org.springframework.http.converter.HttpMessageConverter#write(Object, org.springframework.http.HttpOutputMessage) write} method fails.
+ * Thrown by {@link com.rocket.summer.framework.http.converter.HttpMessageConverter} implementations when the
+ * {@link com.rocket.summer.framework.http.converter.HttpMessageConverter#write(Object, com.rocket.summer.framework.http.HttpOutputMessage) write} method fails.
  *
  * @author Arjen Poutsma
  * @since 3.0

@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Base interface for type filters using a
- * {@link org.springframework.core.type.classreading.MetadataReader}.
+ * {@link com.rocket.summer.framework.core.type.classreading.MetadataReader}.
  *
  * @author Costin Leau
  * @author Juergen Hoeller

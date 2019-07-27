@@ -22,8 +22,8 @@ public abstract class ResourcePatternUtils {
      * @param resourceLocation the location String to check
      * @return whether the location qualifies as a URL
      * @see ResourcePatternResolver#CLASSPATH_ALL_URL_PREFIX
-     * @see org.springframework.util.ResourceUtils#CLASSPATH_URL_PREFIX
-     * @see org.springframework.util.ResourceUtils#isUrl(String)
+     * @see com.rocket.summer.framework.util.ResourceUtils#CLASSPATH_URL_PREFIX
+     * @see com.rocket.summer.framework.util.ResourceUtils#isUrl(String)
      * @see java.net.URL
      */
     public static boolean isUrl(String resourceLocation) {

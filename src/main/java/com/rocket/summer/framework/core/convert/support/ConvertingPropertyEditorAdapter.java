@@ -8,7 +8,7 @@ import java.beans.PropertyEditorSupport;
 
 /**
  * Adapter that exposes a {@link java.beans.PropertyEditor} for any given
- * {@link org.springframework.core.convert.ConversionService} and specific target type.
+ * {@link com.rocket.summer.framework.core.convert.ConversionService} and specific target type.
  *
  * @author Juergen Hoeller
  * @since 3.0
@@ -24,7 +24,7 @@ public class ConvertingPropertyEditorAdapter extends PropertyEditorSupport {
 
     /**
      * Create a new ConvertingPropertyEditorAdapter for a given
-     * {@link org.springframework.core.convert.ConversionService}
+     * {@link com.rocket.summer.framework.core.convert.ConversionService}
      * and the given target type.
      * @param conversionService the ConversionService to delegate to
      * @param targetDescriptor the target type to convert to

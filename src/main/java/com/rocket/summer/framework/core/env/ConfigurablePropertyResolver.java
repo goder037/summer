@@ -5,7 +5,7 @@ import com.rocket.summer.framework.core.convert.support.ConfigurableConversionSe
 /**
  * Configuration interface to be implemented by most if not all {@link PropertyResolver
  * PropertyResolver} types. Provides facilities for accessing and customizing the
- * {@link org.springframework.core.convert.ConversionService ConversionService} used when
+ * {@link com.rocket.summer.framework.core.convert.ConversionService ConversionService} used when
  * converting property values from one type to another.
  *
  * @author Chris Beams
@@ -23,7 +23,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
      * cs.addConverter(new FooConverter());
      * </pre>
      * @see PropertyResolver#getProperty(String, Class)
-     * @see org.springframework.core.convert.converter.ConverterRegistry#addConverter
+     * @see com.rocket.summer.framework.core.convert.converter.ConverterRegistry#addConverter
      */
     ConfigurableConversionService getConversionService();
 
@@ -36,7 +36,7 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
      * such as {@code #addConverter}.
      * @see PropertyResolver#getProperty(String, Class)
      * @see #getConversionService()
-     * @see org.springframework.core.convert.converter.ConverterRegistry#addConverter
+     * @see com.rocket.summer.framework.core.convert.converter.ConverterRegistry#addConverter
      */
     void setConversionService(ConfigurableConversionService conversionService);
 

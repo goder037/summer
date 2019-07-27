@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Simple {@link org.springframework.aop.IntroductionAdvisor} implementation
+ * Simple {@link com.rocket.summer.framework.aop.IntroductionAdvisor} implementation
  * that by default applies to any class.
  *
  * @author Rod Johnson
@@ -34,7 +34,7 @@ public class DefaultIntroductionAdvisor implements IntroductionAdvisor, ClassFil
     /**
      * Create a DefaultIntroductionAdvisor for the given advice.
      * @param advice the Advice to apply (may implement the
-     * {@link org.springframework.aop.IntroductionInfo} interface)
+     * {@link com.rocket.summer.framework.aop.IntroductionInfo} interface)
      * @see #addInterface
      */
     public DefaultIntroductionAdvisor(Advice advice) {

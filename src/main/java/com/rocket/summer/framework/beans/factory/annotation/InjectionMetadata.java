@@ -22,8 +22,8 @@ import java.util.Set;
  * Not intended for direct use in applications.
  *
  * <p>Used by {@link AutowiredAnnotationBeanPostProcessor},
- * {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor} and
- * {@link org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
+ * {@link com.rocket.summer.framework.context.annotation.CommonAnnotationBeanPostProcessor} and
+ * {@link com.rocket.summer.framework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor}.
  *
  * @author Juergen Hoeller
  * @since 2.5

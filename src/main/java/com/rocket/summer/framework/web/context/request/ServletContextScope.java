@@ -18,16 +18,16 @@ import java.util.Map;
  * ApplicationContext.
  *
  * <p>The associated destruction mechanism relies on a
- * {@link org.springframework.web.context.ContextCleanupListener} being registered in
- * <code>web.xml</code>. Note that {@link org.springframework.web.context.ContextLoaderListener}
+ * {@link com.rocket.summer.framework.web.context.ContextCleanupListener} being registered in
+ * <code>web.xml</code>. Note that {@link com.rocket.summer.framework.web.context.ContextLoaderListener}
  * includes ContextCleanupListener's functionality.
  *
  * <p>This scope is registered as default scope with key
- * {@link org.springframework.web.context.WebApplicationContext#SCOPE_APPLICATION "application"}.
+ * {@link com.rocket.summer.framework.web.context.WebApplicationContext#SCOPE_APPLICATION "application"}.
  *
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.web.context.ContextCleanupListener
+ * @see com.rocket.summer.framework.web.context.ContextCleanupListener
  */
 public class ServletContextScope implements Scope, DisposableBean {
 
@@ -82,7 +82,7 @@ public class ServletContextScope implements Scope, DisposableBean {
     /**
      * Invoke all registered destruction callbacks.
      * To be called on ServletContext shutdown.
-     * @see org.springframework.web.context.ContextCleanupListener
+     * @see com.rocket.summer.framework.web.context.ContextCleanupListener
      */
     public void destroy() {
         for (Runnable runnable : this.destructionCallbacks.values()) {

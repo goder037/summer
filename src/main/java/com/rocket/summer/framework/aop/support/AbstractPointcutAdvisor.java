@@ -7,7 +7,7 @@ import com.rocket.summer.framework.util.ObjectUtils;
 import java.io.Serializable;
 
 /**
- * Abstract base class for {@link org.springframework.aop.PointcutAdvisor}
+ * Abstract base class for {@link com.rocket.summer.framework.aop.PointcutAdvisor}
  * implementations. Can be subclassed for returning a specific pointcut/advice
  * or a freely configurable pointcut/advice.
  *

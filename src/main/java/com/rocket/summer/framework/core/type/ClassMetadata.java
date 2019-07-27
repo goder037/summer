@@ -7,7 +7,7 @@ package com.rocket.summer.framework.core.type;
  * @author Juergen Hoeller
  * @since 2.5
  * @see StandardClassMetadata
- * @see org.springframework.core.type.classreading.MetadataReader#getClassMetadata()
+ * @see com.rocket.summer.framework.core.type.classreading.MetadataReader#getClassMetadata()
  * @see AnnotationMetadata
  */
 public interface ClassMetadata {

@@ -28,7 +28,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
     /**
      * Specify the order value for this HandlerAdapter bean.
      * <p>Default value is <code>Integer.MAX_VALUE</code>, meaning that it's non-ordered.
-     * @see org.springframework.core.Ordered#getOrder()
+     * @see com.rocket.summer.framework.core.Ordered#getOrder()
      */
     public void setOrder(int order) {
         this.order = order;

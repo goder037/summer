@@ -59,7 +59,6 @@ import java.util.List;
  * @author Juergen Hoeller
  * @since 1.0.1
  */
-@SuppressWarnings("serial")
 public class DefaultMessageCodesResolver implements MessageCodesResolver, Serializable {
 
     /**
@@ -70,7 +69,6 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
 
     private String prefix = "";
 
-
     /**
      * Specify a prefix to be applied to any code built by this resolver.
      * <p>Default is none. Specify, for example, "validation." to get
@@ -78,6 +76,12 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
      */
     public void setPrefix(String prefix) {
         this.prefix = (prefix != null ? prefix : "");
+    }
+
+    public String[] resolveMessageCodes(String errorCode, String objectName) {
+        return new String[] {
+                postProcessMessageCode(errorCode + CODE_SEPARATOR + objectName),
+                postProcessMessageCode(errorCode)};
     }
 
     /**
@@ -88,11 +92,15 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
         return this.prefix;
     }
 
-
-    public String[] resolveMessageCodes(String errorCode, String objectName) {
-        return new String[] {
-                postProcessMessageCode(errorCode + CODE_SEPARATOR + objectName),
-                postProcessMessageCode(errorCode)};
+    /**
+     * Post-process the given message code, built by this resolver.
+     * <p>The default implementation applies the specified prefix, if any.
+     * @param code the message code as built by this resolver
+     * @return the final message code to be returned
+     * @see #setPrefix
+     */
+    protected String postProcessMessageCode(String code) {
+        return getPrefix() + code;
     }
 
     /**
@@ -145,17 +153,4 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
             }
         }
     }
-
-    /**
-     * Post-process the given message code, built by this resolver.
-     * <p>The default implementation applies the specified prefix, if any.
-     * @param code the message code as built by this resolver
-     * @return the final message code to be returned
-     * @see #setPrefix
-     */
-    protected String postProcessMessageCode(String code) {
-        return getPrefix() + code;
-    }
-
 }
-

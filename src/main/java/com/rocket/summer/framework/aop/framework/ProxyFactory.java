@@ -115,7 +115,7 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * @param proxyInterface the interface that the proxy should implement
      * @param targetSource the TargetSource that the proxy should invoke
      * @return the proxy object
-     * @see #ProxyFactory(Class, org.springframework.aop.TargetSource)
+     * @see #ProxyFactory(Class, com.rocket.summer.framework.aop.TargetSource)
      */
     public static Object getProxy(Class proxyInterface, TargetSource targetSource) {
         return new ProxyFactory(proxyInterface, targetSource).getProxy();

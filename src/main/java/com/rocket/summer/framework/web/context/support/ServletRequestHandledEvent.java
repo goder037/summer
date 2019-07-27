@@ -6,8 +6,8 @@ package com.rocket.summer.framework.web.context.support;
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.web.servlet.FrameworkServlet
- * @see org.springframework.context.ApplicationContext#publishEvent
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet
+ * @see com.rocket.summer.framework.context.ApplicationContext#publishEvent
  */
 public class ServletRequestHandledEvent extends RequestHandledEvent {
 

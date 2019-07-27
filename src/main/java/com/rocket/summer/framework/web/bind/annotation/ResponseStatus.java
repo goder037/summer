@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * to the HTTP response when the handler method is invoked, or whenever said exception is thrown.
  *
  * @author Arjen Poutsma
- * @see org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver
+ * @see com.rocket.summer.framework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver
  * @since 3.0
  */
 @Target({ElementType.TYPE, ElementType.METHOD})

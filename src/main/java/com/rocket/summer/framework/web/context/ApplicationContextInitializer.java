@@ -13,16 +13,16 @@ import com.rocket.summer.framework.context.ConfigurableApplicationContext;
  * for declaring a "contextInitializerClasses" context-param and init-param, respectively.
  *
  * <p>{@code ApplicationContextInitializer} processors are encouraged to detect
- * whether Spring's {@link org.springframework.core.Ordered Ordered} interface has been
- * implemented or if the @{@link org.springframework.core.annotation.Order Order}
+ * whether Spring's {@link com.rocket.summer.framework.core.Ordered Ordered} interface has been
+ * implemented or if the @{@link com.rocket.summer.framework.core.annotation.Order Order}
  * annotation is present and to sort instances accordingly if so prior to invocation.
  *
  * @author Chris Beams
  * @since 3.1
- * @see org.springframework.web.context.ContextLoader#customizeContext
- * @see org.springframework.web.context.ContextLoader#CONTEXT_INITIALIZER_CLASSES_PARAM
- * @see org.springframework.web.servlet.FrameworkServlet#setContextInitializerClasses
- * @see org.springframework.web.servlet.FrameworkServlet#applyInitializers
+ * @see com.rocket.summer.framework.web.context.ContextLoader#customizeContext
+ * @see com.rocket.summer.framework.web.context.ContextLoader#CONTEXT_INITIALIZER_CLASSES_PARAM
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet#setContextInitializerClasses
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet#applyInitializers
  */
 public interface ApplicationContextInitializer<C extends ConfigurableApplicationContext> {
 

@@ -43,9 +43,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
      * <p>If the passed-in bean factory does not only implement the BeanDefinitionRegistry
      * interface but also the ResourceLoader interface, it will be used as default
      * ResourceLoader as well. This will usually be the case for
-     * {@link org.springframework.context.ApplicationContext} implementations.
+     * {@link com.rocket.summer.framework.context.ApplicationContext} implementations.
      * <p>If given a plain BeanDefinitionRegistry, the default ResourceLoader will be a
-     * {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}.
+     * {@link com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver}.
      * @param registry the BeanFactory to load bean definitions into,
      * in the form of a BeanDefinitionRegistry
      * @see #setResourceLoader
@@ -80,8 +80,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
      * resource pattern resolving through the ResourcePatternResolver interface.
      * <p>Setting this to <code>null</code> suggests that absolute resource loading
      * is not available for this bean definition reader.
-     * @see org.springframework.core.io.support.ResourcePatternResolver
-     * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver
      */
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;

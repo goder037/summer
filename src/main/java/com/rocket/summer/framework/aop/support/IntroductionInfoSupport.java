@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Support for implementations of {@link org.springframework.aop.IntroductionInfo}.
+ * Support for implementations of {@link com.rocket.summer.framework.aop.IntroductionInfo}.
  *
  * <p>Allows subclasses to conveniently add all interfaces from a given object,
  * and to suppress interfaces that should not be added. Also allows for querying

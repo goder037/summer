@@ -118,7 +118,7 @@ public class FileSystemResource extends AbstractResource {
     /**
      * This implementation creates a FileSystemResource, applying the given path
      * relative to the path of the underlying file of this resource descriptor.
-     * @see org.springframework.util.StringUtils#applyRelativePath(String, String)
+     * @see com.rocket.summer.framework.util.StringUtils#applyRelativePath(String, String)
      */
     public Resource createRelative(String relativePath) {
         String pathToUse = StringUtils.applyRelativePath(this.path, relativePath);

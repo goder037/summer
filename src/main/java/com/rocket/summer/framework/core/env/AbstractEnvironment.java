@@ -157,7 +157,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
      *
      * <p>Note that clients of any {@link ConfigurableEnvironment} may further customize
      * property sources via the {@link #getPropertySources()} accessor, typically within
-     * an {@link org.springframework.context.ApplicationContextInitializer
+     * an {@link com.rocket.summer.framework.context.ApplicationContextInitializer
      * ApplicationContextInitializer}. For example:
      * <pre class="code">
      * ConfigurableEnvironment env = new StandardEnvironment();
@@ -177,7 +177,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
      *
      * @see MutablePropertySources
      * @see PropertySourcesPropertyResolver
-     * @see org.springframework.context.ApplicationContextInitializer
+     * @see com.rocket.summer.framework.context.ApplicationContextInitializer
      */
     protected void customizePropertySources(MutablePropertySources propertySources) {
     }

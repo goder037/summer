@@ -7,7 +7,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
 
 /**
  * ASM class visitor which looks only for the class name and implemented types,
- * exposing them through the {@link org.springframework.core.type.ClassMetadata}
+ * exposing them through the {@link com.rocket.summer.framework.core.type.ClassMetadata}
  * interface.
  *
  * @author Rod Johnson

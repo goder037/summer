@@ -27,8 +27,8 @@ import java.util.Map;
  * @since 2.0
  * @see #setExtractOldValueForEditor
  * @see BeanWrapper
- * @see org.springframework.validation.DirectFieldBindingResult
- * @see org.springframework.validation.DataBinder#initDirectFieldAccess()
+ * @see com.rocket.summer.framework.validation.DirectFieldBindingResult
+ * @see com.rocket.summer.framework.validation.DataBinder#initDirectFieldAccess()
  */
 public class DirectFieldAccessor extends AbstractPropertyAccessor {
 

@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of the {@link org.springframework.web.servlet.HandlerMapping}
+ * Implementation of the {@link com.rocket.summer.framework.web.servlet.HandlerMapping}
  * interface that map from URLs to beans with names that start with a slash ("/"),
  * similar to how Struts maps URLs to action names.
  *
  * <p>This is the default implementation used by the
- * {@link org.springframework.web.servlet.DispatcherServlet}, along with
- * {@link org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping}
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}, along with
+ * {@link com.rocket.summer.framework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping}
  * (on Java 5 and higher). Alternatively, {@link SimpleUrlHandlerMapping} allows for
  * customizing a handler mapping declaratively.
  *
@@ -26,7 +26,7 @@ import java.util.List;
  * to map within the current servlet mapping if applicable; see the
  * {@link #setAlwaysUseFullPath "alwaysUseFullPath"} property for details.
  * For details on the pattern options, see the
- * {@link org.springframework.util.AntPathMatcher} javadoc.
+ * {@link com.rocket.summer.framework.util.AntPathMatcher} javadoc.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

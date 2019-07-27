@@ -8,7 +8,7 @@ import com.rocket.summer.framework.web.context.request.WebRequest;
 import com.rocket.summer.framework.web.multipart.MultipartRequest;
 
 /**
- * Special {@link org.springframework.validation.DataBinder} to perform data binding
+ * Special {@link com.rocket.summer.framework.validation.DataBinder} to perform data binding
  * from web request parameters to JavaBeans, including support for multipart files.
  *
  * <p>See the DataBinder/WebDataBinder superclasses for customization options,
@@ -16,8 +16,8 @@ import com.rocket.summer.framework.web.multipart.MultipartRequest;
  * property editors.
  *
  * <p>Can also used for manual data binding in custom web controllers or interceptors
- * that build on Spring's {@link org.springframework.web.context.request.WebRequest}
- * abstraction: e.g. in a {@link org.springframework.web.context.request.WebRequestInterceptor}
+ * that build on Spring's {@link com.rocket.summer.framework.web.context.request.WebRequest}
+ * abstraction: e.g. in a {@link com.rocket.summer.framework.web.context.request.WebRequestInterceptor}
  * implementation. Simply instantiate a WebRequestDataBinder for each binding
  * process, and invoke <code>bind</code> with the current WebRequest as argument:
  *
@@ -35,7 +35,7 @@ import com.rocket.summer.framework.web.multipart.MultipartRequest;
  *
  * @author Juergen Hoeller
  * @since 2.5.2
- * @see #bind(org.springframework.web.context.request.WebRequest)
+ * @see #bind(com.rocket.summer.framework.web.context.request.WebRequest)
  * @see #registerCustomEditor
  * @see #setAllowedFields
  * @see #setRequiredFields
@@ -77,10 +77,10 @@ public class WebRequestDataBinder extends WebDataBinder {
      * byte[], or String. The latter two receive the contents of the uploaded file;
      * all metadata like original file name, content type, etc are lost in those cases.
      * @param request request with parameters to bind (can be multipart)
-     * @see org.springframework.web.multipart.MultipartRequest
-     * @see org.springframework.web.multipart.MultipartFile
+     * @see com.rocket.summer.framework.web.multipart.MultipartRequest
+     * @see com.rocket.summer.framework.web.multipart.MultipartFile
      * @see #bindMultipartFiles
-     * @see #bind(org.springframework.beans.PropertyValues)
+     * @see #bind(com.rocket.summer.framework.beans.PropertyValues)
      */
     public void bind(WebRequest request) {
         MutablePropertyValues mpvs = new MutablePropertyValues(request.getParameterMap());

@@ -10,7 +10,7 @@ import java.util.Set;
  * @since 3.1
  * @see ConfigurablePropertyResolver#setRequiredProperties(String...)
  * @see ConfigurablePropertyResolver#validateRequiredProperties()
- * @see org.springframework.context.support.AbstractApplicationContext#prepareRefresh()
+ * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#prepareRefresh()
  */
 public class MissingRequiredPropertiesException extends IllegalStateException {
 

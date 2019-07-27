@@ -64,7 +64,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     /**
      * Constant that indicates dependency checking for "simple" properties.
      * @see #setDependencyCheck
-     * @see org.springframework.beans.BeanUtils#isSimpleProperty
+     * @see com.rocket.summer.framework.beans.BeanUtils#isSimpleProperty
      */
     public static final int DEPENDENCY_CHECK_SIMPLE = 2;
 

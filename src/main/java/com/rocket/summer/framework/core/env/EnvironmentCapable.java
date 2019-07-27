@@ -8,10 +8,10 @@ package com.rocket.summer.framework.core.env;
  * instances that may or may not actually be ApplicationContext instances in order to interact
  * with the environment if indeed it is available.
  *
- * <p>As mentioned, {@link org.springframework.context.ApplicationContext ApplicationContext}
+ * <p>As mentioned, {@link com.rocket.summer.framework.context.ApplicationContext ApplicationContext}
  * extends EnvironmentCapable, and thus exposes a {@link #getEnvironment()} method; however,
- * {@link org.springframework.context.ConfigurableApplicationContext ConfigurableApplicationContext}
- * redefines {@link org.springframework.context.ConfigurableApplicationContext#getEnvironment
+ * {@link com.rocket.summer.framework.context.ConfigurableApplicationContext ConfigurableApplicationContext}
+ * redefines {@link com.rocket.summer.framework.context.ConfigurableApplicationContext#getEnvironment
  * getEnvironment()} and narrows the signature to return a {@link ConfigurableEnvironment}. The effect
  * is that an Environment object is 'read-only' until it accessed from a ConfigurableApplicationContext,
  * at which point it too may be configured.
@@ -20,7 +20,7 @@ package com.rocket.summer.framework.core.env;
  * @since 3.1
  * @see Environment
  * @see ConfigurableEnvironment
- * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
+ * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#getEnvironment
  */
 public interface EnvironmentCapable {
 

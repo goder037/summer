@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Base class for decorating ClassLoaders such as {@link OverridingClassLoader}
- * and {@link org.springframework.instrument.classloading.ShadowingClassLoader},
+ * and {@link com.rocket.summer.framework.instrument.classloading.ShadowingClassLoader},
  * providing common handling of excluded packages and classes.
  *
  * @author Juergen Hoeller

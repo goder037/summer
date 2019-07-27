@@ -13,20 +13,20 @@ import java.util.*;
 
 /**
  * Generic registry for shared bean instances, implementing the
- * {@link org.springframework.beans.factory.config.SingletonBeanRegistry}.
+ * {@link com.rocket.summer.framework.beans.factory.config.SingletonBeanRegistry}.
  * Allows for registering singleton instances that should be shared
  * for all callers of the registry, to be obtained via bean name.
  *
  * <p>Also supports registration of
- * {@link org.springframework.beans.factory.DisposableBean} instances,
+ * {@link com.rocket.summer.framework.beans.factory.DisposableBean} instances,
  * (which might or might not correspond to registered singletons),
  * to be destroyed on shutdown of the registry. Dependencies between
  * beans can be registered to enforce an appropriate shutdown order.
  *
  * <p>This class mainly serves as base class for
- * {@link org.springframework.beans.factory.BeanFactory} implementations,
+ * {@link com.rocket.summer.framework.beans.factory.BeanFactory} implementations,
  * factoring out the common management of singleton bean instances. Note that
- * the {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
+ * the {@link com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory}
  * interface extends the {@link SingletonBeanRegistry} interface.
  *
  * <p>Note that this class assumes neither a bean definition concept
@@ -39,8 +39,8 @@ import java.util.*;
  * @since 2.0
  * @see #registerSingleton
  * @see #registerDisposableBean
- * @see org.springframework.beans.factory.DisposableBean
- * @see org.springframework.beans.factory.config.ConfigurableBeanFactory
+ * @see com.rocket.summer.framework.beans.factory.DisposableBean
+ * @see com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory
  */
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 

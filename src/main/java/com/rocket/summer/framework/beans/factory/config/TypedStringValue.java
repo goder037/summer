@@ -16,7 +16,7 @@ import com.rocket.summer.framework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 1.2
  * @see BeanDefinition#getPropertyValues
- * @see org.springframework.beans.MutablePropertyValues#addPropertyValue
+ * @see com.rocket.summer.framework.beans.MutablePropertyValues#addPropertyValue
  */
 public class TypedStringValue implements BeanMetadataElement {
 

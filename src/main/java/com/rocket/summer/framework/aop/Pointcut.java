@@ -5,14 +5,14 @@ package com.rocket.summer.framework.aop;
  *
  * <p>A pointcut is composed of a {@link ClassFilter} and a {@link MethodMatcher}.
  * Both these basic terms and a Pointcut itself can be combined to build up combinations
- * (e.g. through {@link org.springframework.aop.support.ComposablePointcut}).
+ * (e.g. through {@link com.rocket.summer.framework.aop.support.ComposablePointcut}).
  *
  * @author Rod Johnson
  * @see ClassFilter
  * @see MethodMatcher
- * @see org.springframework.aop.support.Pointcuts
- * @see org.springframework.aop.support.ClassFilters
- * @see org.springframework.aop.support.MethodMatchers
+ * @see com.rocket.summer.framework.aop.support.Pointcuts
+ * @see com.rocket.summer.framework.aop.support.ClassFilters
+ * @see com.rocket.summer.framework.aop.support.MethodMatchers
  */
 public interface Pointcut {
 

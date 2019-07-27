@@ -18,7 +18,7 @@ import com.rocket.summer.framework.core.io.ResourceLoader;
  *
  * @author Juergen Hoeller
  * @since 1.1
- * @see org.springframework.core.io.Resource
+ * @see com.rocket.summer.framework.core.io.Resource
  */
 public interface BeanDefinitionReader {
 
@@ -52,7 +52,7 @@ public interface BeanDefinitionReader {
      * for loading bean definitions from a resource location (or location pattern).
      * This is a convenience to avoid explicit ResourceLoader handling.
      * @see #loadBeanDefinitions(String)
-     * @see org.springframework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
      */
     ResourceLoader getResourceLoader();
 
@@ -96,8 +96,8 @@ public interface BeanDefinitionReader {
      * @return the number of bean definitions found
      * @throws BeanDefinitionStoreException in case of loading or parsing errors
      * @see #getResourceLoader()
-     * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
-     * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
+     * @see #loadBeanDefinitions(com.rocket.summer.framework.core.io.Resource)
+     * @see #loadBeanDefinitions(com.rocket.summer.framework.core.io.Resource[])
      */
     int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
 

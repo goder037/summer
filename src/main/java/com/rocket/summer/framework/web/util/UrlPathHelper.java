@@ -7,15 +7,16 @@ import org.apache.commons.logging.LogFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 /**
  * Helper class for URL path matching. Provides support for URL paths in
  * RequestDispatcher includes and support for consistent URL decoding.
  *
- * <p>Used by {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping},
- * {@link org.springframework.web.servlet.mvc.multiaction.AbstractUrlMethodNameResolver}
- * and {@link org.springframework.web.servlet.support.RequestContext} for path matching
+ * <p>Used by {@link com.rocket.summer.framework.web.servlet.handler.AbstractUrlHandlerMapping},
+ * {@link com.rocket.summer.framework.web.servlet.mvc.multiaction.AbstractUrlMethodNameResolver}
+ * and {@link com.rocket.summer.framework.web.servlet.support.RequestContext} for path matching
  * and/or URI determination.
  *
  * @author Juergen Hoeller

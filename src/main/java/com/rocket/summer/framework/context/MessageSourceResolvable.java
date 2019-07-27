@@ -8,8 +8,8 @@ package com.rocket.summer.framework.context;
  *
  * @author Juergen Hoeller
  * @see MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
- * @see org.springframework.validation.ObjectError
- * @see org.springframework.validation.FieldError
+ * @see com.rocket.summer.framework.validation.ObjectError
+ * @see com.rocket.summer.framework.validation.FieldError
  */
 public interface MessageSourceResolvable {
 

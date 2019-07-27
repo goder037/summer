@@ -9,14 +9,14 @@ import java.util.Locale;
 
 /**
  * {@link ServletWebRequest} subclass that is aware of
- * {@link org.springframework.web.servlet.DispatcherServlet}'s
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}'s
  * request context, such as the Locale determined by the configured
- * {@link org.springframework.web.servlet.LocaleResolver}.
+ * {@link com.rocket.summer.framework.web.servlet.LocaleResolver}.
  *
  * @author Juergen Hoeller
  * @since 2.0
  * @see #getLocale()
- * @see org.springframework.web.servlet.LocaleResolver
+ * @see com.rocket.summer.framework.web.servlet.LocaleResolver
  */
 public class DispatcherServletWebRequest extends ServletWebRequest {
 

@@ -67,10 +67,10 @@ import java.lang.annotation.*;
  * @author Dave Syer
  * @author Rossen Stoyanchev
  * @since 3.1
- * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurer
- * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
- * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport
- * @see org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
+ * @see com.rocket.summer.framework.web.servlet.config.annotation.WebMvcConfigurer
+ * @see com.rocket.summer.framework.web.servlet.config.annotation.WebMvcConfigurerAdapter
+ * @see com.rocket.summer.framework.web.servlet.config.annotation.WebMvcConfigurationSupport
+ * @see com.rocket.summer.framework.web.servlet.config.annotation.DelegatingWebMvcConfiguration
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

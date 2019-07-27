@@ -87,7 +87,7 @@ public interface PropertyResolver {
      * @return the resolved String (never {@code null})
      * @throws IllegalArgumentException if given text is {@code null}
      * @see #resolveRequiredPlaceholders
-     * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String)
+     * @see com.rocket.summer.framework.util.SystemPropertyUtils#resolvePlaceholders(String)
      */
     String resolvePlaceholders(String text);
 
@@ -98,7 +98,7 @@ public interface PropertyResolver {
      * @return the resolved String (never {@code null})
      * @throws IllegalArgumentException if given text is {@code null}
      * @throws IllegalArgumentException if any placeholders are unresolvable
-     * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, boolean)
+     * @see com.rocket.summer.framework.util.SystemPropertyUtils#resolvePlaceholders(String, boolean)
      */
     String resolveRequiredPlaceholders(String text) throws IllegalArgumentException;
 }

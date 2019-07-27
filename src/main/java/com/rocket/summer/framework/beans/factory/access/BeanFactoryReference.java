@@ -11,7 +11,7 @@ import com.rocket.summer.framework.beans.factory.BeanFactory;
  *
  * @author Colin Sampaleanu
  * @see BeanFactoryLocator
- * @see org.springframework.context.access.ContextBeanFactoryReference
+ * @see com.rocket.summer.framework.context.access.ContextBeanFactoryReference
  */
 public interface BeanFactoryReference {
 
@@ -27,14 +27,14 @@ public interface BeanFactoryReference {
      * <p>Depending on the actual implementation of {@link BeanFactoryLocator}, and
      * the actual type of {@code BeanFactory}, this may possibly not actually
      * do anything; alternately in the case of a 'closeable' {@code BeanFactory}
-     * or derived class (such as {@link org.springframework.context.ApplicationContext})
+     * or derived class (such as {@link com.rocket.summer.framework.context.ApplicationContext})
      * may 'close' it, or may 'close' it once no more references remain.
      * <p>In an EJB usage scenario this would normally be called from
      * {@code ejbRemove()} and {@code ejbPassivate()}.
      * <p>This is safe to call multiple times.
      * @see BeanFactoryLocator
-     * @see org.springframework.context.access.ContextBeanFactoryReference
-     * @see org.springframework.context.ConfigurableApplicationContext#close()
+     * @see com.rocket.summer.framework.context.access.ContextBeanFactoryReference
+     * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#close()
      */
     void release();
 

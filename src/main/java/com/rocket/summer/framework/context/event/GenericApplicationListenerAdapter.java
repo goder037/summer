@@ -12,7 +12,7 @@ import com.rocket.summer.framework.util.Assert;
  *
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.context.ApplicationListener#onApplicationEvent
+ * @see com.rocket.summer.framework.context.ApplicationListener#onApplicationEvent
  */
 public class GenericApplicationListenerAdapter implements SmartApplicationListener {
 

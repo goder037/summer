@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Supports "name=value" style expressions as described in:
- * {@link org.springframework.web.bind.annotation.RequestMapping#params()} and
- * {@link org.springframework.web.bind.annotation.RequestMapping#headers()}.
+ * {@link com.rocket.summer.framework.web.bind.annotation.RequestMapping#params()} and
+ * {@link com.rocket.summer.framework.web.bind.annotation.RequestMapping#headers()}.
  *
  * @author Rossen Stoyanchev
  * @author Arjen Poutsma

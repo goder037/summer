@@ -11,16 +11,16 @@ import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
 
 /**
- * {@link org.springframework.web.context.WebApplicationContext} implementation
+ * {@link com.rocket.summer.framework.web.context.WebApplicationContext} implementation
  * which accepts annotated classes as input - in particular
- * {@link org.springframework.context.annotation.Configuration @Configuration}-annotated
- * classes, but also plain {@link org.springframework.stereotype.Component @Components}
+ * {@link com.rocket.summer.framework.context.annotation.Configuration @Configuration}-annotated
+ * classes, but also plain {@link com.rocket.summer.framework.stereotype.Component @Components}
  * and JSR-330 compliant classes using {@literal javax.inject} annotations. Allows for
  * registering classes one by one (specifying class names as config location) as well
  * as for classpath scanning (specifying base packages as config location).
  *
  * <p>This is essentially the equivalent of
- * {@link org.springframework.context.annotation.AnnotationConfigApplicationContext}
+ * {@link com.rocket.summer.framework.context.annotation.AnnotationConfigApplicationContext}
  * for a web environment.
  *
  * <p>To make use of this application context, the "contextClass" context-param for
@@ -40,7 +40,7 @@ import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ * @see com.rocket.summer.framework.context.annotation.AnnotationConfigApplicationContext
  */
 public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWebApplicationContext {
 
@@ -110,7 +110,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
     /**
      * Provide a custom {@link BeanNameGenerator} for use with {@link AnnotatedBeanDefinitionReader}
      * and/or {@link ClassPathBeanDefinitionScanner}, if any.
-     * <p>Default is {@link org.springframework.context.annotation.AnnotationBeanNameGenerator}.
+     * <p>Default is {@link com.rocket.summer.framework.context.annotation.AnnotationBeanNameGenerator}.
      * @see AnnotatedBeanDefinitionReader#setBeanNameGenerator
      * @see ClassPathBeanDefinitionScanner#setBeanNameGenerator
      */
@@ -121,7 +121,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
     /**
      * Provide a custom {@link ScopeMetadataResolver} for use with {@link AnnotatedBeanDefinitionReader}
      * and/or {@link ClassPathBeanDefinitionScanner}, if any.
-     * <p>Default is {@link org.springframework.context.annotation.AnnotationScopeMetadataResolver}.
+     * <p>Default is {@link com.rocket.summer.framework.context.annotation.AnnotationScopeMetadataResolver}.
      * @see AnnotatedBeanDefinitionReader#setScopeMetadataResolver
      * @see ClassPathBeanDefinitionScanner#setScopeMetadataResolver
      */

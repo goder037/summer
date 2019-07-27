@@ -16,7 +16,7 @@ import org.aopalliance.aop.Advice;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 13.03.2003
- * @see org.springframework.aop.framework.AdvisedSupport
+ * @see com.rocket.summer.framework.aop.framework.AdvisedSupport
  */
 public interface Advised extends TargetClassAware {
 
@@ -80,7 +80,7 @@ public interface Advised extends TargetClassAware {
      * <p>Default is "false". Set this to "true" if the advisors have been
      * pre-filtered already, meaning that the ClassFilter check can be skipped
      * when building the actual advisor chain for proxy invocations.
-     * @see org.springframework.aop.ClassFilter
+     * @see com.rocket.summer.framework.aop.ClassFilter
      */
     void setPreFiltered(boolean preFiltered);
 
@@ -99,7 +99,7 @@ public interface Advised extends TargetClassAware {
 
     /**
      * Add an advisor at the end of the advisor chain.
-     * <p>The Advisor may be an {@link org.springframework.aop.IntroductionAdvisor},
+     * <p>The Advisor may be an {@link com.rocket.summer.framework.aop.IntroductionAdvisor},
      * in which new interfaces will be available when a proxy is next obtained
      * from the relevant factory.
      * @param advisor the advisor to add to the end of the chain
@@ -141,7 +141,7 @@ public interface Advised extends TargetClassAware {
 
     /**
      * Replace the given advisor.
-     * <p><b>Note:</b> If the advisor is an {@link org.springframework.aop.IntroductionAdvisor}
+     * <p><b>Note:</b> If the advisor is an {@link com.rocket.summer.framework.aop.IntroductionAdvisor}
      * and the replacement is not or implements different interfaces, the proxy will need
      * to be re-obtained or the old interfaces won't be supported and the new interface
      * won't be implemented.
@@ -164,13 +164,13 @@ public interface Advised extends TargetClassAware {
      * @param advice advice to add to the tail of the chain
      * @throws AopConfigException in case of invalid advice
      * @see #addAdvice(int, Advice)
-     * @see org.springframework.aop.support.DefaultPointcutAdvisor
+     * @see com.rocket.summer.framework.aop.support.DefaultPointcutAdvisor
      */
     void addAdvice(Advice advice) throws AopConfigException;
 
     /**
      * Add the given AOP Alliance Advice at the specified position in the advice chain.
-     * <p>This will be wrapped in a {@link org.springframework.aop.support.DefaultPointcutAdvisor}
+     * <p>This will be wrapped in a {@link com.rocket.summer.framework.aop.support.DefaultPointcutAdvisor}
      * with a pointcut that always applies, and returned from the {@link #getAdvisors()}
      * method in this wrapped form.
      * <p>Note: The given advice will apply to all invocations on the proxy,

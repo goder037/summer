@@ -96,7 +96,7 @@ public class ConstructorArgumentValues {
     /**
      * Add argument value for the given index in the constructor argument list,
      * merging the new value (typically a collection) with the current value
-     * if demanded: see {@link org.springframework.beans.Mergeable}.
+     * if demanded: see {@link com.rocket.summer.framework.beans.Mergeable}.
      * @param key the index in the constructor argument list
      * @param newValue the argument value in the form of a ValueHolder
      */

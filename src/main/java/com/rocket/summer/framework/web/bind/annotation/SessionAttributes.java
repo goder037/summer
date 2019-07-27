@@ -20,7 +20,7 @@ import java.lang.annotation.*;
  * <p>For permanent session attributes, e.g. a user authentication object,
  * use the traditional <code>session.setAttribute</code> method instead.
  * Alternatively, consider using the attribute management capabilities of the
- * generic {@link org.springframework.web.context.request.WebRequest} interface.
+ * generic {@link com.rocket.summer.framework.web.context.request.WebRequest} interface.
  *
  * <p><b>NOTE:</b> When using controller interfaces (e.g. for AOP proxying),
  * make sure to consistently put <i>all</i> your mapping annotations - such as

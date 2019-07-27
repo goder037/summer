@@ -12,8 +12,8 @@ package com.rocket.summer.framework.beans.factory;
  *
  * @author Juergen Hoeller
  * @since 12.08.2003
- * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
- * @see org.springframework.context.ConfigurableApplicationContext#close
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
+ * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#close
  */
 public interface DisposableBean {
 

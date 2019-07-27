@@ -35,16 +35,6 @@ public abstract class AbstractErrors implements Errors, Serializable {
         doSetNestedPath(getNestedPath() + subPath);
     }
 
-    public void popNestedPath() throws IllegalArgumentException {
-        try {
-            String formerNestedPath = this.nestedPathStack.pop();
-            doSetNestedPath(formerNestedPath);
-        }
-        catch (EmptyStackException ex) {
-            throw new IllegalStateException("Cannot pop nested path: no nested path on stack");
-        }
-    }
-
     /**
      * Actually set the nested path.
      * Delegated to by setNestedPath and pushNestedPath.
@@ -85,6 +75,37 @@ public abstract class AbstractErrors implements Errors, Serializable {
         return field;
     }
 
+    /**
+     * Check whether the given FieldError matches the given field.
+     * @param field the field that we are looking up FieldErrors for
+     * @param fieldError the candidate FieldError
+     * @return whether the FieldError matches the given field
+     */
+    protected boolean isMatchingFieldError(String field, FieldError fieldError) {
+        return (field.equals(fieldError.getField()) ||
+                (field.endsWith("*") && fieldError.getField().startsWith(field.substring(0, field.length() - 1))));
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(getClass().getName());
+        sb.append(": ").append(getErrorCount()).append(" errors");
+        for (ObjectError error : getAllErrors()) {
+            sb.append('\n').append(error);
+        }
+        return sb.toString();
+    }
+
+    public void popNestedPath() throws IllegalArgumentException {
+        try {
+            String formerNestedPath = this.nestedPathStack.pop();
+            doSetNestedPath(formerNestedPath);
+        }
+        catch (EmptyStackException ex) {
+            throw new IllegalStateException("Cannot pop nested path: no nested path on stack");
+        }
+    }
 
     public void reject(String errorCode) {
         reject(errorCode, null, null);
@@ -177,27 +198,4 @@ public abstract class AbstractErrors implements Errors, Serializable {
         }
         return null;
     }
-
-    /**
-     * Check whether the given FieldError matches the given field.
-     * @param field the field that we are looking up FieldErrors for
-     * @param fieldError the candidate FieldError
-     * @return whether the FieldError matches the given field
-     */
-    protected boolean isMatchingFieldError(String field, FieldError fieldError) {
-        return (field.equals(fieldError.getField()) ||
-                (field.endsWith("*") && fieldError.getField().startsWith(field.substring(0, field.length() - 1))));
-    }
-
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getClass().getName());
-        sb.append(": ").append(getErrorCount()).append(" errors");
-        for (ObjectError error : getAllErrors()) {
-            sb.append('\n').append(error);
-        }
-        return sb.toString();
-    }
-
 }

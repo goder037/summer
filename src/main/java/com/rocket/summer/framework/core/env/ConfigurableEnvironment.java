@@ -42,17 +42,17 @@ import java.util.Map;
  * When an {@link Environment} is being used by an {@code ApplicationContext}, it is
  * important that any such {@code PropertySource} manipulations be performed
  * <em>before</em> the context's {@link
- * org.springframework.context.support.AbstractApplicationContext#refresh() refresh()}
+ * com.rocket.summer.framework.context.support.AbstractApplicationContext#refresh() refresh()}
  * method is called. This ensures that all property sources are available during the
  * container bootstrap process, including use by {@linkplain
- * org.springframework.context.support.PropertySourcesPlaceholderConfigurer property
+ * com.rocket.summer.framework.context.support.PropertySourcesPlaceholderConfigurer property
  * placeholder configurers}.
  *
  *
  * @author Chris Beams
  * @since 3.1
  * @see StandardEnvironment
- * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
+ * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#getEnvironment
  */
 public interface ConfigurableEnvironment extends Environment, ConfigurablePropertyResolver {
 
@@ -65,7 +65,7 @@ public interface ConfigurableEnvironment extends Environment, ConfigurableProper
      * {@link #addActiveProfile} to add a profile while preserving the existing set.
      * @see #addActiveProfile
      * @see #setDefaultProfiles
-     * @see org.springframework.context.annotation.Profile
+     * @see com.rocket.summer.framework.context.annotation.Profile
      * @see AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME
      * @throws IllegalArgumentException if any profile is null, empty or whitespace-only
      */
@@ -149,7 +149,7 @@ public interface ConfigurableEnvironment extends Environment, ConfigurableProper
      * property sources and profile information prior to calling {@code merge}.
      * @param parent the environment to merge with
      * @since 3.1.2
-     * @see org.springframework.context.support.AbstractApplicationContext#setParent
+     * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#setParent
      */
     void merge(ConfigurableEnvironment parent);
 

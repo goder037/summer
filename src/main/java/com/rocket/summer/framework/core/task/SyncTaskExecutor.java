@@ -18,7 +18,7 @@ import java.io.Serializable;
  *
  * @author Juergen Hoeller
  * @see SimpleAsyncTaskExecutor
- * @see org.springframework.scheduling.timer.TimerTaskExecutor
+ * @see com.rocket.summer.framework.scheduling.timer.TimerTaskExecutor
  * @since 2.0
  */
 public class SyncTaskExecutor implements TaskExecutor, Serializable {

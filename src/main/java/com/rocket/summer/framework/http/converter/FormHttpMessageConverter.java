@@ -330,7 +330,7 @@ public class FormHttpMessageConverter implements HttpMessageConverter<MultiValue
 
 
     /**
-     * Implementation of {@link org.springframework.http.HttpOutputMessage} used for writing multipart data.
+     * Implementation of {@link com.rocket.summer.framework.http.HttpOutputMessage} used for writing multipart data.
      */
     private class MultipartHttpOutputMessage implements HttpOutputMessage {
 

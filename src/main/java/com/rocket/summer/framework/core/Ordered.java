@@ -15,7 +15,7 @@ package com.rocket.summer.framework.core;
  * @author Juergen Hoeller
  * @since 07.04.2003
  * @see OrderComparator
- * @see org.springframework.core.annotation.Order
+ * @see com.rocket.summer.framework.core.annotation.Order
  */
 public interface Ordered {
 

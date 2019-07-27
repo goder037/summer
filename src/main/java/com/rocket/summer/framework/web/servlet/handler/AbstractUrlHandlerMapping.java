@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
- * Abstract base class for URL-mapped {@link org.springframework.web.servlet.HandlerMapping}
+ * Abstract base class for URL-mapped {@link com.rocket.summer.framework.web.servlet.HandlerMapping}
  * implementations. Provides infrastructure for mapping handlers to URLs and configurable
  * URL lookup. For information on the latter, see "alwaysUseFullPath" property.
  *
@@ -19,7 +19,7 @@ import java.util.*;
  * various Ant-style pattern matches, e.g. a registered "/t*" pattern matches
  * both "/test" and "/team", "/test/*" matches all paths in the "/test" directory,
  * "/test/**" matches all paths below "/test". For details, see the
- * {@link org.springframework.util.AntPathMatcher AntPathMatcher} javadoc.
+ * {@link com.rocket.summer.framework.util.AntPathMatcher AntPathMatcher} javadoc.
  *
  * <p>Will search all path patterns to find the most exact match for the
  * current request path. The most exact match is defined as the longest
@@ -118,7 +118,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
      * @param request current HTTP request (to expose the path within the mapping to)
      * @return the associated handler instance, or <code>null</code> if not found
      * @see #exposePathWithinMapping
-     * @see org.springframework.util.AntPathMatcher
+     * @see com.rocket.summer.framework.util.AntPathMatcher
      */
     protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
         // Direct match?

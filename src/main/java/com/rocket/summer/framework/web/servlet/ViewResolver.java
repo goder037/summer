@@ -13,9 +13,9 @@ import java.util.Locale;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.web.servlet.view.InternalResourceViewResolver
- * @see org.springframework.web.servlet.view.ResourceBundleViewResolver
- * @see org.springframework.web.servlet.view.XmlViewResolver
+ * @see com.rocket.summer.framework.web.servlet.view.InternalResourceViewResolver
+ * @see com.rocket.summer.framework.web.servlet.view.ResourceBundleViewResolver
+ * @see com.rocket.summer.framework.web.servlet.view.XmlViewResolver
  */
 public interface ViewResolver {
 

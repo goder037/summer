@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * A Servlet-specific {@link org.springframework.web.method.annotation.ModelAttributeMethodProcessor} that applies data
+ * A Servlet-specific {@link com.rocket.summer.framework.web.method.annotation.ModelAttributeMethodProcessor} that applies data
  * binding through a WebDataBinder of type {@link ServletRequestDataBinder}.
  *
  * <p>Also adds a fall-back strategy to instantiate the model attribute from a

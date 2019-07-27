@@ -7,8 +7,8 @@ package com.rocket.summer.framework.aop.framework;
  *
  * @author Juergen Hoeller
  * @since 2.0.3
- * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator
- * @see org.springframework.aop.scope.ScopedProxyFactoryBean
+ * @see com.rocket.summer.framework.aop.framework.autoproxy.AbstractAutoProxyCreator
+ * @see com.rocket.summer.framework.aop.scope.ScopedProxyFactoryBean
  */
 public interface AopInfrastructureBean {
 

@@ -15,8 +15,8 @@ import java.io.InputStream;
  * @author Juergen Hoeller
  * @author Trevor D. Cook
  * @since 29.09.2003
- * @see org.springframework.web.multipart.MultipartHttpServletRequest
- * @see org.springframework.web.multipart.MultipartResolver
+ * @see com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest
+ * @see com.rocket.summer.framework.web.multipart.MultipartResolver
  */
 public interface MultipartFile {
 

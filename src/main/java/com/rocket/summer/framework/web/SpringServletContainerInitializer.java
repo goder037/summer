@@ -95,8 +95,8 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
      *
      * <p>Assuming that one or more {@code WebApplicationInitializer} types are detected,
      * they will be instantiated (and <em>sorted</em> if the @{@link
-     * org.springframework.core.annotation.Order Order} annotation is present or
-     * the {@link org.springframework.core.Ordered Ordered} interface has been
+     * com.rocket.summer.framework.core.annotation.Order Order} annotation is present or
+     * the {@link com.rocket.summer.framework.core.Ordered Ordered} interface has been
      * implemented). Then the {@link WebApplicationInitializer#onStartup(ServletContext)}
      * method will be invoked on each instance, delegating the {@code ServletContext} such
      * that each instance may register and configure servlets such as Spring's

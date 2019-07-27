@@ -52,7 +52,7 @@ public interface SmartFactoryBean extends FactoryBean {
      * of a {@link #isSingleton() singleton} object, in particular if
      * post-processors expect to be applied on startup.
      * @return whether eager initialization applies
-     * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
+     * @see com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
      */
     boolean isEagerInit();
 

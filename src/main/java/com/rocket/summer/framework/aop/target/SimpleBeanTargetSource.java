@@ -1,9 +1,9 @@
 package com.rocket.summer.framework.aop.target;
 
 /**
- * Simple {@link org.springframework.aop.TargetSource} implementation,
+ * Simple {@link com.rocket.summer.framework.aop.TargetSource} implementation,
  * freshly obtaining the specified target bean from its containing
- * Spring {@link org.springframework.beans.factory.BeanFactory}.
+ * Spring {@link com.rocket.summer.framework.beans.factory.BeanFactory}.
  *
  * <p>Can obtain any kind of target bean: singleton, scoped, or prototype.
  * Typically used for scoped beans.

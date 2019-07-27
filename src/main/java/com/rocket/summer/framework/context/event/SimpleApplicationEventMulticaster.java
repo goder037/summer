@@ -37,9 +37,9 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
      * caller until all listeners have been executed. However, note that asynchronous
      * execution will not participate in the caller's thread context (class loader,
      * transaction association) unless the TaskExecutor explicitly supports this.
-     * @see org.springframework.core.task.SyncTaskExecutor
-     * @see org.springframework.core.task.SimpleAsyncTaskExecutor
-     * @see org.springframework.scheduling.timer.TimerTaskExecutor
+     * @see com.rocket.summer.framework.core.task.SyncTaskExecutor
+     * @see com.rocket.summer.framework.core.task.SimpleAsyncTaskExecutor
+     * @see com.rocket.summer.framework.scheduling.timer.TimerTaskExecutor
      */
     public void setTaskExecutor(TaskExecutor taskExecutor) {
         this.taskExecutor = (taskExecutor != null ? taskExecutor : new SyncTaskExecutor());

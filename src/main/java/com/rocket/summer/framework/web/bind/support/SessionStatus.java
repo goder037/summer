@@ -6,13 +6,13 @@ package com.rocket.summer.framework.web.bind.support;
  * then follow up with appropriate cleanup, e.g. of session attributes which
  * have been implicitly created during this handler's processing (according to
  * the
- * {@link org.springframework.web.bind.annotation.SessionAttributes @SessionAttributes}
+ * {@link com.rocket.summer.framework.web.bind.annotation.SessionAttributes @SessionAttributes}
  * annotation).
  *
  * @author Juergen Hoeller
  * @since 2.5
- * @see org.springframework.web.bind.annotation.RequestMapping
- * @see org.springframework.web.bind.annotation.SessionAttributes
+ * @see com.rocket.summer.framework.web.bind.annotation.RequestMapping
+ * @see com.rocket.summer.framework.web.bind.annotation.SessionAttributes
  */
 public interface SessionStatus {
 

@@ -18,10 +18,10 @@ import java.util.HashMap;
  * made available to the next request, which may or may not be the intended
  * recipient. On a redirect, the target URL is known and a FlashMap can be
  * updated with that information. This is done automatically when the
- * {@code org.springframework.web.servlet.view.RedirectView} is used.
+ * {@code com.rocket.summer.framework.web.servlet.view.RedirectView} is used.
  *
  * <p>Note: annotated controllers will usually not use FlashMap directly.
- * See {@code org.springframework.web.servlet.mvc.support.RedirectAttributes}
+ * See {@code com.rocket.summer.framework.web.servlet.mvc.support.RedirectAttributes}
  * for an overview of using flash attributes in annotated controllers.
  *
  * @author Rossen Stoyanchev

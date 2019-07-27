@@ -9,7 +9,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 /**
- * {@link org.springframework.context.MessageSource} implementation that
+ * {@link com.rocket.summer.framework.context.MessageSource} implementation that
  * accesses resource bundles using specified basenames. This class relies
  * on the underlying JDK's {@link java.util.ResourceBundle} implementation,
  * in combination with the JDK's standard message parsing provided by
@@ -116,9 +116,9 @@ public class ResourceBundleMessageSource extends AbstractMessageSource implement
     /**
      * Set the ClassLoader to load resource bundles with.
      * <p>Default is the containing BeanFactory's
-     * {@link org.springframework.beans.factory.BeanClassLoaderAware bean ClassLoader},
+     * {@link com.rocket.summer.framework.beans.factory.BeanClassLoaderAware bean ClassLoader},
      * or the default ClassLoader determined by
-     * {@link org.springframework.util.ClassUtils#getDefaultClassLoader()}
+     * {@link com.rocket.summer.framework.util.ClassUtils#getDefaultClassLoader()}
      * if not running within a BeanFactory.
      */
     public void setBundleClassLoader(ClassLoader classLoader) {

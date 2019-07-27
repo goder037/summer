@@ -18,8 +18,8 @@ import java.beans.PropertyEditorSupport;
  *
  * @author Juergen Hoeller
  * @since 10.06.2003
- * @see org.springframework.validation.DataBinder#registerCustomEditor
- * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
+ * @see com.rocket.summer.framework.validation.DataBinder#registerCustomEditor
+ * @see com.rocket.summer.framework.web.servlet.mvc.BaseCommandController#initBinder
  */
 public class CustomBooleanEditor extends PropertyEditorSupport {
 

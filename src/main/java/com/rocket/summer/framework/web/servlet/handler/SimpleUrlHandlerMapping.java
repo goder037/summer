@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Implementation of the {@link org.springframework.web.servlet.HandlerMapping}
+ * Implementation of the {@link com.rocket.summer.framework.web.servlet.HandlerMapping}
  * interface to map from URLs to request handler beans. Supports both mapping to bean
  * instances and mapping to bean names; the latter is required for non-singleton handlers.
  *
@@ -29,7 +29,7 @@ import java.util.Properties;
  * to map within the current servlet mapping if applicable; see the
  * {@link #setAlwaysUseFullPath "alwaysUseFullPath"} property for details.
  * For details on the pattern options, see the
- * {@link org.springframework.util.AntPathMatcher} javadoc.
+ * {@link com.rocket.summer.framework.util.AntPathMatcher} javadoc.
 
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -46,7 +46,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
      * Map URL paths to handler bean names.
      * This is the typical way of configuring this HandlerMapping.
      * <p>Supports direct URL matches and Ant-style pattern matches. For syntax
-     * details, see the {@link org.springframework.util.AntPathMatcher} javadoc.
+     * details, see the {@link com.rocket.summer.framework.util.AntPathMatcher} javadoc.
      * @param mappings properties with URLs as keys and bean names as values
      * @see #setUrlMap
      */
@@ -58,7 +58,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
      * Set a Map with URL paths as keys and handler beans (or handler bean names)
      * as values. Convenient for population with bean references.
      * <p>Supports direct URL matches and Ant-style pattern matches. For syntax
-     * details, see the {@link org.springframework.util.AntPathMatcher} javadoc.
+     * details, see the {@link com.rocket.summer.framework.util.AntPathMatcher} javadoc.
      * @param urlMap map with URLs as keys and beans as values
      * @see #setMappings
      */

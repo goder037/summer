@@ -17,7 +17,7 @@ import java.lang.annotation.*;
  * @see Repository
  * @see Service
  * @see Controller
- * @see org.springframework.context.annotation.ClassPathBeanDefinitionScanner
+ * @see com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

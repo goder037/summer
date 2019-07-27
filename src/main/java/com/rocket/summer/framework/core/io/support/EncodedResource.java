@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- * Holder that combines a {@link org.springframework.core.io.Resource}
+ * Holder that combines a {@link com.rocket.summer.framework.core.io.Resource}
  * with a specific encoding to be used for reading from the resource.
  *
  * <p>Used as argument for operations that support to read content with

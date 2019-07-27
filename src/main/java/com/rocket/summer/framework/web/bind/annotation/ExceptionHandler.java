@@ -28,15 +28,15 @@ import java.lang.annotation.*;
  * As a consequence, such an argument will never be <code>null</code>.
  * <i>Note that session access may not be thread-safe, in particular in a
  * Servlet environment: Consider switching the
- * {@link org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter#setSynchronizeOnSession "synchronizeOnSession"}
+ * {@link com.rocket.summer.framework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter#setSynchronizeOnSession "synchronizeOnSession"}
  * flag to "true" if multiple requests are allowed to access a session concurrently.</i>
- * <li>{@link org.springframework.web.context.request.WebRequest} or
- * {@link org.springframework.web.context.request.NativeWebRequest}.
+ * <li>{@link com.rocket.summer.framework.web.context.request.WebRequest} or
+ * {@link com.rocket.summer.framework.web.context.request.NativeWebRequest}.
  * Allows for generic request parameter access as well as request/session
  * attribute access, without ties to the native Servlet/Portlet API.
  * <li>{@link java.util.Locale} for the current request locale
  * (determined by the most specific locale resolver available,
- * i.e. the configured {@link org.springframework.web.servlet.LocaleResolver}
+ * i.e. the configured {@link com.rocket.summer.framework.web.servlet.LocaleResolver}
  * in a Servlet environment and the portal locale in a Portlet environment).
  * <li>{@link java.io.InputStream} / {@link java.io.Reader} for access
  * to the request's content. This will be the raw InputStream/Reader as
@@ -49,19 +49,19 @@ import java.lang.annotation.*;
  * <p>The following return types are supported for handler methods:
  * <ul>
  * <li>A <code>ModelAndView</code> object (Servlet MVC or Portlet MVC).
- * <li>A {@link org.springframework.ui.Model Model} object, with the view name
- * implicitly determined through a {@link org.springframework.web.servlet.RequestToViewNameTranslator}.
+ * <li>A {@link com.rocket.summer.framework.ui.Model Model} object, with the view name
+ * implicitly determined through a {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}.
  * <li>A {@link java.util.Map} object for exposing a model,
  * with the view name implicitly determined through a
- * {@link org.springframework.web.servlet.RequestToViewNameTranslator}.
- * <li>A {@link org.springframework.web.servlet.View} object.
+ * {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}.
+ * <li>A {@link com.rocket.summer.framework.web.servlet.View} object.
  * <li>A {@link java.lang.String} value which is interpreted as view name.
  * <li><code>void</code> if the method handles the response itself (by
  * writing the response content directly, declaring an argument of type
  * {@link javax.servlet.ServletResponse} / {@link javax.servlet.http.HttpServletResponse}
  * / {@link javax.portlet.RenderResponse} for that purpose)
  * or if the view name is supposed to be implicitly determined through a
- * {@link org.springframework.web.servlet.RequestToViewNameTranslator}
+ * {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * (not declaring a response argument in the handler method signature;
  * only applicable in a Servlet environment).
  * </ul>
@@ -72,7 +72,7 @@ import java.lang.annotation.*;
  *
  * <p><b>Note:</b> In Portlet environments, {@code ExceptionHandler} annotated methods
  * will only be called during the render and resource phases - just like
- * {@link org.springframework.web.portlet.HandlerExceptionResolver} beans would.
+ * {@link com.rocket.summer.framework.web.portlet.HandlerExceptionResolver} beans would.
  * Exceptions carried over from the action and event phases will be invoked during
  * the render phase as well, with exception handler methods having to be present
  * on the controller class that defines the applicable <i>render</i> method.
@@ -80,8 +80,8 @@ import java.lang.annotation.*;
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.web.context.request.WebRequest
- * @see org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver
+ * @see com.rocket.summer.framework.web.context.request.WebRequest
+ * @see com.rocket.summer.framework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

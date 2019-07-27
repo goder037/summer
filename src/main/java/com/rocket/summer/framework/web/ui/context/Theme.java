@@ -5,13 +5,13 @@ import com.rocket.summer.framework.context.MessageSource;
 /**
  * A Theme can resolve theme-specific messages, codes, file paths, etcetera
  * (e&#46;g&#46; CSS and image files in a web environment).
- * The exposed {@link org.springframework.context.MessageSource} supports
+ * The exposed {@link com.rocket.summer.framework.context.MessageSource} supports
  * theme-specific parameterization and internationalization.
  *
  * @author Juergen Hoeller
  * @since 17.06.2003
  * @see ThemeSource
- * @see org.springframework.web.servlet.ThemeResolver
+ * @see com.rocket.summer.framework.web.servlet.ThemeResolver
  */
 public interface Theme {
 

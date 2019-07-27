@@ -13,8 +13,8 @@ import com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFacto
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.beans.factory.annotation.Configurable
- * @see org.springframework.beans.factory.config.AutowireCapableBeanFactory
+ * @see com.rocket.summer.framework.beans.factory.annotation.Configurable
+ * @see com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory
  */
 public enum Autowire {
 

@@ -11,7 +11,7 @@ import com.rocket.summer.framework.context.BeansException;
  *
  * @author Juergen Hoeller
  * @since 1.0.1
- * @see org.springframework.web.struts.ActionServletAwareProcessor
+ * @see com.rocket.summer.framework.web.struts.ActionServletAwareProcessor
  */
 public interface DestructionAwareBeanPostProcessor extends BeanPostProcessor {
 
@@ -23,9 +23,9 @@ public interface DestructionAwareBeanPostProcessor extends BeanPostProcessor {
      * inner beans).
      * @param bean the bean instance to be destroyed
      * @param beanName the name of the bean
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.factory.DisposableBean
-     * @see org.springframework.beans.factory.support.AbstractBeanDefinition#setDestroyMethodName
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.factory.DisposableBean
+     * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition#setDestroyMethodName
      */
     void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException;
 

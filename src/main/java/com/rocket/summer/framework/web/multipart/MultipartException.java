@@ -9,7 +9,7 @@ import com.rocket.summer.framework.context.NestedRuntimeException;
  * @author Juergen Hoeller
  * @since 29.09.2003
  * @see MultipartResolver#resolveMultipart
- * @see org.springframework.web.multipart.support.MultipartFilter
+ * @see com.rocket.summer.framework.web.multipart.support.MultipartFilter
  */
 public class MultipartException extends NestedRuntimeException {
 

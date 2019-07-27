@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * bean exists among the candidates, it will be the autowired value.
  *
  * <p>May be used on any class directly or indirectly annotated with
- * {@link org.springframework.stereotype.Component} or on methods annotated
+ * {@link com.rocket.summer.framework.stereotype.Component} or on methods annotated
  * with {@link Bean}.
  *
  * <p>Using {@link Primary} at the class level has no effect unless component-scanning
@@ -20,7 +20,7 @@ import java.lang.annotation.*;
  * @since 3.0
  * @see Lazy
  * @see Bean
- * @see org.springframework.stereotype.Component
+ * @see com.rocket.summer.framework.stereotype.Component
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

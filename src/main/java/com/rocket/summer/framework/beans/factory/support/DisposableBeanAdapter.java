@@ -27,8 +27,8 @@ import java.util.List;
  * @author Juergen Hoeller
  * @since 2.0
  * @see AbstractBeanFactory
- * @see org.springframework.beans.factory.DisposableBean
- * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
+ * @see com.rocket.summer.framework.beans.factory.DisposableBean
+ * @see com.rocket.summer.framework.beans.factory.config.DestructionAwareBeanPostProcessor
  * @see AbstractBeanDefinition#getDestroyMethodName()
  */
 class DisposableBeanAdapter implements DisposableBean, Runnable, Serializable {

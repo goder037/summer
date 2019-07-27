@@ -8,11 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Servlet 2.4+ listener that exposes the request to the current thread,
- * through both {@link org.springframework.context.i18n.LocaleContextHolder} and
+ * through both {@link com.rocket.summer.framework.context.i18n.LocaleContextHolder} and
  * {@link RequestContextHolder}. To be registered as listener in <code>web.xml</code>.
  *
- * <p>Alternatively, Spring's {@link org.springframework.web.filter.RequestContextFilter}
- * and Spring's {@link org.springframework.web.servlet.DispatcherServlet} also expose
+ * <p>Alternatively, Spring's {@link com.rocket.summer.framework.web.filter.RequestContextFilter}
+ * and Spring's {@link com.rocket.summer.framework.web.servlet.DispatcherServlet} also expose
  * the same request context to the current thread. In contrast to this listener,
  * advanced options are available there (e.g. "threadContextInheritable").
  *
@@ -22,10 +22,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author Juergen Hoeller
  * @since 2.0
  * @see javax.servlet.ServletRequestListener
- * @see org.springframework.context.i18n.LocaleContextHolder
- * @see org.springframework.web.context.request.RequestContextHolder
- * @see org.springframework.web.filter.RequestContextFilter
- * @see org.springframework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.context.i18n.LocaleContextHolder
+ * @see com.rocket.summer.framework.web.context.request.RequestContextHolder
+ * @see com.rocket.summer.framework.web.filter.RequestContextFilter
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
  */
 public class RequestContextListener implements ServletRequestListener {
 

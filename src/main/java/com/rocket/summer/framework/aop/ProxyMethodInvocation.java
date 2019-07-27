@@ -12,8 +12,8 @@ import org.aopalliance.intercept.MethodInvocation;
  * @author Juergen Hoeller
  * @author Adrian Colyer
  * @since 1.1.3
- * @see org.springframework.aop.framework.ReflectiveMethodInvocation
- * @see org.springframework.aop.support.DelegatingIntroductionInterceptor
+ * @see com.rocket.summer.framework.aop.framework.ReflectiveMethodInvocation
+ * @see com.rocket.summer.framework.aop.support.DelegatingIntroductionInterceptor
  */
 public interface ProxyMethodInvocation extends MethodInvocation {
 

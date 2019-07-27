@@ -6,7 +6,7 @@ import com.rocket.summer.framework.context.BeansException;
  * The root interface for accessing a Spring bean container.
  * This is the basic client view of a bean container;
  * further interfaces such as {@link ListableBeanFactory} and
- * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
+ * {@link com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory}
  * are available for specific purposes.
  *
  * <p>This interface is implemented by objects that hold a number of bean definitions,
@@ -32,7 +32,7 @@ import com.rocket.summer.framework.context.BeansException;
  * implemented using this BeanFactory interface and its subinterfaces.
  *
  * <p>Normally a BeanFactory will load bean definitions stored in a configuration
- * source (such as an XML document), and use the <code>org.springframework.beans</code>
+ * source (such as an XML document), and use the <code>com.rocket.summer.framework.beans</code>
  * package to configure the beans. However, an implementation could simply return
  * Java objects it creates as necessary directly in Java code. There are no
  * constraints on how the definitions could be stored: LDAP, RDBMS, XML,
@@ -75,17 +75,17 @@ import com.rocket.summer.framework.context.BeansException;
  * @see BeanNameAware#setBeanName
  * @see BeanClassLoaderAware#setBeanClassLoader
  * @see BeanFactoryAware#setBeanFactory
- * @see org.springframework.context.ResourceLoaderAware#setResourceLoader
- * @see org.springframework.context.ApplicationEventPublisherAware#setApplicationEventPublisher
- * @see org.springframework.context.MessageSourceAware#setMessageSource
- * @see org.springframework.context.ApplicationContextAware#setApplicationContext
- * @see org.springframework.web.context.ServletContextAware#setServletContext
- * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization
+ * @see com.rocket.summer.framework.context.ResourceLoaderAware#setResourceLoader
+ * @see com.rocket.summer.framework.context.ApplicationEventPublisherAware#setApplicationEventPublisher
+ * @see com.rocket.summer.framework.context.MessageSourceAware#setMessageSource
+ * @see com.rocket.summer.framework.context.ApplicationContextAware#setApplicationContext
+ * @see com.rocket.summer.framework.web.context.ServletContextAware#setServletContext
+ * @see com.rocket.summer.framework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization
  * @see InitializingBean#afterPropertiesSet
- * @see org.springframework.beans.factory.support.RootBeanDefinition#getInitMethodName
- * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition#getInitMethodName
+ * @see com.rocket.summer.framework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
  * @see DisposableBean#destroy
- * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
  */
 public interface BeanFactory {
 

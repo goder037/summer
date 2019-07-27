@@ -15,9 +15,9 @@ import com.rocket.summer.framework.util.StringUtils;
  *
  * @author Juergen Hoeller
  * @since 1.0.2
- * @see org.springframework.beans.factory.BeanNameAware
- * @see org.springframework.beans.factory.support.RootBeanDefinition
- * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ * @see com.rocket.summer.framework.beans.factory.BeanNameAware
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition
+ * @see com.rocket.summer.framework.beans.factory.support.ChildBeanDefinition
  */
 public class BeanDefinitionHolder implements BeanMetadataElement {
 

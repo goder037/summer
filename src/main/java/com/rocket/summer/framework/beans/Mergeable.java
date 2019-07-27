@@ -6,10 +6,10 @@ package com.rocket.summer.framework.beans;
  *
  * @author Rob Harrop
  * @since 2.0
- * @see org.springframework.beans.factory.support.ManagedSet
- * @see org.springframework.beans.factory.support.ManagedList
- * @see org.springframework.beans.factory.support.ManagedMap
- * @see org.springframework.beans.factory.support.ManagedProperties
+ * @see com.rocket.summer.framework.beans.factory.support.ManagedSet
+ * @see com.rocket.summer.framework.beans.factory.support.ManagedList
+ * @see com.rocket.summer.framework.beans.factory.support.ManagedMap
+ * @see com.rocket.summer.framework.beans.factory.support.ManagedProperties
  */
 public interface Mergeable {
 

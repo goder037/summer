@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.web.context.support.WebApplicationObjectSupport
+ * @see com.rocket.summer.framework.web.context.support.WebApplicationObjectSupport
  */
 public abstract class ApplicationObjectSupport implements ApplicationContextAware {
 
@@ -105,7 +105,7 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
     /**
      * Subclasses can override this for custom initialization behavior.
      * <p>The default implementation is empty. Called by
-     * {@link #initApplicationContext(org.springframework.context.ApplicationContext)}.
+     * {@link #initApplicationContext(com.rocket.summer.framework.context.ApplicationContext)}.
      * @throws ApplicationContextException in case of initialization errors
      * @throws BeansException if thrown by ApplicationContext methods
      * @see #setApplicationContext

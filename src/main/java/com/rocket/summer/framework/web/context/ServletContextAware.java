@@ -20,8 +20,8 @@ public interface ServletContextAware {
      * custom init-method. Invoked after ApplicationContextAware's
      * <code>setApplicationContext</code>.
      * @param servletContext ServletContext object to be used by this object
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
-     * @see org.springframework.context.ApplicationContextAware#setApplicationContext
+     * @see com.rocket.summer.framework.beans.factory.InitializingBean#afterPropertiesSet
+     * @see com.rocket.summer.framework.context.ApplicationContextAware#setApplicationContext
      */
     void setServletContext(ServletContext servletContext);
 

@@ -20,14 +20,14 @@ import javax.servlet.http.HttpServletResponse;
  * to handlers who want to develop their own web workflow.
  *
  * <p>Note: HandlerAdaptger implementators may implement the
- * {@link org.springframework.core.Ordered} interface to be able to specify a
+ * {@link com.rocket.summer.framework.core.Ordered} interface to be able to specify a
  * sorting order (and thus a priority) for getting applied by DispatcherServlet.
  * Non-Ordered instances get treated as lowest priority.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter
- * @see org.springframework.web.servlet.handler.SimpleServletHandlerAdapter
+ * @see com.rocket.summer.framework.web.servlet.mvc.SimpleControllerHandlerAdapter
+ * @see com.rocket.summer.framework.web.servlet.handler.SimpleServletHandlerAdapter
  */
 public interface HandlerAdapter {
 
@@ -65,7 +65,7 @@ public interface HandlerAdapter {
      * @param handler handler to use
      * @return the lastModified value for the given handler
      * @see javax.servlet.http.HttpServlet#getLastModified
-     * @see org.springframework.web.servlet.mvc.LastModified#getLastModified
+     * @see com.rocket.summer.framework.web.servlet.mvc.LastModified#getLastModified
      */
     long getLastModified(HttpServletRequest request, Object handler);
 

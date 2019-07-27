@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Abstract base class for {@link org.springframework.web.servlet.HandlerMapping}
+ * Abstract base class for {@link com.rocket.summer.framework.web.servlet.HandlerMapping}
  * implementations. Supports ordering, a default handler, handler interceptors,
  * including handler interceptors mapped by path patterns.
  *
@@ -34,9 +34,9 @@ import java.util.List;
  * @see #setDefaultHandler
  * @see #setAlwaysUseFullPath
  * @see #setUrlDecode
- * @see org.springframework.util.AntPathMatcher
+ * @see com.rocket.summer.framework.util.AntPathMatcher
  * @see #setInterceptors
- * @see org.springframework.web.servlet.HandlerInterceptor
+ * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
  */
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
         implements HandlerMapping, Ordered {
@@ -58,7 +58,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
     /**
      * Specify the order value for this HandlerMapping bean.
      * <p>Default value is <code>Integer.MAX_VALUE</code>, meaning that it's non-ordered.
-     * @see org.springframework.core.Ordered#getOrder()
+     * @see com.rocket.summer.framework.core.Ordered#getOrder()
      */
     public final void setOrder(int order) {
         this.order = order;
@@ -90,7 +90,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      * context. Else, the path within the current servlet mapping is used if applicable
      * (that is, in the case of a ".../*" servlet mapping in web.xml).
      * <p>Default is "false".
-     * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
+     * @see com.rocket.summer.framework.web.util.UrlPathHelper#setAlwaysUseFullPath
      */
     public void setAlwaysUseFullPath(boolean alwaysUseFullPath) {
         this.urlPathHelper.setAlwaysUseFullPath(alwaysUseFullPath);
@@ -101,7 +101,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      * <i>undecoded</i> by the Servlet API, in contrast to the servlet path.
      * <p>Uses either the request encoding or the default encoding according
      * to the Servlet spec (ISO-8859-1).
-     * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
+     * @see com.rocket.summer.framework.web.util.UrlPathHelper#setUrlDecode
      */
     public void setUrlDecode(boolean urlDecode) {
         this.urlPathHelper.setUrlDecode(urlDecode);
@@ -128,7 +128,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
     /**
      * Set the PathMatcher implementation to use for matching URL paths
      * against registered URL patterns. Default is AntPathMatcher.
-     * @see org.springframework.util.AntPathMatcher
+     * @see com.rocket.summer.framework.util.AntPathMatcher
      */
     public void setPathMatcher(PathMatcher pathMatcher) {
         Assert.notNull(pathMatcher, "PathMatcher must not be null");
@@ -150,8 +150,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      * Mapped interceptor beans are also detected by type during initialization.
      * @param interceptors array of handler interceptors, or <code>null</code> if none
      * @see #adaptInterceptor
-     * @see org.springframework.web.servlet.HandlerInterceptor
-     * @see org.springframework.web.context.request.WebRequestInterceptor
+     * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
+     * @see com.rocket.summer.framework.web.context.request.WebRequestInterceptor
      */
     public void setInterceptors(Object[] interceptors) {
         this.interceptors.addAll(Arrays.asList(interceptors));
@@ -226,8 +226,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      * Can be overridden in subclasses.
      * @param interceptor the specified interceptor object
      * @return the interceptor wrapped as HandlerInterceptor
-     * @see org.springframework.web.servlet.HandlerInterceptor
-     * @see org.springframework.web.context.request.WebRequestInterceptor
+     * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
+     * @see com.rocket.summer.framework.web.context.request.WebRequestInterceptor
      * @see WebRequestHandlerInterceptorAdapter
      */
     protected HandlerInterceptor adaptInterceptor(Object interceptor) {

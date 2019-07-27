@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Abstract bean factory superclass that implements default bean creation,
  * with the full capabilities specified by the {@link RootBeanDefinition} class.
- * Implements the {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
+ * Implements the {@link com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory}
  * interface in addition to AbstractBeanFactory's {@link #createBean} method.
  *
  * <p>Provides bean creation (with constructor resolution), property population,
@@ -41,7 +41,7 @@ import java.util.*;
  *
  * <p>Note that this class does <i>not</i> assume or implement bean definition
  * registry capabilities. See {@link DefaultListableBeanFactory} for an implementation
- * of the {@link org.springframework.beans.factory.ListableBeanFactory} and
+ * of the {@link com.rocket.summer.framework.beans.factory.ListableBeanFactory} and
  * {@link BeanDefinitionRegistry} interfaces, which represent the API and SPI
  * view of such a factory, respectively.
  *
@@ -173,8 +173,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * BeanFactoryAware or ApplicationContext through ApplicationContextAware.
      * <p>By default, only the BeanFactoryAware interface is ignored.
      * For further types to ignore, invoke this method for each type.
-     * @see org.springframework.beans.factory.BeanFactoryAware
-     * @see org.springframework.context.ApplicationContextAware
+     * @see com.rocket.summer.framework.beans.factory.BeanFactoryAware
+     * @see com.rocket.summer.framework.context.ApplicationContextAware
      */
     public void ignoreDependencyInterface(Class ifc) {
         this.ignoredDependencyInterfaces.add(ifc);
@@ -795,8 +795,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param beanClass the raw class of the bean
      * @param beanName the name of the bean
      * @return the candidate constructors, or <code>null</code> if none specified
-     * @throws org.springframework.beans.BeansException in case of errors
-     * @see org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @see com.rocket.summer.framework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
      */
     protected Constructor[] determineConstructorsFromBeanPostProcessors(Class beanClass, String beanName)
             throws BeansException {
@@ -1051,7 +1051,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param mbd the merged bean definition the bean was created with
      * @param bw the BeanWrapper the bean was created with
      * @return an array of bean property names
-     * @see org.springframework.beans.BeanUtils#isSimpleProperty
+     * @see com.rocket.summer.framework.beans.BeanUtils#isSimpleProperty
      */
     protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
         Set result = new TreeSet();

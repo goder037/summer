@@ -5,22 +5,22 @@ package com.rocket.summer.framework.context;
  * The typical use case for this is to control asynchronous processing.
  *
  * <p>Can be implemented by both components (typically a Spring bean defined in
- * a Spring {@link org.springframework.beans.factory.BeanFactory}) and containers
+ * a Spring {@link com.rocket.summer.framework.beans.factory.BeanFactory}) and containers
  * (typically a Spring {@link ApplicationContext}). Containers will propagate
  * start/stop signals to all components that apply.
  *
  * <p>Can be used for direct invocations or for management operations via JMX.
- * In the latter case, the {@link org.springframework.jmx.export.MBeanExporter}
+ * In the latter case, the {@link com.rocket.summer.framework.jmx.export.MBeanExporter}
  * will typically be defined with an
- * {@link org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler},
+ * {@link com.rocket.summer.framework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler},
  * restricting the visibility of activity-controlled components to the Lifecycle
  * interface.
  *
  * @author Juergen Hoeller
  * @since 2.0
  * @see ConfigurableApplicationContext
- * @see org.springframework.jms.listener.AbstractMessageListenerContainer
- * @see org.springframework.scheduling.quartz.SchedulerFactoryBean
+ * @see com.rocket.summer.framework.jms.listener.AbstractMessageListenerContainer
+ * @see com.rocket.summer.framework.scheduling.quartz.SchedulerFactoryBean
  */
 public interface Lifecycle {
 

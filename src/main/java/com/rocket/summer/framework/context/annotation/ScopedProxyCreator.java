@@ -10,7 +10,7 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
  *
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.aop.scope.ScopedProxyUtils#createScopedProxy
+ * @see com.rocket.summer.framework.aop.scope.ScopedProxyUtils#createScopedProxy
  */
 class ScopedProxyCreator {
 

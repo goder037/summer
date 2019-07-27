@@ -30,7 +30,7 @@ import java.util.*;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.aop.framework.AopProxy
+ * @see com.rocket.summer.framework.aop.framework.AopProxy
  */
 public class AdvisedSupport extends ProxyConfig implements Advised {
 
@@ -104,7 +104,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Set the given object as target.
      * Will create a SingletonTargetSource for the object.
      * @see #setTargetSource
-     * @see org.springframework.aop.target.SingletonTargetSource
+     * @see com.rocket.summer.framework.aop.target.SingletonTargetSource
      */
     public void setTarget(Object target) {
         setTargetSource(new SingletonTargetSource(target));
@@ -121,7 +121,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     /**
      * Set a target class to be proxied, indicating that the proxy
      * should be castable to the given class.
-     * <p>Internally, an {@link org.springframework.aop.target.EmptyTargetSource}
+     * <p>Internally, an {@link com.rocket.summer.framework.aop.target.EmptyTargetSource}
      * for the given target class will be used. The kind of proxy needed
      * will be determined on actual creation of the proxy.
      * <p>This is a replacement for setting a "targetSource" or "target",

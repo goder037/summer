@@ -42,7 +42,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
     /**
      * Create a new PathMatchingResourcePatternResolver with a DefaultResourceLoader.
      * <p>ClassLoader access will happen via the thread context class loader.
-     * @see org.springframework.core.io.DefaultResourceLoader
+     * @see com.rocket.summer.framework.core.io.DefaultResourceLoader
      */
     public PathMatchingResourcePatternResolver() {
         this.resourceLoader = new DefaultResourceLoader();
@@ -91,7 +91,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @param url a URL as returned from the ClassLoader
      * @return the corresponding Resource object
      * @see java.lang.ClassLoader#getResources
-     * @see org.springframework.core.io.Resource
+     * @see com.rocket.summer.framework.core.io.Resource
      */
     protected Resource convertClassLoaderURL(URL url) {
         return new UrlResource(url);
@@ -180,7 +180,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @return the Set of matching Resource instances
      * @throws IOException in case of I/O errors
      * @see java.net.JarURLConnection
-     * @see org.springframework.util.PathMatcher
+     * @see com.rocket.summer.framework.util.PathMatcher
      */
     protected Set doFindPathMatchingJarResources(Resource rootDirResource, String subPattern) throws IOException {
         URLConnection con = rootDirResource.getURL().openConnection();
@@ -276,7 +276,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @throws IOException in case of I/O errors
      * @see #doFindPathMatchingJarResources
      * @see #doFindPathMatchingFileResources
-     * @see org.springframework.util.PathMatcher
+     * @see com.rocket.summer.framework.util.PathMatcher
      */
     protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
         String rootDirPath = determineRootDir(locationPattern);
@@ -307,7 +307,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @param resource the resource handle to check
      * (usually the root directory to start path matching from)
      * @see #doFindPathMatchingJarResources
-     * @see org.springframework.util.ResourceUtils#isJarURL
+     * @see com.rocket.summer.framework.util.ResourceUtils#isJarURL
      */
     protected boolean isJarResource(Resource resource) throws IOException {
         return ResourceUtils.isJarURL(resource.getURL());
@@ -340,7 +340,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @return the Set of matching Resource instances
      * @throws IOException in case of I/O errors
      * @see #retrieveMatchingFiles
-     * @see org.springframework.util.PathMatcher
+     * @see com.rocket.summer.framework.util.PathMatcher
      */
     protected Set doFindPathMatchingFileResources(Resource rootDirResource, String subPattern) throws IOException {
         File rootDir = null;
@@ -365,7 +365,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
      * @return the Set of matching Resource instances
      * @throws IOException in case of I/O errors
      * @see #retrieveMatchingFiles
-     * @see org.springframework.util.PathMatcher
+     * @see com.rocket.summer.framework.util.PathMatcher
      */
     protected Set doFindMatchingFileSystemResources(File rootDir, String subPattern) throws IOException {
         if (logger.isDebugEnabled()) {

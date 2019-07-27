@@ -7,14 +7,14 @@ import java.beans.PropertyEditor;
  * This is the central interface that a {@link PropertyEditorRegistrar} operates on.
  *
  * <p>Extended by {@link BeanWrapper}; implemented by {@link BeanWrapperImpl}
- * and {@link org.springframework.validation.DataBinder}.
+ * and {@link com.rocket.summer.framework.validation.DataBinder}.
  *
  * @author Juergen Hoeller
  * @since 1.2.6
  * @see java.beans.PropertyEditor
  * @see PropertyEditorRegistrar
  * @see BeanWrapper
- * @see org.springframework.validation.DataBinder
+ * @see com.rocket.summer.framework.validation.DataBinder
  */
 public interface PropertyEditorRegistry {
 

@@ -56,11 +56,11 @@ public class StandardServletEnvironment extends StandardEnvironment
      * #initPropertySources(ServletContext) fully initialized} once the actual
      * {@link ServletContext} object becomes available.
      * @see StandardEnvironment#customizePropertySources
-     * @see org.springframework.core.env.AbstractEnvironment#customizePropertySources
+     * @see com.rocket.summer.framework.core.env.AbstractEnvironment#customizePropertySources
      * @see ServletConfigPropertySource
      * @see ServletContextPropertySource
-     * @see org.springframework.jndi.JndiPropertySource
-     * @see org.springframework.context.support.AbstractApplicationContext#initPropertySources
+     * @see com.rocket.summer.framework.jndi.JndiPropertySource
+     * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#initPropertySources
      * @see #initPropertySources(ServletContext)
      */
     @Override

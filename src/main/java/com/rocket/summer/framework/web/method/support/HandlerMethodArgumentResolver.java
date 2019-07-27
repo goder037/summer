@@ -33,7 +33,7 @@ public interface HandlerMethodArgumentResolver {
      *
      * @param parameter the method parameter to resolve. This parameter must
      * have previously been passed to
-     * {@link #supportsParameter(org.springframework.core.MethodParameter)}
+     * {@link #supportsParameter(com.rocket.summer.framework.core.MethodParameter)}
      * and it must have returned {@code true}
      * @param mavContainer the ModelAndViewContainer for the current request
      * @param webRequest the current request

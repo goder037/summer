@@ -4,9 +4,9 @@ import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.core.Ordered;
 
 /**
- * {@link org.springframework.context.ApplicationListener} decorator that filters
+ * {@link com.rocket.summer.framework.context.ApplicationListener} decorator that filters
  * events from a specified event source, invoking its delegate listener for
- * matching {@link org.springframework.context.ApplicationEvent} objects only.
+ * matching {@link com.rocket.summer.framework.context.ApplicationEvent} objects only.
  *
  * <p>Can also be used as base class, overriding the {@link #onApplicationEventInternal}
  * method instead of specifying a delegate listener.

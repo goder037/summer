@@ -23,8 +23,8 @@ import java.net.URL;
  * @author Juergen Hoeller
  * @since 15.12.2003
  * @see java.net.URL
- * @see org.springframework.core.io.ResourceEditor
- * @see org.springframework.core.io.ResourceLoader
+ * @see com.rocket.summer.framework.core.io.ResourceEditor
+ * @see com.rocket.summer.framework.core.io.ResourceLoader
  * @see FileEditor
  * @see InputStreamEditor
  */

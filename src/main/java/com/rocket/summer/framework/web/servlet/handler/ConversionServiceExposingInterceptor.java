@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Interceptor that places the configured {@link ConversionService} in request scope
  * so it's available during request processing. The request attribute name is
- * "org.springframework.core.convert.ConversionService", the value of
+ * "com.rocket.summer.framework.core.convert.ConversionService", the value of
  * <code>ConversionService.class.getName()</code>.
  *
  * <p>Mainly for use within JSP tags such as the spring:eval tag.

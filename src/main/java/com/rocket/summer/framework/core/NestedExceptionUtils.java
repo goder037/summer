@@ -12,7 +12,7 @@ package com.rocket.summer.framework.core;
  * @see NestedRuntimeException
  * @see NestedCheckedException
  * @see NestedIOException
- * @see org.springframework.web.util.NestedServletException
+ * @see com.rocket.summer.framework.web.util.NestedServletException
  */
 public abstract class NestedExceptionUtils {
 

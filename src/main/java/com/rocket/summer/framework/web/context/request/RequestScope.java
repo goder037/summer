@@ -1,18 +1,18 @@
 package com.rocket.summer.framework.web.context.request;
 
 /**
- * Request-backed {@link org.springframework.beans.factory.config.Scope}
+ * Request-backed {@link com.rocket.summer.framework.beans.factory.config.Scope}
  * implementation.
  *
  * <p>Relies on a thread-bound {@link RequestAttributes} instance, which
  * can be exported through {@link RequestContextListener},
- * {@link org.springframework.web.filter.RequestContextFilter} or
- * {@link org.springframework.web.servlet.DispatcherServlet}.
+ * {@link com.rocket.summer.framework.web.filter.RequestContextFilter} or
+ * {@link com.rocket.summer.framework.web.servlet.DispatcherServlet}.
  *
  * <p>This <code>Scope</code> will also work for Portlet environments,
  * through an alternate <code>RequestAttributes</code> implementation
  * (as exposed out-of-the-box by Spring's
- * {@link org.springframework.web.portlet.DispatcherPortlet}.
+ * {@link com.rocket.summer.framework.web.portlet.DispatcherPortlet}.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -21,9 +21,9 @@ package com.rocket.summer.framework.web.context.request;
  * @see RequestContextHolder#currentRequestAttributes()
  * @see RequestAttributes#SCOPE_REQUEST
  * @see RequestContextListener
- * @see org.springframework.web.filter.RequestContextFilter
- * @see org.springframework.web.servlet.DispatcherServlet
- * @see org.springframework.web.portlet.DispatcherPortlet
+ * @see com.rocket.summer.framework.web.filter.RequestContextFilter
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.portlet.DispatcherPortlet
  */
 public class RequestScope extends AbstractRequestAttributesScope {
 

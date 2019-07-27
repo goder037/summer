@@ -7,7 +7,7 @@ package com.rocket.summer.framework.beans.factory;
  *
  * @author Rod Johnson
  * @since 10.03.2003
- * @see org.springframework.beans.factory.FactoryBean
+ * @see com.rocket.summer.framework.beans.factory.FactoryBean
  */
 public class BeanIsNotAFactoryException extends BeanNotOfRequiredTypeException {
 

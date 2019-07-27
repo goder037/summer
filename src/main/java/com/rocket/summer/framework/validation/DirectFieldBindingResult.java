@@ -18,6 +18,7 @@ import com.rocket.summer.framework.util.Assert;
  * @see DataBinder#initDirectFieldAccess()
  * @see BeanPropertyBindingResult
  */
+@SuppressWarnings("serial")
 public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
 
     private final Object target;
@@ -34,7 +35,6 @@ public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
         super(objectName);
         this.target = target;
     }
-
 
     @Override
     public final Object getTarget() {
@@ -63,6 +63,4 @@ public class DirectFieldBindingResult extends AbstractPropertyBindingResult {
         Assert.state(this.target != null, "Cannot access fields on null target instance '" + getObjectName() + "'!");
         return PropertyAccessorFactory.forDirectFieldAccess(this.target);
     }
-
 }
-

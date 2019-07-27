@@ -3,7 +3,7 @@ package com.rocket.summer.framework.beans;
 import com.rocket.summer.framework.core.AttributeAccessorSupport;
 
 /**
- * Extension of {@link org.springframework.core.AttributeAccessorSupport},
+ * Extension of {@link com.rocket.summer.framework.core.AttributeAccessorSupport},
  * holding attributes as {@link BeanMetadataAttribute} objects in order
  * to keep track of the definition source.
  *

@@ -10,35 +10,27 @@ import com.rocket.summer.framework.core.NamedThreadLocal;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.util.StringValueResolver;
 
 import java.beans.PropertyEditor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Abstract base class for {@link org.springframework.beans.factory.BeanFactory}
+ * Abstract base class for {@link com.rocket.summer.framework.beans.factory.BeanFactory}
  * implementations, providing the full capabilities of the
- * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory} SPI.
+ * {@link com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory} SPI.
  * Does <i>not</i> assume a listable bean factory: can therefore also be used
  * as base class for bean factory implementations which obtain bean definitions
  * from some backend resource (where bean definition access is an expensive operation).
  *
  * <p>This class provides a singleton cache (through its base class
- * {@link org.springframework.beans.factory.support.DefaultSingletonBeanRegistry},
- * singleton/prototype determination, {@link org.springframework.beans.factory.FactoryBean}
+ * {@link com.rocket.summer.framework.beans.factory.support.DefaultSingletonBeanRegistry},
+ * singleton/prototype determination, {@link com.rocket.summer.framework.beans.factory.FactoryBean}
  * handling, aliases, bean definition merging for child bean definitions,
- * and bean destruction ({@link org.springframework.beans.factory.DisposableBean}
+ * and bean destruction ({@link com.rocket.summer.framework.beans.factory.DisposableBean}
  * interface, custom destroy methods). Furthermore, it can manage a bean factory
  * hierarchy (delegating to the parent in case of an unknown bean), through implementing
- * the {@link org.springframework.beans.factory.HierarchicalBeanFactory} interface.
+ * the {@link com.rocket.summer.framework.beans.factory.HierarchicalBeanFactory} interface.
  *
  * <p>The main template methods to be implemented by subclasses are
  * {@link #getBeanDefinition} and {@link #createBean}, retrieving a bean definition
@@ -68,11 +60,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     /** Whether to cache bean metadata or rather reobtain it for every access */
     private boolean cacheBeanMetadata = true;
 
+    /** Resolution strategy for expressions in bean definition values */
+    private BeanExpressionResolver beanExpressionResolver;
+
     /** Custom PropertyEditorRegistrars to apply to the beans of this factory */
     private final Set propertyEditorRegistrars = new LinkedHashSet(4);
 
     /** Custom PropertyEditors to apply to the beans of this factory */
     private final Map customEditors = new HashMap(4);
+
+    /** String resolvers to apply e.g. to annotation attribute values */
+    private final List<StringValueResolver> embeddedValueResolvers = new LinkedList<StringValueResolver>();
 
     /** A custom TypeConverter to use, overriding the default PropertyEditor mechanism */
     private TypeConverter typeConverter;
@@ -143,6 +141,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      */
     public <T> T getBean(String name, Class<T> requiredType, Object... args) throws BeansException {
         return doGetBean(name, requiredType, args, false);
+    }
+
+    public String resolveEmbeddedValue(String value) {
+        String result = value;
+        for (StringValueResolver resolver : this.embeddedValueResolvers) {
+            result = resolver.resolveStringValue(result);
+        }
+        return result;
     }
 
     /**
@@ -292,6 +298,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             }
         }
         return (T) bean;
+    }
+
+    public BeanExpressionResolver getBeanExpressionResolver() {
+        return this.beanExpressionResolver;
     }
 
 
@@ -639,7 +649,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * Return whether this factory holds a InstantiationAwareBeanPostProcessor
      * that will get applied to singleton beans on shutdown.
      * @see #addBeanPostProcessor
-     * @see org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor
+     * @see com.rocket.summer.framework.beans.factory.config.InstantiationAwareBeanPostProcessor
      */
     protected boolean hasInstantiationAwareBeanPostProcessors() {
         return this.hasInstantiationAwareBeanPostProcessors;
@@ -649,7 +659,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * Return whether this factory holds a DestructionAwareBeanPostProcessor
      * that will get applied to singleton beans on shutdown.
      * @see #addBeanPostProcessor
-     * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
+     * @see com.rocket.summer.framework.beans.factory.config.DestructionAwareBeanPostProcessor
      */
     protected boolean hasDestructionAwareBeanPostProcessors() {
         return this.hasDestructionAwareBeanPostProcessors;
@@ -1161,7 +1171,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @param beanName the name of the bean
      * @param mbd the merged bean definition for the bean
      * @return the type for the bean if determinable, or <code>null</code> else
-     * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+     * @see com.rocket.summer.framework.beans.factory.FactoryBean#getObjectType()
      * @see #getBean(String)
      */
     protected Class getTypeForFactoryBean(String beanName, RootBeanDefinition mbd) {
@@ -1277,9 +1287,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * a specified destroy method and registered DestructionAwareBeanPostProcessors.
      * @param bean the bean instance to check
      * @param mbd the corresponding bean definition
-     * @see org.springframework.beans.factory.DisposableBean
+     * @see com.rocket.summer.framework.beans.factory.DisposableBean
      * @see AbstractBeanDefinition#getDestroyMethodName()
-     * @see org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor
+     * @see com.rocket.summer.framework.beans.factory.config.DestructionAwareBeanPostProcessor
      */
     protected boolean requiresDestruction(Object bean, RootBeanDefinition mbd) {
         return (bean instanceof DisposableBean || mbd.getDestroyMethodName() != null ||
@@ -1337,7 +1347,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @param beanName the name of the bean to look for
      * @return if this bean factory contains a bean definition with the given name
      * @see #containsBean
-     * @see org.springframework.beans.factory.ListableBeanFactory#containsBeanDefinition
+     * @see com.rocket.summer.framework.beans.factory.ListableBeanFactory#containsBeanDefinition
      */
     protected abstract boolean containsBeanDefinition(String beanName);
 
@@ -1353,12 +1363,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * template method and the public interface method in that case.
      * @param beanName the name of the bean to find a definition for
      * @return the BeanDefinition for this prototype name (never <code>null</code>)
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if the bean definition cannot be resolved
      * @throws BeansException in case of errors
      * @see RootBeanDefinition
      * @see ChildBeanDefinition
-     * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#getBeanDefinition
+     * @see com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory#getBeanDefinition
      */
     protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 

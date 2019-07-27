@@ -26,7 +26,7 @@ import static com.rocket.summer.framework.web.context.support.StandardServletEnv
 
 /**
  * Convenience methods for retrieving the root
- * {@link org.springframework.web.context.WebApplicationContext} for a given
+ * {@link com.rocket.summer.framework.web.context.WebApplicationContext} for a given
  * <code>ServletContext</code>. This is e.g. useful for accessing a Spring
  * context from within custom web views or Struts actions.
  *
@@ -35,24 +35,24 @@ import static com.rocket.summer.framework.web.context.support.StandardServletEnv
  * This helper class is just the most generic way to access the root context.
  *
  * @author Juergen Hoeller
- * @see org.springframework.web.context.ContextLoader
- * @see org.springframework.web.servlet.FrameworkServlet
- * @see org.springframework.web.servlet.DispatcherServlet
- * @see org.springframework.web.jsf.FacesContextUtils
- * @see org.springframework.web.jsf.SpringBeanVariableResolver
- * @see org.springframework.web.jsf.el.SpringBeanFacesELResolver
+ * @see com.rocket.summer.framework.web.context.ContextLoader
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.jsf.FacesContextUtils
+ * @see com.rocket.summer.framework.web.jsf.SpringBeanVariableResolver
+ * @see com.rocket.summer.framework.web.jsf.el.SpringBeanFacesELResolver
  */
 public abstract class WebApplicationContextUtils {
 
     /**
      * Find the root WebApplicationContext for this web application, which is
-     * typically loaded via {@link org.springframework.web.context.ContextLoaderListener}.
+     * typically loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
      * <p>Will rethrow an exception that happened on root context startup,
      * to differentiate between a failed context startup and no context at all.
      * @param sc ServletContext to find the web application context for
      * @return the root WebApplicationContext for this web app
      * @throws IllegalStateException if the root WebApplicationContext could not be found
-     * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
+     * @see com.rocket.summer.framework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
      */
     public static WebApplicationContext getRequiredWebApplicationContext(ServletContext sc)
             throws IllegalStateException {
@@ -66,12 +66,12 @@ public abstract class WebApplicationContextUtils {
 
     /**
      * Find the root WebApplicationContext for this web application, which is
-     * typically loaded via {@link org.springframework.web.context.ContextLoaderListener}.
+     * typically loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
      * <p>Will rethrow an exception that happened on root context startup,
      * to differentiate between a failed context startup and no context at all.
      * @param sc ServletContext to find the web application context for
      * @return the root WebApplicationContext for this web app, or <code>null</code> if none
-     * @see org.springframework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
+     * @see com.rocket.summer.framework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
      */
     public static WebApplicationContext getWebApplicationContext(ServletContext sc) {
         return getWebApplicationContext(sc, WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
@@ -80,9 +80,9 @@ public abstract class WebApplicationContextUtils {
     /**
      * Replace {@code Servlet}-based stub property sources with actual instances
      * populated with the given context and config objects.
-     * @see org.springframework.core.env.PropertySource.StubPropertySource
-     * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
-     * @see org.springframework.core.env.ConfigurableEnvironment#getPropertySources()
+     * @see com.rocket.summer.framework.core.env.PropertySource.StubPropertySource
+     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
+     * @see com.rocket.summer.framework.core.env.ConfigurableEnvironment#getPropertySources()
      */
     public static void initServletPropertySources(
             MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {

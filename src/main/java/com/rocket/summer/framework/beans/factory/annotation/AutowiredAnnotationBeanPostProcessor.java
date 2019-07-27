@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor} implementation
  * that autowires annotated fields, setter methods and arbitrary config methods.
  * Such members to be injected are detected through a Java 5 annotation:
  * by default, Spring's {@link Autowired} annotation.
@@ -62,7 +62,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2.5
  * @see #setAutowiredAnnotationType
  * @see Autowired
- * @see org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+ * @see com.rocket.summer.framework.context.annotation.CommonAnnotationBeanPostProcessor
  */
 public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
         implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {

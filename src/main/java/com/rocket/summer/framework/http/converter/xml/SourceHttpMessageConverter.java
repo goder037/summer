@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Implementation of {@link org.springframework.http.converter.HttpMessageConverter} that can read and write {@link
+ * Implementation of {@link com.rocket.summer.framework.http.converter.HttpMessageConverter} that can read and write {@link
  * Source} objects.
  *
  * @author Arjen Poutsma

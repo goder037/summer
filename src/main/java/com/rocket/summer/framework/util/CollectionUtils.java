@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.util;
 
+import java.io.Serializable;
 import java.util.*;
 
 public abstract class CollectionUtils {
@@ -119,6 +120,34 @@ public abstract class CollectionUtils {
         for (int i = 0; i < arr.length; i++) {
             collection.add(arr[i]);
         }
+    }
+
+    /**
+     * Returns an unmodifiable view of the specified multi-value map.
+     *
+     * @param  map the map for which an unmodifiable view is to be returned.
+     * @return an unmodifiable view of the specified multi-value map.
+     */
+    public static <K,V> MultiValueMap<K,V> unmodifiableMultiValueMap(MultiValueMap<? extends K, ? extends V> map) {
+        Assert.notNull(map, "'map' must not be null");
+        Map<K, List<V>> result = new LinkedHashMap<K, List<V>>(map.size());
+        for (Map.Entry<? extends K, ? extends List<? extends V>> entry : map.entrySet()) {
+            List<V> values = Collections.unmodifiableList(entry.getValue());
+            result.put(entry.getKey(), values);
+        }
+        Map<K, List<V>> unmodifiableMap = Collections.unmodifiableMap(result);
+        return toMultiValueMap(unmodifiableMap);
+    }
+
+    /**
+     * Adapts a {@code Map<K, List<V>>} to an {@code MultiValueMap<K,V>}.
+     *
+     * @param map the map
+     * @return the multi-value map
+     */
+    public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> map) {
+        return new MultiValueMapAdapter<K, V>(map);
+
     }
 
     /**
@@ -309,5 +338,108 @@ public abstract class CollectionUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Adapts a Map to the MultiValueMap contract.
+     */
+    private static class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializable {
+
+        private final Map<K, List<V>> map;
+
+        public MultiValueMapAdapter(Map<K, List<V>> map) {
+            Assert.notNull(map, "'map' must not be null");
+            this.map = map;
+        }
+
+        public void add(K key, V value) {
+            List<V> values = this.map.get(key);
+            if (values == null) {
+                values = new LinkedList<V>();
+                this.map.put(key, values);
+            }
+            values.add(value);
+        }
+
+        public V getFirst(K key) {
+            List<V> values = this.map.get(key);
+            return (values != null ? values.get(0) : null);
+        }
+
+        public void set(K key, V value) {
+            List<V> values = new LinkedList<V>();
+            values.add(value);
+            this.map.put(key, values);
+        }
+
+        public void setAll(Map<K, V> values) {
+            for (Entry<K, V> entry : values.entrySet()) {
+                set(entry.getKey(), entry.getValue());
+            }
+        }
+
+        public Map<K, V> toSingleValueMap() {
+            LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K, V>(this.map.size());
+            for (Entry<K, List<V>> entry : map.entrySet()) {
+                singleValueMap.put(entry.getKey(), entry.getValue().get(0));
+            }
+            return singleValueMap;
+        }
+
+        public int size() {
+            return this.map.size();
+        }
+
+        public boolean isEmpty() {
+            return this.map.isEmpty();
+        }
+
+        public boolean containsKey(Object key) {
+            return this.map.containsKey(key);
+        }
+
+        public boolean containsValue(Object value) {
+            return this.map.containsValue(value);
+        }
+
+        public List<V> get(Object key) {
+            return this.map.get(key);
+        }
+
+        public List<V> put(K key, List<V> value) {
+            return this.map.put(key, value);
+        }
+
+        public List<V> remove(Object key) {
+            return this.map.remove(key);
+        }
+
+        public void putAll(Map<? extends K, ? extends List<V>> m) {
+            this.map.putAll(m);
+        }
+
+        public void clear() {
+            this.map.clear();
+        }
+
+        public Set<K> keySet() {
+            return this.map.keySet();
+        }
+
+        public Collection<List<V>> values() {
+            return this.map.values();
+        }
+
+        public Set<Entry<K, List<V>>> entrySet() {
+            return this.map.entrySet();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            return map.equals(other);
+        }
     }
 }

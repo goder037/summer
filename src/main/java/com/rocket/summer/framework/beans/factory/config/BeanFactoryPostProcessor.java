@@ -28,7 +28,7 @@ public interface BeanFactoryPostProcessor {
      * will have been instantiated yet. This allows for overriding or adding
      * properties even to eager-initializing beans.
      * @param beanFactory the bean factory used by the application context
-     * @throws org.springframework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      */
     void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
 

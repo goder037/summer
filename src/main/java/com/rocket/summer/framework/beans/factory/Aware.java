@@ -10,9 +10,9 @@ package com.rocket.summer.framework.beans.factory;
  *
  * <p>Note that merely implementing {@link Aware} provides no default
  * functionality. Rather, processing must be done explicitly, for example
- * in a {@link org.springframework.beans.factory.config.BeanPostProcessor BeanPostProcessor}.
- * Refer to {@link org.springframework.context.support.ApplicationContextAwareProcessor}
- * and {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory}
+ * in a {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor BeanPostProcessor}.
+ * Refer to {@link com.rocket.summer.framework.context.support.ApplicationContextAwareProcessor}
+ * and {@link com.rocket.summer.framework.beans.factory.support.AbstractAutowireCapableBeanFactory}
  * for examples of processing {@code *Aware} interface callbacks.
  *
  * @author Chris Beams

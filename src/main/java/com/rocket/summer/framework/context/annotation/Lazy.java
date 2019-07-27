@@ -6,14 +6,14 @@ import java.lang.annotation.*;
  * Indicates whether a bean is to be lazily initialized.
  *
  * <p>May be used on any class directly or indirectly annotated with
- * {@link org.springframework.stereotype.Component} or on methods annotated with
+ * {@link com.rocket.summer.framework.stereotype.Component} or on methods annotated with
  * {@link Bean}.
  *
  * <p>If this annotation is not present on a Component or Bean definition, eager
  * initialization will occur. If present and set to {@literal true}, the
  * Bean/Component will not be initialized until referenced by another bean or
  * explicitly retrieved from the enclosing
- * {@link org.springframework.beans.factory.BeanFactory}. If present and set to
+ * {@link com.rocket.summer.framework.beans.factory.BeanFactory}. If present and set to
  * {@literal false}, the bean will be instantiated on startup by bean factories
  * that perform eager initialization of singletons.
  *
@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * @see Primary
  * @see Bean
  * @see Configuration
- * @see org.springframework.stereotype.Component
+ * @see com.rocket.summer.framework.stereotype.Component
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

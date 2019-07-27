@@ -7,7 +7,7 @@ import com.rocket.summer.framework.core.type.classreading.MetadataReader;
 import com.rocket.summer.framework.util.Assert;
 
 /**
- * Extension of the {@link org.springframework.beans.factory.support.GenericBeanDefinition}
+ * Extension of the {@link com.rocket.summer.framework.beans.factory.support.GenericBeanDefinition}
  * class, based on an ASM ClassReader, with support for annotation metadata exposed
  * through the {@link AnnotatedBeanDefinition} interface.
  *
@@ -19,7 +19,7 @@ import com.rocket.summer.framework.util.Assert;
  * @since 2.5
  * @see #getMetadata()
  * @see #getBeanClassName()
- * @see org.springframework.core.type.classreading.MetadataReaderFactory
+ * @see com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory
  */
 public class ScannedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
 

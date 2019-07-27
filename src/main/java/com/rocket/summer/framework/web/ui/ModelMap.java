@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Juergen Hoeller
  * @since 2.0
  * @see Conventions#getVariableName
- * @see org.springframework.web.servlet.ModelAndView
+ * @see com.rocket.summer.framework.web.servlet.ModelAndView
  */
 public class ModelMap extends LinkedHashMap<String, Object> {
 
@@ -62,7 +62,7 @@ public class ModelMap extends LinkedHashMap<String, Object> {
 
     /**
      * Add the supplied attribute to this <code>Map</code> using a
-     * {@link org.springframework.core.Conventions#getVariableName generated name}.
+     * {@link com.rocket.summer.framework.core.Conventions#getVariableName generated name}.
      * <p><emphasis>Note: Empty {@link Collection Collections} are not added to
      * the model when using this method because we cannot correctly determine
      * the true convention name. View code should check for <code>null</code> rather

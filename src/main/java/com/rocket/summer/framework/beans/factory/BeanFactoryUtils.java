@@ -61,8 +61,8 @@ public abstract class BeanFactoryUtils {
      * @param name the name of the bean
      * @return whether the given name is a generated bean name
      * @see #GENERATED_BEAN_NAME_SEPARATOR
-     * @see org.springframework.beans.factory.support.BeanDefinitionReaderUtils#generateBeanName
-     * @see org.springframework.beans.factory.support.DefaultBeanNameGenerator
+     * @see com.rocket.summer.framework.beans.factory.support.BeanDefinitionReaderUtils#generateBeanName
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultBeanNameGenerator
      */
     public static boolean isGeneratedBeanName(String name) {
         return (name != null && name.indexOf(GENERATED_BEAN_NAME_SEPARATOR) != -1);
@@ -278,7 +278,7 @@ public abstract class BeanFactoryUtils {
      * @param lbf the bean factory
      * @param type type of bean to match
      * @return the matching bean instance
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if 0 or more than 1 beans of the given type were found
      * @throws BeansException if the bean could not be created
      */
@@ -315,7 +315,7 @@ public abstract class BeanFactoryUtils {
      * eagerly initialized to determine their type: So be aware that passing in "true"
      * for this flag will initialize FactoryBeans and "factory-bean" references.
      * @return the matching bean instance
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if 0 or more than 1 beans of the given type were found
      * @throws BeansException if the bean could not be created
      */
@@ -344,7 +344,7 @@ public abstract class BeanFactoryUtils {
      * @param lbf the bean factory
      * @param type type of bean to match
      * @return the matching bean instance
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if 0 or more than 1 beans of the given type were found
      * @throws BeansException if the bean could not be created
      */
@@ -379,7 +379,7 @@ public abstract class BeanFactoryUtils {
      * eagerly initialized to determine their type: So be aware that passing in "true"
      * for this flag will initialize FactoryBeans and "factory-bean" references.
      * @return the matching bean instance
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if 0 or more than 1 beans of the given type were found
      * @throws BeansException if the bean could not be created
      */

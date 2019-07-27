@@ -14,8 +14,8 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 /**
- * Base class for {@link org.springframework.aop.TargetSource} implementations
- * that are based on a Spring {@link org.springframework.beans.factory.BeanFactory},
+ * Base class for {@link com.rocket.summer.framework.aop.TargetSource} implementations
+ * that are based on a Spring {@link com.rocket.summer.framework.beans.factory.BeanFactory},
  * delegating to Spring-managed bean instances.
  *
  * <p>Subclasses can create prototype instances or lazily access a
@@ -28,7 +28,7 @@ import java.io.Serializable;
  * @author Juergen Hoeller
  * @author Rod Johnson
  * @since 1.1.4
- * @see org.springframework.beans.factory.BeanFactory#getBean
+ * @see com.rocket.summer.framework.beans.factory.BeanFactory#getBean
  * @see LazyInitTargetSource
  * @see PrototypeTargetSource
  * @see ThreadLocalTargetSource

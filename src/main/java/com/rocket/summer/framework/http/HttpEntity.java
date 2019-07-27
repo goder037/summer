@@ -5,7 +5,7 @@ import com.rocket.summer.framework.util.MultiValueMap;
 /**
  * Represents an HTTP request or response entity, consisting of headers and body.
  *
- * <p>Typically used in combination with the {@link org.springframework.web.client.RestTemplate RestTemplate}, like so:
+ * <p>Typically used in combination with the {@link com.rocket.summer.framework.web.client.RestTemplate RestTemplate}, like so:
  * <pre class="code">
  * HttpHeaders headers = new HttpHeaders();
  * headers.setContentType(MediaType.TEXT_PLAIN);
@@ -30,7 +30,7 @@ import com.rocket.summer.framework.util.MultiValueMap;
  *
  * @author Arjen Poutsma
  * @since 3.0.2
- * @see org.springframework.web.client.RestTemplate
+ * @see com.rocket.summer.framework.web.client.RestTemplate
  * @see #getBody()
  * @see #getHeaders()
  */

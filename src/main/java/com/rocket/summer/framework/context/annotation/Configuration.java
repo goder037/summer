@@ -53,7 +53,7 @@ public @interface Configuration {
      * the name/id of the bean element will take precedence.
      *
      * @return the specified bean name, if any
-     * @see org.springframework.beans.factory.support.DefaultBeanNameGenerator
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultBeanNameGenerator
      */
     String value() default "";
 

@@ -17,7 +17,7 @@ import java.beans.PropertyEditorSupport;
  * @author Rick Evans
  * @since 13.05.2003
  * @see java.lang.Class#forName
- * @see org.springframework.util.ClassUtils#forName(String, ClassLoader)
+ * @see com.rocket.summer.framework.util.ClassUtils#forName(String, ClassLoader)
  */
 public class ClassEditor extends PropertyEditorSupport {
 

@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Looks for a {@link #CONTEXT_CLASS_PARAM "contextClass"} parameter
  * at the {@code web.xml} context-param level to specify the context
  * class type, falling back to the default of
- * {@link org.springframework.web.context.support.XmlWebApplicationContext}
+ * {@link com.rocket.summer.framework.web.context.support.XmlWebApplicationContext}
  * if not found. With the default ContextLoader implementation, any context class
  * specified needs to implement the ConfigurableWebApplicationContext interface.
  *
@@ -55,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>As of Spring 3.1, {@code ContextLoader} supports injecting the root web
  * application context via the {@link #ContextLoader(WebApplicationContext)}
  * constructor, allowing for programmatic configuration in Servlet 3.0+ environments. See
- * {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+ * {@link com.rocket.summer.framework.web.WebApplicationInitializer} for usage examples.
  *
  * @author Juergen Hoeller
  * @author Colin Sampaleanu
@@ -63,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 17.02.2003
  * @see ContextLoaderListener
  * @see ConfigurableWebApplicationContext
- * @see org.springframework.web.context.support.XmlWebApplicationContext
+ * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
  */
 public class ContextLoader {
 
@@ -91,7 +91,7 @@ public class ContextLoader {
      * Name of servlet context parameter (i.e., {@value}) that can specify the
      * config location for the root context, falling back to the implementation's
      * default otherwise.
-     * @see org.springframework.web.context.support.XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
+     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext#DEFAULT_CONFIG_LOCATION
      */
     public static final String CONFIG_LOCATION_PARAM = "contextConfigLocation";
 
@@ -211,7 +211,7 @@ public class ContextLoader {
      * {@code ConfigurableWebApplicationContext}, none of the above will occur under the
      * assumption that the user has performed these actions (or not) per his or her
      * specific needs.
-     * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+     * <p>See {@link com.rocket.summer.framework.web.WebApplicationInitializer} for usage examples.
      * <p>In any case, the given application context will be registered into the
      * ServletContext under the attribute name {@link
      * WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE} and subclasses are
@@ -371,7 +371,7 @@ public class ContextLoader {
      * @param servletContext current servlet context
      * @return the WebApplicationContext implementation class to use
      * @see #CONTEXT_CLASS_PARAM
-     * @see org.springframework.web.context.support.XmlWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
      */
     protected Class<?> determineContextClass(ServletContext servletContext) {
         String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM);
@@ -435,8 +435,8 @@ public class ContextLoader {
      * {@linkplain ApplicationContextInitializer#initialize invokes each} with the
      * given web application context.
      * <p>Any {@code ApplicationContextInitializers} implementing
-     * {@link org.springframework.core.Ordered Ordered} or marked with @{@link
-     * org.springframework.core.annotation.Order Order} will be sorted appropriately.
+     * {@link com.rocket.summer.framework.core.Ordered Ordered} or marked with @{@link
+     * com.rocket.summer.framework.core.annotation.Order Order} will be sorted appropriately.
      * @param servletContext the current servlet context
      * @param applicationContext the newly created application context
      * @see #createWebApplicationContext(ServletContext, ApplicationContext)
@@ -486,14 +486,14 @@ public class ContextLoader {
      * EJBs. For pure web applications, there is usually no need to worry about
      * having a parent context to the root web application context.
      * <p>The default implementation uses
-     * {@link org.springframework.context.access.ContextSingletonBeanFactoryLocator},
+     * {@link com.rocket.summer.framework.context.access.ContextSingletonBeanFactoryLocator},
      * configured via {@link #LOCATOR_FACTORY_SELECTOR_PARAM} and
      * {@link #LOCATOR_FACTORY_KEY_PARAM}, to load a parent context
      * which will be shared by all other users of ContextsingletonBeanFactoryLocator
      * which also use the same configuration parameters.
      * @param servletContext current servlet context
      * @return the parent application context, or {@code null} if none
-     * @see org.springframework.context.access.ContextSingletonBeanFactoryLocator
+     * @see com.rocket.summer.framework.context.access.ContextSingletonBeanFactoryLocator
      */
     protected ApplicationContext loadParentContext(ServletContext servletContext) {
         ApplicationContext parentContext = null;
@@ -553,7 +553,7 @@ public class ContextLoader {
      * the web application's ClassLoader).
      * @return the current root web application context, or {@code null}
      * if none found
-     * @see org.springframework.web.context.support.SpringBeanAutowiringSupport
+     * @see com.rocket.summer.framework.web.context.support.SpringBeanAutowiringSupport
      */
     public static WebApplicationContext getCurrentWebApplicationContext() {
         ClassLoader ccl = Thread.currentThread().getContextClassLoader();

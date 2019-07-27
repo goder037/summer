@@ -68,7 +68,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
      * system property values if necessary. Applied to config locations.
      * @param path the original file path
      * @return the resolved file path
-     * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders
+     * @see com.rocket.summer.framework.util.SystemPropertyUtils#resolvePlaceholders
      */
     protected String resolvePath(String path) {
         return SystemPropertyUtils.resolvePlaceholders(path);

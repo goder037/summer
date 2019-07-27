@@ -5,8 +5,8 @@ import com.rocket.summer.framework.context.support.GenericApplicationContext;
 
 /**
  * Standalone application context, accepting annotated classes as input - in particular
- * {@link org.springframework.context.annotation.Configuration @Configuration}-annotated
- * classes, but also plain {@link org.springframework.stereotype.Component @Components}
+ * {@link com.rocket.summer.framework.context.annotation.Configuration @Configuration}-annotated
+ * classes, but also plain {@link com.rocket.summer.framework.stereotype.Component @Components}
  * and JSR-330 compliant classes using {@literal javax.inject} annotations. Allows for
  * registering classes one by one ({@link #register}) as well as for classpath scanning
  * ({@link #scan}).
@@ -22,7 +22,7 @@ import com.rocket.summer.framework.context.support.GenericApplicationContext;
  * @see #scan
  * @see AnnotatedBeanDefinitionReader
  * @see ClassPathBeanDefinitionScanner
- * @see org.springframework.context.support.GenericXmlApplicationContext
+ * @see com.rocket.summer.framework.context.support.GenericXmlApplicationContext
  */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext {
 

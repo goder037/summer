@@ -20,13 +20,13 @@ import com.rocket.summer.framework.core.AliasRegistry;
  *
  * @author Juergen Hoeller
  * @since 26.11.2003
- * @see org.springframework.beans.factory.config.BeanDefinition
+ * @see com.rocket.summer.framework.beans.factory.config.BeanDefinition
  * @see AbstractBeanDefinition
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
  * @see DefaultListableBeanFactory
- * @see org.springframework.context.support.GenericApplicationContext
- * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+ * @see com.rocket.summer.framework.context.support.GenericApplicationContext
+ * @see com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader
  * @see PropertiesBeanDefinitionReader
  */
 public interface BeanDefinitionRegistry extends AliasRegistry {

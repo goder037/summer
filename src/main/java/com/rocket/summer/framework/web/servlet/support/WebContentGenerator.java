@@ -14,10 +14,10 @@ import java.util.Set;
 
 /**
  * Convenient superclass for any kind of web content generator,
- * like {@link org.springframework.web.servlet.mvc.AbstractController}
- * and {@link org.springframework.web.servlet.mvc.WebContentInterceptor}.
+ * like {@link com.rocket.summer.framework.web.servlet.mvc.AbstractController}
+ * and {@link com.rocket.summer.framework.web.servlet.mvc.WebContentInterceptor}.
  * Can also be used for custom handlers that have their own
- * {@link org.springframework.web.servlet.HandlerAdapter}.
+ * {@link com.rocket.summer.framework.web.servlet.HandlerAdapter}.
  *
  * <p>Supports HTTP cache control options. The usage of corresponding
  * HTTP headers can be controlled via the "useExpiresHeader",

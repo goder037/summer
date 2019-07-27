@@ -1,7 +1,7 @@
 package com.rocket.test;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.rocket.summer.framework.context.annotation.Bean;
+import com.rocket.summer.framework.context.annotation.Configuration;
 
 @Configuration
 public class SpringConf {

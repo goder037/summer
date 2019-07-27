@@ -9,7 +9,7 @@ package com.rocket.summer.framework.core.env;
  * <p>A <em>profile</em> is a named, logical group of bean definitions to be registered
  * with the container only if the given profile is <em>active</em>. Beans may be assigned
  * to a profile whether defined in XML or via annotations; see the spring-beans 3.1 schema
- * or the {@link org.springframework.context.annotation.Profile @Profile} annotation for
+ * or the {@link com.rocket.summer.framework.context.annotation.Profile @Profile} annotation for
  * syntax details. The role of the {@code Environment} object with relation to profiles is
  * in determining which profiles (if any) are currently {@linkplain #getActiveProfiles
  * active}, and which profiles (if any) should be {@linkplain #getDefaultProfiles active
@@ -23,13 +23,13 @@ package com.rocket.summer.framework.core.env;
  * and resolving properties from them.
  *
  * <p>Beans managed within an {@code ApplicationContext} may register to be {@link
- * org.springframework.context.EnvironmentAware EnvironmentAware} or {@code @Inject} the
+ * com.rocket.summer.framework.context.EnvironmentAware EnvironmentAware} or {@code @Inject} the
  * {@code Environment} in order to query profile state or resolve properties directly.
  *
  * <p>In most cases, however, application-level beans should not need to interact with the
  * {@code Environment} directly but instead may have to have <code>${...}</code> property
  * values replaced by a property placeholder configurer such as
- * {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+ * {@link com.rocket.summer.framework.context.support.PropertySourcesPlaceholderConfigurer
  * PropertySourcesPlaceholderConfigurer}, which itself is {@code EnvironmentAware} and
  * as of Spring 3.1 is registered by default when using
  * {@code <context:property-placeholder/>}.
@@ -47,10 +47,10 @@ package com.rocket.summer.framework.core.env;
  * @see ConfigurableEnvironment
  * @see AbstractEnvironment
  * @see StandardEnvironment
- * @see org.springframework.context.EnvironmentAware
- * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
- * @see org.springframework.context.ConfigurableApplicationContext#setEnvironment
- * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
+ * @see com.rocket.summer.framework.context.EnvironmentAware
+ * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#getEnvironment
+ * @see com.rocket.summer.framework.context.ConfigurableApplicationContext#setEnvironment
+ * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#createEnvironment
  */
 public interface Environment extends PropertyResolver {
 

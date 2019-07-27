@@ -36,15 +36,15 @@ import java.lang.annotation.*;
  * As a consequence, such an argument will never be <code>null</code>.
  * <i>Note that session access may not be thread-safe, in particular in a
  * Servlet environment: Consider switching the
- * {@link org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter#setSynchronizeOnSession "synchronizeOnSession"}
+ * {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter#setSynchronizeOnSession "synchronizeOnSession"}
  * flag to "true" if multiple requests are allowed to access a session concurrently.</i>
- * <li>{@link org.springframework.web.context.request.WebRequest} or
- * {@link org.springframework.web.context.request.NativeWebRequest}.
+ * <li>{@link com.rocket.summer.framework.web.context.request.WebRequest} or
+ * {@link com.rocket.summer.framework.web.context.request.NativeWebRequest}.
  * Allows for generic request parameter access as well as request/session
  * attribute access, without ties to the native Servlet/Portlet API.
  * <li>{@link java.util.Locale} for the current request locale
  * (determined by the most specific locale resolver available,
- * i.e. the configured {@link org.springframework.web.servlet.LocaleResolver}
+ * i.e. the configured {@link com.rocket.summer.framework.web.servlet.LocaleResolver}
  * in a Servlet environment and the portal locale in a Portlet environment).
  * <li>{@link java.io.InputStream} / {@link java.io.Reader} for access
  * to the request's content. This will be the raw InputStream/Reader as
@@ -62,46 +62,46 @@ import java.lang.annotation.*;
  * specific Servlet/Portlet request parameters. Parameter values will be
  * converted to the declared method argument type. Additionally,
  * {@code @RequestParam} can be used on a {@link java.util.Map Map&lt;String, String&gt;} or
- * {@link org.springframework.util.MultiValueMap MultiValueMap&lt;String, String&gt;}
+ * {@link com.rocket.summer.framework.util.MultiValueMap MultiValueMap&lt;String, String&gt;}
  * method parameter to gain access to all request parameters.
  * <li>{@link RequestHeader @RequestHeader} annotated parameters for access to
  * specific Servlet/Portlet request HTTP headers. Parameter values will be
  * converted to the declared method argument type. Additionally,
  * {@code @RequestHeader} can be used on a {@link java.util.Map Map&lt;String, String&gt;},
- * {@link org.springframework.util.MultiValueMap MultiValueMap&lt;String, String&gt;}, or
- * {@link org.springframework.http.HttpHeaders HttpHeaders} method parameter to
+ * {@link com.rocket.summer.framework.util.MultiValueMap MultiValueMap&lt;String, String&gt;}, or
+ * {@link com.rocket.summer.framework.http.HttpHeaders HttpHeaders} method parameter to
  * gain access to all request headers.
  * <li>{@link RequestBody @RequestBody} annotated parameters (Servlet-only)
  * for access to the Servlet request HTTP contents. The request stream will be
  * converted to the declared method argument type using
- * {@linkplain org.springframework.http.converter.HttpMessageConverter message
+ * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}. Such parameters may optionally be annotated with {@code @Valid}
  * but do not support access to validation results through a
- * {@link org.springframework.validation.Errors} /
- * {@link org.springframework.validation.BindingResult} argument.
- * Instead a {@link org.springframework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
+ * {@link com.rocket.summer.framework.validation.Errors} /
+ * {@link com.rocket.summer.framework.validation.BindingResult} argument.
+ * Instead a {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
  * exception is raised.
  * <li>{@link RequestPart @RequestPart} annotated parameters
  * (Servlet-only, {@literal @MVC 3.1-only})
  * for access to the content
  * of a part of "multipart/form-data" request. The request part stream will be
  * converted to the declared method argument type using
- * {@linkplain org.springframework.http.converter.HttpMessageConverter message
+ * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}. Such parameters may optionally be annotated with {@code @Valid}
  * but do not support access to validation results through a
- * {@link org.springframework.validation.Errors} /
- * {@link org.springframework.validation.BindingResult} argument.
- * Instead a {@link org.springframework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
+ * {@link com.rocket.summer.framework.validation.Errors} /
+ * {@link com.rocket.summer.framework.validation.BindingResult} argument.
+ * Instead a {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
  * exception is raised.
- * <li>{@link org.springframework.http.HttpEntity HttpEntity&lt;?&gt;} parameters
+ * <li>{@link com.rocket.summer.framework.http.HttpEntity HttpEntity&lt;?&gt;} parameters
  * (Servlet-only) for access to the Servlet request HTTP headers and contents.
  * The request stream will be converted to the entity body using
- * {@linkplain org.springframework.http.converter.HttpMessageConverter message
+ * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}.
- * <li>{@link java.util.Map} / {@link org.springframework.ui.Model} /
- * {@link org.springframework.ui.ModelMap} for enriching the implicit model
+ * <li>{@link java.util.Map} / {@link com.rocket.summer.framework.ui.Model} /
+ * {@link com.rocket.summer.framework.ui.ModelMap} for enriching the implicit model
  * that will be exposed to the web view.
- * <li>{@link org.springframework.web.servlet.mvc.support.RedirectAttributes}
+ * <li>{@link com.rocket.summer.framework.web.servlet.mvc.support.RedirectAttributes}
  * (Servlet-only, {@literal @MVC 3.1-only}) to specify the exact set of attributes
  * to use in case of a redirect and also to add flash attributes (attributes
  * stored temporarily on the server-side to make them available to the request
@@ -117,14 +117,14 @@ import java.lang.annotation.*;
  * in property notation (e.g. "orderAddress" for type "mypackage.OrderAddress").
  * Specify a parameter-level {@link ModelAttribute} annotation for declaring
  * a specific model attribute name.
- * <li>{@link org.springframework.validation.Errors} /
- * {@link org.springframework.validation.BindingResult} validation results
+ * <li>{@link com.rocket.summer.framework.validation.Errors} /
+ * {@link com.rocket.summer.framework.validation.BindingResult} validation results
  * for a preceding command/form object (the immediate preceding argument).
- * <li>{@link org.springframework.web.bind.support.SessionStatus} status handle
+ * <li>{@link com.rocket.summer.framework.web.bind.support.SessionStatus} status handle
  * for marking form processing as complete (triggering the cleanup of session
  * attributes that have been indicated by the {@link SessionAttributes} annotation
  * at the handler type level).
- * <li>{@link org.springframework.web.util.UriComponentsBuilder}
+ * <li>{@link com.rocket.summer.framework.web.util.UriComponentsBuilder}
  * (Servlet-only, {@literal @MVC 3.1-only})
  * for preparing a URL relative to the current request's host, port, scheme,
  * context path, and the literal part of the servlet mapping.
@@ -135,43 +135,43 @@ import java.lang.annotation.*;
  * <li>A <code>ModelAndView</code> object (Servlet MVC or Portlet MVC),
  * with the model implicitly enriched with command objects and the results
  * of {@link ModelAttribute} annotated reference data accessor methods.
- * <li>A {@link org.springframework.ui.Model Model} object, with the view name
- * implicitly determined through a {@link org.springframework.web.servlet.RequestToViewNameTranslator}
+ * <li>A {@link com.rocket.summer.framework.ui.Model Model} object, with the view name
+ * implicitly determined through a {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * and the model implicitly enriched with command objects and the results
  * of {@link ModelAttribute} annotated reference data accessor methods.
  * <li>A {@link java.util.Map} object for exposing a model,
  * with the view name implicitly determined through a
- * {@link org.springframework.web.servlet.RequestToViewNameTranslator}
+ * {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * and the model implicitly enriched with command objects and the results
  * of {@link ModelAttribute} annotated reference data accessor methods.
- * <li>A {@link org.springframework.web.servlet.View} object, with the
+ * <li>A {@link com.rocket.summer.framework.web.servlet.View} object, with the
  * model implicitly determined through command objects and
  * {@link ModelAttribute} annotated reference data accessor methods.
  * The handler method may also programmatically enrich the model by
- * declaring a {@link org.springframework.ui.Model} argument (see above).
+ * declaring a {@link com.rocket.summer.framework.ui.Model} argument (see above).
  * <li>A {@link java.lang.String} value which is interpreted as view name,
  * with the model implicitly determined through command objects and
  * {@link ModelAttribute} annotated reference data accessor methods.
  * The handler method may also programmatically enrich the model by
- * declaring a {@link org.springframework.ui.ModelMap} argument
+ * declaring a {@link com.rocket.summer.framework.ui.ModelMap} argument
  * (see above).
  * <li>{@link ResponseBody @ResponseBody} annotated methods (Servlet-only)
  * for access to the Servlet response HTTP contents. The return value will
  * be converted to the response stream using
- * {@linkplain org.springframework.http.converter.HttpMessageConverter message
+ * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}.
- * <li>A {@link org.springframework.http.HttpEntity HttpEntity&lt;?&gt;} or
- * {@link org.springframework.http.ResponseEntity ResponseEntity&lt;?&gt;} object
+ * <li>A {@link com.rocket.summer.framework.http.HttpEntity HttpEntity&lt;?&gt;} or
+ * {@link com.rocket.summer.framework.http.ResponseEntity ResponseEntity&lt;?&gt;} object
  * (Servlet-only) to access to the Servlet response HTTP headers and contents.
  * The entity body will be converted to the response stream using
- * {@linkplain org.springframework.http.converter.HttpMessageConverter message
+ * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}.
  * <li><code>void</code> if the method handles the response itself (by
  * writing the response content directly, declaring an argument of type
  * {@link javax.servlet.ServletResponse} / {@link javax.servlet.http.HttpServletResponse}
  * / {@link javax.portlet.RenderResponse} for that purpose)
  * or if the view name is supposed to be implicitly determined through a
- * {@link org.springframework.web.servlet.RequestToViewNameTranslator}
+ * {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * (not declaring a response argument in the handler method signature;
  * only applicable in a Servlet environment).
  * <li>Any other return type will be considered as single model attribute
@@ -214,11 +214,11 @@ import java.lang.annotation.*;
  * @see ModelAttribute
  * @see SessionAttributes
  * @see InitBinder
- * @see org.springframework.web.context.request.WebRequest
- * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodMapping
- * @see org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter
- * @see org.springframework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping
- * @see org.springframework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter
+ * @see com.rocket.summer.framework.web.context.request.WebRequest
+ * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodMapping
+ * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter
+ * @see com.rocket.summer.framework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping
+ * @see com.rocket.summer.framework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -296,7 +296,7 @@ public @interface RequestMapping {
      * gets checked before the handler method is even resolved).
      * <p>Maps against HttpServletRequest headers in a Servlet environment,
      * and against PortletRequest properties in a Portlet 2.0 environment.
-     * @see org.springframework.http.MediaType
+     * @see com.rocket.summer.framework.http.MediaType
      */
     String[] headers() default {};
 
@@ -309,7 +309,7 @@ public @interface RequestMapping {
      * <p><b>Supported at the type level as well as at the method level!</b>
      * When used at the type level, all method-level mappings override
      * this consumes restriction.
-     * @see org.springframework.http.MediaType
+     * @see com.rocket.summer.framework.http.MediaType
      * @see javax.servlet.http.HttpServletRequest#getContentType()
      */
     String[] consumes() default {};
@@ -323,7 +323,7 @@ public @interface RequestMapping {
      * <p><b>Supported at the type level as well as at the method level!</b>
      * When used at the type level, all method-level mappings override
      * this consumes restriction.
-     * @see org.springframework.http.MediaType
+     * @see com.rocket.summer.framework.http.MediaType
      */
     String[] produces() default {};
 

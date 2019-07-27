@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.web.context.request.WebRequestInterceptor
- * @see org.springframework.web.servlet.HandlerInterceptor
+ * @see com.rocket.summer.framework.web.context.request.WebRequestInterceptor
+ * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
  */
 public class WebRequestHandlerInterceptorAdapter implements HandlerInterceptor {
 

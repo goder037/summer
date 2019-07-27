@@ -8,18 +8,18 @@ import javax.servlet.ServletContext;
 /**
  * Interface to be implemented by configurable web application contexts.
  * Supported by {@link ContextLoader} and
- * {@link org.springframework.web.servlet.FrameworkServlet}.
+ * {@link com.rocket.summer.framework.web.servlet.FrameworkServlet}.
  *
  * <p>Note: The setters of this interface need to be called before an
  * invocation of the {@link #refresh} method inherited from
- * {@link org.springframework.context.ConfigurableApplicationContext}.
+ * {@link com.rocket.summer.framework.context.ConfigurableApplicationContext}.
  * They do not cause an initialization of the context on their own.
  *
  * @author Juergen Hoeller
  * @since 05.12.2003
  * @see #refresh
  * @see ContextLoader#createWebApplicationContext
- * @see org.springframework.web.servlet.FrameworkServlet#createWebApplicationContext
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet#createWebApplicationContext
  */
 public interface ConfigurableWebApplicationContext extends WebApplicationContext, ConfigurableApplicationContext {
 

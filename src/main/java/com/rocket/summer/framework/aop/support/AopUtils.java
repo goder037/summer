@@ -16,14 +16,14 @@ import java.util.*;
  * Utility methods for AOP support code.
  * Mainly for internal use within Spring's AOP support.
  *
- * <p>See {@link org.springframework.aop.framework.AopProxyUtils} for a
+ * <p>See {@link com.rocket.summer.framework.aop.framework.AopProxyUtils} for a
  * collection of framework-specific AOP utility methods which depend
  * on internals of Spring's AOP framework implementation.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @see org.springframework.aop.framework.AopProxyUtils
+ * @see com.rocket.summer.framework.aop.framework.AopProxyUtils
  */
 public abstract class AopUtils {
 
@@ -69,7 +69,7 @@ public abstract class AopUtils {
      * <p>Returns the target class for an AOP proxy and the plain class else.
      * @param candidate the instance to check (might be an AOP proxy)
      * @return the target class (or the plain class of the given object as fallback)
-     * @see org.springframework.aop.TargetClassAware#getTargetClass()
+     * @see com.rocket.summer.framework.aop.TargetClassAware#getTargetClass()
      */
     public static Class getTargetClass(Object candidate) {
         Assert.notNull(candidate, "Candidate object must not be null");
@@ -121,7 +121,7 @@ public abstract class AopUtils {
      * is one. E.g. the method may be <code>IFoo.bar()</code> and the target class
      * may be <code>DefaultFoo</code>. In this case, the method may be
      * <code>DefaultFoo.bar()</code>. This enables attributes on that method to be found.
-     * <p><b>NOTE:</b> In contrast to {@link org.springframework.util.ClassUtils#getMostSpecificMethod},
+     * <p><b>NOTE:</b> In contrast to {@link com.rocket.summer.framework.util.ClassUtils#getMostSpecificMethod},
      * this method resolves Java 5 bridge methods in order to retrieve attributes
      * from the <i>original</i> method definition.
      * @param method the method to be invoked, which may come from an interface
@@ -129,7 +129,7 @@ public abstract class AopUtils {
      * May be <code>null</code> or may not even implement the method.
      * @return the specific target method, or the original method if the
      * <code>targetClass</code> doesn't implement it or is <code>null</code>
-     * @see org.springframework.util.ClassUtils#getMostSpecificMethod
+     * @see com.rocket.summer.framework.util.ClassUtils#getMostSpecificMethod
      */
     public static Method getMostSpecificMethod(Method method, Class targetClass) {
         Method resolvedMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
@@ -268,7 +268,7 @@ public abstract class AopUtils {
      * @param args the arguments for the method
      * @return the invocation result, if any
      * @throws Throwable if thrown by the target method
-     * @throws org.springframework.aop.AopInvocationException in case of a reflection error
+     * @throws com.rocket.summer.framework.aop.AopInvocationException in case of a reflection error
      */
     public static Object invokeJoinpointUsingReflection(Object target, Method method, Object[] args)
             throws Throwable {

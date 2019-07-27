@@ -18,9 +18,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 /**
- * {@link org.springframework.context.support.AbstractRefreshableApplicationContext}
+ * {@link com.rocket.summer.framework.context.support.AbstractRefreshableApplicationContext}
  * subclass which implements the
- * {@link org.springframework.web.context.ConfigurableWebApplicationContext}
+ * {@link com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext}
  * interface for web environments. Provides a "configLocations" property,
  * to be populated through the ConfigurableWebApplicationContext interface
  * on web application startup.
@@ -34,17 +34,17 @@ import javax.servlet.ServletContext;
  * <p>Interprets resource paths as servlet context resources, i.e. as paths beneath
  * the web application root. Absolute paths, e.g. for files outside the web app root,
  * can be accessed via "file:" URLs, as implemented by
- * {@link org.springframework.core.io.DefaultResourceLoader}.
+ * {@link com.rocket.summer.framework.core.io.DefaultResourceLoader}.
  *
  * <p>In addition to the special beans detected by
- * {@link org.springframework.context.support.AbstractApplicationContext},
- * this class detects a bean of type {@link org.springframework.ui.context.ThemeSource}
+ * {@link com.rocket.summer.framework.context.support.AbstractApplicationContext},
+ * this class detects a bean of type {@link com.rocket.summer.framework.ui.context.ThemeSource}
  * in the context, under the special bean name "themeSource".
  *
  * <p><b>This is the web context to be subclassed for a different bean definition format.</b>
  * Such a context implementation can be specified as "contextClass" context-param
- * for {@link org.springframework.web.context.ContextLoader} or as "contextClass"
- * init-param for {@link org.springframework.web.servlet.FrameworkServlet},
+ * for {@link com.rocket.summer.framework.web.context.ContextLoader} or as "contextClass"
+ * init-param for {@link com.rocket.summer.framework.web.servlet.FrameworkServlet},
  * replacing the default {@link XmlWebApplicationContext}. It will then automatically
  * receive the "contextConfigLocation" context-param or init-param, respectively.
  *
@@ -52,13 +52,13 @@ import javax.servlet.ServletContext;
  * to configure themselves based on the configuration received through the
  * {@link ConfigurableWebApplicationContext} interface. In contrast, a standalone
  * application context might allow for configuration in custom startup code
- * (for example, {@link org.springframework.context.support.GenericApplicationContext}).
+ * (for example, {@link com.rocket.summer.framework.context.support.GenericApplicationContext}).
  *
  * @author Juergen Hoeller
  * @since 1.1.3
  * @see #loadBeanDefinitions
- * @see org.springframework.web.context.ConfigurableWebApplicationContext#setConfigLocations
- * @see org.springframework.ui.context.ThemeSource
+ * @see com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext#setConfigLocations
+ * @see com.rocket.summer.framework.ui.context.ThemeSource
  */
 public abstract class AbstractRefreshableWebApplicationContext extends AbstractRefreshableConfigApplicationContext
         implements ConfigurableWebApplicationContext, ThemeSource {

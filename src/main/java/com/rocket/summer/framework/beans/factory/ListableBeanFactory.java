@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * <p>The methods in this interface will just respect bean definitions of this factory.
  * They will ignore any singleton beans that have been registered by other means like
- * {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}'s
+ * {@link com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory}'s
  * <code>registerSingleton</code> method, with the exception of
  * <code>getBeanNamesOfType</code> and <code>getBeansOfType</code> which will check
  * such manually registered singletons too. Of course, BeanFactory's <code>getBean</code>

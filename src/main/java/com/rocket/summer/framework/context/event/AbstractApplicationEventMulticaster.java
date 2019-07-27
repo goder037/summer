@@ -87,7 +87,7 @@ public abstract class AbstractApplicationEventMulticaster implements Application
      * potentially modified when new listeners get registered or
      * existing ones get removed. This Collection is not a snapshot copy.
      * @return a Collection of ApplicationListeners
-     * @see org.springframework.context.ApplicationListener
+     * @see com.rocket.summer.framework.context.ApplicationListener
      */
     protected Collection getApplicationListeners() {
         return this.applicationListeners;

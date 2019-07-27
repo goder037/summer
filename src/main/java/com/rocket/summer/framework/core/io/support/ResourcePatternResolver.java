@@ -9,10 +9,10 @@ import java.io.IOException;
  * Strategy interface for resolving a location pattern (for example,
  * an Ant-style path pattern) into Resource objects.
  *
- * <p>This is an extension to the {@link org.springframework.core.io.ResourceLoader}
+ * <p>This is an extension to the {@link com.rocket.summer.framework.core.io.ResourceLoader}
  * interface. A passed-in ResourceLoader (for example, an
- * {@link org.springframework.context.ApplicationContext} passed in via
- * {@link org.springframework.context.ResourceLoaderAware} when running in a context)
+ * {@link com.rocket.summer.framework.context.ApplicationContext} passed in via
+ * {@link com.rocket.summer.framework.context.ResourceLoaderAware} when running in a context)
  * can be checked whether it implements this extended interface too.
  *
  * <p>{@link PathMatchingResourcePatternResolver} is a standalone implementation
@@ -30,10 +30,10 @@ import java.io.IOException;
  *
  * @author Juergen Hoeller
  * @since 1.0.2
- * @see org.springframework.core.io.Resource
- * @see org.springframework.core.io.ResourceLoader
- * @see org.springframework.context.ApplicationContext
- * @see org.springframework.context.ResourceLoaderAware
+ * @see com.rocket.summer.framework.core.io.Resource
+ * @see com.rocket.summer.framework.core.io.ResourceLoader
+ * @see com.rocket.summer.framework.context.ApplicationContext
+ * @see com.rocket.summer.framework.context.ResourceLoaderAware
  */
 public interface ResourcePatternResolver extends ResourceLoader {
 
@@ -42,7 +42,7 @@ public interface ResourcePatternResolver extends ResourceLoader {
      * This differs from ResourceLoader's classpath URL prefix in that it
      * retrieves all matching resources for a given name (e.g. "/beans.xml"),
      * for example in the root of all deployed JAR files.
-     * @see org.springframework.core.io.ResourceLoader#CLASSPATH_URL_PREFIX
+     * @see com.rocket.summer.framework.core.io.ResourceLoader#CLASSPATH_URL_PREFIX
      */
     String CLASSPATH_ALL_URL_PREFIX = "classpath*:";
 

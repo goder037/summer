@@ -25,9 +25,9 @@ import com.rocket.summer.framework.web.ui.ModelMap;
  * @author Juergen Hoeller
  * @since 2.0
  * @see ServletWebRequest
- * @see org.springframework.web.servlet.DispatcherServlet
- * @see org.springframework.web.servlet.handler.AbstractHandlerMapping#setInterceptors
- * @see org.springframework.web.servlet.HandlerInterceptor
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMapping#setInterceptors
+ * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
  */
 public interface WebRequestInterceptor {
 

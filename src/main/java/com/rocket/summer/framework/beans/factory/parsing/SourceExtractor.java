@@ -14,8 +14,8 @@ import com.rocket.summer.framework.core.io.Resource;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.beans.BeanMetadataElement#getSource()
- * @see org.springframework.beans.factory.config.BeanDefinition
+ * @see com.rocket.summer.framework.beans.BeanMetadataElement#getSource()
+ * @see com.rocket.summer.framework.beans.factory.config.BeanDefinition
  */
 public interface SourceExtractor {
 

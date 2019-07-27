@@ -32,8 +32,8 @@ public interface WebApplicationContext extends ApplicationContext {
      * <p>Note: If the startup of the root context fails, this attribute can contain
      * an exception or error as value. Use WebApplicationContextUtils for convenient
      * lookup of the root WebApplicationContext.
-     * @see org.springframework.web.context.support.WebApplicationContextUtils#getWebApplicationContext
-     * @see org.springframework.web.context.support.WebApplicationContextUtils#getRequiredWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#getWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#getRequiredWebApplicationContext
      */
     String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getName() + ".ROOT";
 

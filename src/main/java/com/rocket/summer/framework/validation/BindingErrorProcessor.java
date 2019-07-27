@@ -59,4 +59,3 @@ public interface BindingErrorProcessor {
     void processPropertyAccessException(PropertyAccessException ex, BindingResult bindingResult);
 
 }
-

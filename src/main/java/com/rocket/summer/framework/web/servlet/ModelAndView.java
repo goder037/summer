@@ -23,7 +23,7 @@ import java.util.Map;
  * @see DispatcherServlet
  * @see ViewResolver
  * @see HandlerAdapter#handle
- * @see org.springframework.web.servlet.mvc.Controller#handleRequest
+ * @see com.rocket.summer.framework.web.servlet.mvc.Controller#handleRequest
  */
 public class ModelAndView {
 

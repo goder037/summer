@@ -7,7 +7,7 @@ import com.rocket.summer.framework.web.context.request.WebRequest;
  *
  * @author Juergen Hoeller
  * @since 2.5
- * @see org.springframework.web.bind.annotation.SessionAttributes
+ * @see com.rocket.summer.framework.web.bind.annotation.SessionAttributes
  */
 public interface SessionAttributeStore {
 

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
  * <p>Convenient superclass for controller implementations, using the Template
  * Method design pattern.</p>
  *
- * <p>As stated in the {@link org.springframework.web.servlet.mvc.Controller Controller}
+ * <p>As stated in the {@link com.rocket.summer.framework.web.servlet.mvc.Controller Controller}
  * interface, a lot of functionality is already provided by certain abstract
  * base controllers. The AbstractController is one of the most important
  * abstract base controller providing basic features such as the generation
@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
  *  <li>Call abstract method {@link #handleRequestInternal(HttpServletRequest,HttpServletResponse) handleRequestInternal()}
  *      (optionally synchronizing around the call on the HttpSession),
  *      which should be implemented by extending classes to provide actual
- *      functionality to return {@link org.springframework.web.servlet.ModelAndView ModelAndView} objects.</li>
+ *      functionality to return {@link com.rocket.summer.framework.web.servlet.ModelAndView ModelAndView} objects.</li>
  * </ol>
  * </p>
  *
@@ -101,9 +101,9 @@ public abstract class AbstractController extends WebContentGenerator implements 
      * as well, since it will always be the same object reference for the
      * same active logical session. However, this is not guaranteed across
      * different servlet containers; the only 100% safe way is a session mutex.
-     * @see org.springframework.web.servlet.mvc.AbstractController#handleRequestInternal
-     * @see org.springframework.web.util.HttpSessionMutexListener
-     * @see org.springframework.web.util.WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
+     * @see com.rocket.summer.framework.web.servlet.mvc.AbstractController#handleRequestInternal
+     * @see com.rocket.summer.framework.web.util.HttpSessionMutexListener
+     * @see com.rocket.summer.framework.web.util.WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
      */
     public final void setSynchronizeOnSession(boolean synchronizeOnSession) {
         this.synchronizeOnSession = synchronizeOnSession;

@@ -1,18 +1,50 @@
 package com.rocket.summer.framework.web.servlet.config.annotation;
 
+import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.beans.factory.BeanInitializationException;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextAware;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.context.annotation.Bean;
+import com.rocket.summer.framework.context.annotation.Configuration;
+import com.rocket.summer.framework.core.convert.converter.Converter;
+import com.rocket.summer.framework.format.Formatter;
+import com.rocket.summer.framework.format.FormatterRegistry;
+import com.rocket.summer.framework.format.support.DefaultFormattingConversionService;
+import com.rocket.summer.framework.format.support.FormattingConversionService;
+import com.rocket.summer.framework.http.converter.ByteArrayHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.HttpMessageConverter;
+import com.rocket.summer.framework.http.converter.ResourceHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.StringHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.json.MappingJackson2HttpMessageConverter;
+import com.rocket.summer.framework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.xml.XmlAwareFormHttpMessageConverter;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.validation.Errors;
+import com.rocket.summer.framework.validation.Validator;
+import com.rocket.summer.framework.web.HttpRequestHandler;
+import com.rocket.summer.framework.web.bind.annotation.ExceptionHandler;
+import com.rocket.summer.framework.web.bind.annotation.ResponseStatus;
+import com.rocket.summer.framework.web.bind.support.ConfigurableWebBindingInitializer;
 import com.rocket.summer.framework.web.context.ServletContextAware;
+import com.rocket.summer.framework.web.method.support.HandlerMethodArgumentResolver;
+import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandler;
+import com.rocket.summer.framework.web.servlet.HandlerAdapter;
 import com.rocket.summer.framework.web.servlet.HandlerExceptionResolver;
 import com.rocket.summer.framework.web.servlet.HandlerMapping;
 import com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMapping;
 import com.rocket.summer.framework.web.servlet.handler.BeanNameUrlHandlerMapping;
+import com.rocket.summer.framework.web.servlet.handler.ConversionServiceExposingInterceptor;
+import com.rocket.summer.framework.web.servlet.handler.HandlerExceptionResolverComposite;
+import com.rocket.summer.framework.web.servlet.mvc.Controller;
+import com.rocket.summer.framework.web.servlet.mvc.HttpRequestHandlerAdapter;
+import com.rocket.summer.framework.web.servlet.mvc.SimpleControllerHandlerAdapter;
+import com.rocket.summer.framework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import com.rocket.summer.framework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -325,13 +357,13 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
         if (ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)) {
             messageConverters.add(new MappingJackson2HttpMessageConverter());
         }
-        else if (ClassUtils.isPresent("org.codehaus.jackson.map.ObjectMapper", classLoader)) {
-            messageConverters.add(new MappingJacksonHttpMessageConverter());
-        }
-        if (ClassUtils.isPresent("com.sun.syndication.feed.WireFeed", classLoader)) {
-            messageConverters.add(new AtomFeedHttpMessageConverter());
-            messageConverters.add(new RssChannelHttpMessageConverter());
-        }
+        /*else if (ClassUtils.isPresent("org.codehaus.jackson.map.ObjectMapper", classLoader)) {
+            messageConverters.add(new MappingJackson2HttpMessageConverter());
+        }*/
+//        if (ClassUtils.isPresent("com.sun.syndication.feed.WireFeed", classLoader)) {
+//            messageConverters.add(new AtomFeedHttpMessageConverter());
+//            messageConverters.add(new RssChannelHttpMessageConverter());
+//        }
     }
 
     /**
@@ -367,7 +399,7 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
             if (ClassUtils.isPresent("javax.validation.Validator", getClass().getClassLoader())) {
                 Class<?> clazz;
                 try {
-                    String className = "org.springframework.validation.beanvalidation.LocalValidatorFactoryBean";
+                    String className = "com.rocket.summer.framework.validation.beanvalidation.LocalValidatorFactoryBean";
                     clazz = ClassUtils.forName(className, WebMvcConfigurationSupport.class.getClassLoader());
                 } catch (ClassNotFoundException e) {
                     throw new BeanInitializationException("Could not find default validator", e);

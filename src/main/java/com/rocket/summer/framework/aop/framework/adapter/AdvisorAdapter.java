@@ -25,8 +25,8 @@ public interface AdvisorAdapter {
      * contains this advice as an argument?
      * @param advice an Advice such as a BeforeAdvice
      * @return whether this adapter understands the given advice object
-     * @see #getInterceptor(org.springframework.aop.Advisor)
-     * @see org.springframework.aop.BeforeAdvice
+     * @see #getInterceptor(com.rocket.summer.framework.aop.Advisor)
+     * @see com.rocket.summer.framework.aop.BeforeAdvice
      */
     boolean supportsAdvice(Advice advice);
 

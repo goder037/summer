@@ -47,6 +47,30 @@ public abstract class BeanUtils {
     }
 
     /**
+     * Convenience method to instantiate a class using its no-arg constructor.
+     * As this method doesn't try to load classes by name, it should avoid
+     * class-loading issues.
+     * @param clazz class to instantiate
+     * @return the new instance
+     * @throws BeanInstantiationException if the bean cannot be instantiated
+     */
+    public static <T> T instantiate(Class<T> clazz) throws BeanInstantiationException {
+        Assert.notNull(clazz, "Class must not be null");
+        if (clazz.isInterface()) {
+            throw new BeanInstantiationException(clazz, "Specified class is an interface");
+        }
+        try {
+            return clazz.newInstance();
+        }
+        catch (InstantiationException ex) {
+            throw new BeanInstantiationException(clazz, "Is it an abstract class?", ex);
+        }
+        catch (IllegalAccessException ex) {
+            throw new BeanInstantiationException(clazz, "Is the constructor accessible?", ex);
+        }
+    }
+
+    /**
      * Convenience method to instantiate a class using the given constructor.
      * As this method doesn't try to load classes by name, it should avoid
      * class-loading issues.
@@ -288,8 +312,8 @@ public abstract class BeanUtils {
      * <p>Used to determine properties to check for a "simple" dependency-check.
      * @param clazz the type to check
      * @return whether the given type represents a "simple" property
-     * @see org.springframework.beans.factory.support.RootBeanDefinition#DEPENDENCY_CHECK_SIMPLE
-     * @see org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#checkDependencies
+     * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition#DEPENDENCY_CHECK_SIMPLE
+     * @see com.rocket.summer.framework.beans.factory.support.AbstractAutowireCapableBeanFactory#checkDependencies
      */
     public static boolean isSimpleProperty(Class clazz) {
         Assert.notNull(clazz, "Class must not be null");

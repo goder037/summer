@@ -11,7 +11,7 @@ package com.rocket.summer.framework.web.context.request;
  * @author Juergen Hoeller
  * @since 2.0
  * @see ServletRequestAttributes
- * @see org.springframework.web.portlet.context.PortletRequestAttributes
+ * @see com.rocket.summer.framework.web.portlet.context.PortletRequestAttributes
  */
 public interface RequestAttributes {
 

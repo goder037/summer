@@ -39,46 +39,46 @@ import java.util.*;
  * <ul> <li>It is based around a JavaBeans configuration mechanism.
  *
  * <li>It can use any {@link HandlerMapping} implementation - pre-built or provided as part of an application - to
- * control the routing of requests to handler objects. Default is {@link org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping}
- * and {@link org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping}. HandlerMapping objects
+ * control the routing of requests to handler objects. Default is {@link com.rocket.summer.framework.web.servlet.handler.BeanNameUrlHandlerMapping}
+ * and {@link com.rocket.summer.framework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping}. HandlerMapping objects
  * can be defined as beans in the servlet's application context, implementing the HandlerMapping interface, overriding
  * the default HandlerMapping if present. HandlerMappings can be given any bean name (they are tested by type).
  *
  * <li>It can use any {@link HandlerAdapter}; this allows for using any handler interface. Default adapters are {@link
- * org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter}, {@link org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter},
- * for Spring's {@link org.springframework.web.HttpRequestHandler} and {@link org.springframework.web.servlet.mvc.Controller}
- * interfaces, respectively. A default {@link org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter}
+ * com.rocket.summer.framework.web.servlet.mvc.HttpRequestHandlerAdapter}, {@link com.rocket.summer.framework.web.servlet.mvc.SimpleControllerHandlerAdapter},
+ * for Spring's {@link com.rocket.summer.framework.web.HttpRequestHandler} and {@link com.rocket.summer.framework.web.servlet.mvc.Controller}
+ * interfaces, respectively. A default {@link com.rocket.summer.framework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter}
  * will be registered as well. HandlerAdapter objects can be added as beans in the application context, overriding the
  * default HandlerAdapters. Like HandlerMappings, HandlerAdapters can be given any bean name (they are tested by type).
  *
  * <li>The dispatcher's exception resolution strategy can be specified via a {@link HandlerExceptionResolver}, for
  * example mapping certain exceptions to error pages. Default are
- * {@link org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver},
- * {@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver}, and
- * {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver}. These HandlerExceptionResolvers can be overridden
+ * {@link com.rocket.summer.framework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver},
+ * {@link com.rocket.summer.framework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver}, and
+ * {@link com.rocket.summer.framework.web.servlet.mvc.support.DefaultHandlerExceptionResolver}. These HandlerExceptionResolvers can be overridden
  * through the application context. HandlerExceptionResolver can be given any bean name (they are tested by type).
  *
  * <li>Its view resolution strategy can be specified via a {@link ViewResolver} implementation, resolving symbolic view
- * names into View objects. Default is {@link org.springframework.web.servlet.view.InternalResourceViewResolver}.
+ * names into View objects. Default is {@link com.rocket.summer.framework.web.servlet.view.InternalResourceViewResolver}.
  * ViewResolver objects can be added as beans in the application context, overriding the default ViewResolver.
  * ViewResolvers can be given any bean name (they are tested by type).
  *
  * <li>If a {@link View} or view name is not supplied by the user, then the configured {@link
  * RequestToViewNameTranslator} will translate the current request into a view name. The corresponding bean name is
- * "viewNameTranslator"; the default is {@link org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator}.
+ * "viewNameTranslator"; the default is {@link com.rocket.summer.framework.web.servlet.view.DefaultRequestToViewNameTranslator}.
  *
  * <li>The dispatcher's strategy for resolving multipart requests is determined by a {@link
- * org.springframework.web.multipart.MultipartResolver} implementation. Implementations for Jakarta Commons FileUpload
- * and Jason Hunter's COS are included; the typical choise is {@link org.springframework.web.multipart.commons.CommonsMultipartResolver}.
+ * com.rocket.summer.framework.web.multipart.MultipartResolver} implementation. Implementations for Jakarta Commons FileUpload
+ * and Jason Hunter's COS are included; the typical choise is {@link com.rocket.summer.framework.web.multipart.commons.CommonsMultipartResolver}.
  * The MultipartResolver bean name is "multipartResolver"; default is none.
  *
  * <li>Its locale resolution strategy is determined by a {@link LocaleResolver}. Out-of-the-box implementations work via
  * HTTP accept header, cookie, or session. The LocaleResolver bean name is "localeResolver"; default is {@link
- * org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver}.
+ * com.rocket.summer.framework.web.servlet.i18n.AcceptHeaderLocaleResolver}.
  *
  * <li>Its theme resolution strategy is determined by a {@link ThemeResolver}. Implementations for a fixed theme and for
  * cookie and session storage are included. The ThemeResolver bean name is "themeResolver"; default is {@link
- * org.springframework.web.servlet.theme.FixedThemeResolver}. </ul>
+ * com.rocket.summer.framework.web.servlet.theme.FixedThemeResolver}. </ul>
  *
  * <p><b>NOTE: The <code>@RequestMapping</code> annotation will only be processed if a corresponding
  * <code>HandlerMapping</code> (for type level annotations) and/or <code>HandlerAdapter</code> (for method level
@@ -89,14 +89,14 @@ import java.util.*;
  *
  * <p><b>A web application can define any number of DispatcherServlets.</b> Each servlet will operate in its own
  * namespace, loading its own application context with mappings, handlers, etc. Only the root application context as
- * loaded by {@link org.springframework.web.context.ContextLoaderListener}, if any, will be shared.
+ * loaded by {@link com.rocket.summer.framework.web.context.ContextLoaderListener}, if any, will be shared.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
- * @see org.springframework.web.HttpRequestHandler
- * @see org.springframework.web.servlet.mvc.Controller
- * @see org.springframework.web.context.ContextLoaderListener
+ * @see com.rocket.summer.framework.web.HttpRequestHandler
+ * @see com.rocket.summer.framework.web.servlet.mvc.Controller
+ * @see com.rocket.summer.framework.web.context.ContextLoaderListener
  */
 public class DispatcherServlet extends FrameworkServlet {
 
@@ -112,14 +112,14 @@ public class DispatcherServlet extends FrameworkServlet {
     /**
      * Name of request attribute that holds a read-only {@code Map<String,?>}
      * with "input" flash attributes saved by a previous request, if any.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
      */
     public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
 
     /**
      * Name of request attribute that holds the "output" {@link FlashMap} with
      * attributes to save for a subsequent request.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getOutputFlashMap(HttpServletRequest)
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getOutputFlashMap(HttpServletRequest)
      */
     public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
 
@@ -132,7 +132,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
     /**
      * Name of request attribute that holds the {@link FlashMapManager}.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getFlashMapManager(HttpServletRequest)
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getFlashMapManager(HttpServletRequest)
      */
     public static final String FLASH_MAP_MANAGER_ATTRIBUTE = DispatcherServlet.class.getName() + ".FLASH_MAP_MANAGER";
 
@@ -165,30 +165,30 @@ public class DispatcherServlet extends FrameworkServlet {
     /**
      * Request attribute to hold the current web application context.
      * Otherwise only the global web app context is obtainable by tags etc.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getWebApplicationContext
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getWebApplicationContext
      */
     public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = DispatcherServlet.class.getName() + ".CONTEXT";
 
     /**
      * Request attribute to hold the current LocaleResolver, retrievable by views.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getLocaleResolver
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getLocaleResolver
      */
     public static final String LOCALE_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".LOCALE_RESOLVER";
 
     /**
      * Request attribute to hold the current ThemeResolver, retrievable by views.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeResolver
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getThemeResolver
      */
     public static final String THEME_RESOLVER_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_RESOLVER";
 
     /**
      * Request attribute to hold the current ThemeSource, retrievable by views.
-     * @see org.springframework.web.servlet.support.RequestContextUtils#getThemeSource
+     * @see com.rocket.summer.framework.web.servlet.support.RequestContextUtils#getThemeSource
      */
     public static final String THEME_SOURCE_ATTRIBUTE = DispatcherServlet.class.getName() + ".THEME_SOURCE";
 
     /** Log category to use when no mapped handler is found for a request. */
-    public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "org.springframework.web.servlet.PageNotFound";
+    public static final String PAGE_NOT_FOUND_LOG_CATEGORY = "com.rocket.summer.framework.web.servlet.PageNotFound";
 
     /**
      * Name of the class path resource (relative to the DispatcherServlet class)
@@ -664,12 +664,12 @@ public class DispatcherServlet extends FrameworkServlet {
 
     /**
      * Create a default strategy.
-     * <p>The default implementation uses {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory#createBean}.
+     * <p>The default implementation uses {@link com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory#createBean}.
      * @param context the current WebApplicationContext
      * @param clazz the strategy implementation class to instantiate
      * @return the fully configured strategy instance
-     * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
-     * @see org.springframework.beans.factory.config.AutowireCapableBeanFactory#createBean
+     * @see com.rocket.summer.framework.context.ApplicationContext#getAutowireCapableBeanFactory()
+     * @see com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory#createBean
      */
     protected Object createDefaultStrategy(ApplicationContext context, Class<?> clazz) {
         return context.getAutowireCapableBeanFactory().createBean(clazz);
@@ -696,7 +696,7 @@ public class DispatcherServlet extends FrameworkServlet {
             Enumeration attrNames = request.getAttributeNames();
             while (attrNames.hasMoreElements()) {
                 String attrName = (String) attrNames.nextElement();
-                if (this.cleanupAfterInclude || attrName.startsWith("org.springframework.web.servlet")) {
+                if (this.cleanupAfterInclude || attrName.startsWith("com.rocket.summer.framework.web.servlet")) {
                     attributesSnapshot.put(attrName, request.getAttribute(attrName));
                 }
             }
@@ -1122,7 +1122,7 @@ public class DispatcherServlet extends FrameworkServlet {
         Enumeration attrNames = request.getAttributeNames();
         while (attrNames.hasMoreElements()) {
             String attrName = (String) attrNames.nextElement();
-            if (this.cleanupAfterInclude || attrName.startsWith("org.springframework.web.servlet")) {
+            if (this.cleanupAfterInclude || attrName.startsWith("com.rocket.summer.framework.web.servlet")) {
                 attrsToCheck.add(attrName);
             }
         }

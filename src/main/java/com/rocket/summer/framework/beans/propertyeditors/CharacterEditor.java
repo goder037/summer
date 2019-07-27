@@ -11,7 +11,7 @@ import java.beans.PropertyEditorSupport;
  *
  * <p>Note that the JDK does not contain a default
  * {@link java.beans.PropertyEditor property editor} for <code>char</code>!
- * {@link org.springframework.beans.BeanWrapperImpl} will register this
+ * {@link com.rocket.summer.framework.beans.BeanWrapperImpl} will register this
  * editor by default.
  *
  * <p>Also supports conversion from a Unicode character sequence; e.g.
@@ -22,7 +22,7 @@ import java.beans.PropertyEditorSupport;
  * @author Rick Evans
  * @since 1.2
  * @see java.lang.Character
- * @see org.springframework.beans.BeanWrapperImpl
+ * @see com.rocket.summer.framework.beans.BeanWrapperImpl
  */
 public class CharacterEditor extends PropertyEditorSupport {
 

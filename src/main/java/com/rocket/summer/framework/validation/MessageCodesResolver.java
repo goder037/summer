@@ -12,7 +12,7 @@ package com.rocket.summer.framework.validation;
  * @see DataBinder#setMessageCodesResolver
  * @see ObjectError
  * @see FieldError
- * @see org.springframework.context.MessageSourceResolvable#getCodes()
+ * @see com.rocket.summer.framework.context.MessageSourceResolvable#getCodes()
  */
 public interface MessageCodesResolver {
 
@@ -37,3 +37,4 @@ public interface MessageCodesResolver {
     String[] resolveMessageCodes(String errorCode, String objectName, String field, Class<?> fieldType);
 
 }
+

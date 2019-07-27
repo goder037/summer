@@ -8,7 +8,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import java.io.Serializable;
 
 /**
- * Adapter to enable {@link org.springframework.aop.MethodBeforeAdvice}
+ * Adapter to enable {@link com.rocket.summer.framework.aop.MethodBeforeAdvice}
  * to be used in the Spring AOP framework.
  *
  * @author Rod Johnson

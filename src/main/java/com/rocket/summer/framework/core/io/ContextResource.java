@@ -9,8 +9,8 @@ package com.rocket.summer.framework.core.io;
  *
  * @author Juergen Hoeller
  * @since 2.5
- * @see org.springframework.web.context.support.ServletContextResource
- * @see org.springframework.web.portlet.context.PortletContextResource
+ * @see com.rocket.summer.framework.web.context.support.ServletContextResource
+ * @see com.rocket.summer.framework.web.portlet.context.PortletContextResource
  */
 public interface ContextResource extends Resource {
 

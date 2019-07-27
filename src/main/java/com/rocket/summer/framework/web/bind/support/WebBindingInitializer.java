@@ -4,7 +4,7 @@ import com.rocket.summer.framework.web.bind.WebDataBinder;
 import com.rocket.summer.framework.web.context.request.WebRequest;
 
 /**
- * Callback interface for initializing a {@link org.springframework.web.bind.WebDataBinder}
+ * Callback interface for initializing a {@link com.rocket.summer.framework.web.bind.WebDataBinder}
  * for performing data binding in the context of a specific web request.
  *
  * @author Juergen Hoeller

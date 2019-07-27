@@ -5,7 +5,7 @@ package com.rocket.summer.framework.beans.factory;
  * which has been defined as abstract
  * @author Juergen Hoeller
  * @since 1.1
- * @see org.springframework.beans.factory.support.AbstractBeanDefinition#setAbstract
+ * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition#setAbstract
  */
 public class BeanIsAbstractException extends BeanCreationException {
 

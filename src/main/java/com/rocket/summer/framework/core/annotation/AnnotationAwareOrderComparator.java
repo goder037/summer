@@ -5,14 +5,14 @@ import com.rocket.summer.framework.core.Ordered;
 
 /**
  * {@link java.util.Comparator} implementation that checks
- * {@link org.springframework.core.Ordered} as well as the
+ * {@link com.rocket.summer.framework.core.Ordered} as well as the
  * {@link Order} annotation, with an order value provided by an
  * <code>Ordered</code> instance overriding a statically defined
  * annotation value (if any).
  *
  * @author Juergen Hoeller
  * @since 2.0.1
- * @see org.springframework.core.Ordered
+ * @see com.rocket.summer.framework.core.Ordered
  * @see Order
  */
 public class AnnotationAwareOrderComparator extends OrderComparator {

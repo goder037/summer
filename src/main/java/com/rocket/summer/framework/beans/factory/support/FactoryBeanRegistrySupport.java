@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Support base class for singleton registries which need to handle
- * {@link org.springframework.beans.factory.FactoryBean} instances,
+ * {@link com.rocket.summer.framework.beans.factory.FactoryBean} instances,
  * integrated with {@link DefaultSingletonBeanRegistry}'s singleton management.
  *
  * <p>Serves as base class for {@link AbstractBeanFactory}.
@@ -65,7 +65,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
      * @param shouldPostProcess whether the bean is subject for post-processing
      * @return the object obtained from the FactoryBean
      * @throws BeanCreationException if FactoryBean object creation failed
-     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     * @see com.rocket.summer.framework.beans.factory.FactoryBean#getObject()
      */
     protected Object getObjectFromFactoryBean(FactoryBean factory, String beanName, boolean shouldPostProcess) {
         if (factory.isSingleton() && containsSingleton(beanName)) {
@@ -90,7 +90,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
      * @param shouldPostProcess whether the bean is subject for post-processing
      * @return the object obtained from the FactoryBean
      * @throws BeanCreationException if FactoryBean object creation failed
-     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     * @see com.rocket.summer.framework.beans.factory.FactoryBean#getObject()
      */
     private Object doGetObjectFromFactoryBean(
             final FactoryBean factory, final String beanName, final boolean shouldPostProcess)
@@ -140,7 +140,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
      * @param object the object obtained from the FactoryBean.
      * @param beanName the name of the bean
      * @return the object to expose
-     * @throws org.springframework.beans.BeansException if any post-processing failed
+     * @throws com.rocket.summer.framework.beans.BeansException if any post-processing failed
      */
     protected Object postProcessObjectFromFactoryBean(Object object, String beanName) throws BeansException {
         return object;

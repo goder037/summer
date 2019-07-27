@@ -41,14 +41,14 @@ import java.lang.annotation.*;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.stereotype.Component
+ * @see com.rocket.summer.framework.stereotype.Component
  * @see Configuration
  * @see Scope
  * @see DependsOn
  * @see Lazy
  * @see Primary
- * @see org.springframework.beans.factory.annotation.Autowired
- * @see org.springframework.beans.factory.annotation.Value
+ * @see com.rocket.summer.framework.beans.factory.annotation.Autowired
+ * @see com.rocket.summer.framework.beans.factory.annotation.Value
  */
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -81,7 +81,7 @@ public @interface Bean {
      * <p>Note: Only invoked on beans whose lifecycle is under the full control of the
      * factory, which is always the case for singletons but not guaranteed
      * for any other scope.
-     * @see {@link org.springframework.context.ConfigurableApplicationContext#close()}
+     * @see {@link com.rocket.summer.framework.context.ConfigurableApplicationContext#close()}
      */
     String destroyMethod() default "";
 

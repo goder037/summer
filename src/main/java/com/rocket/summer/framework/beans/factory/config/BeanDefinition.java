@@ -17,8 +17,8 @@ import com.rocket.summer.framework.core.AttributeAccessor;
  * @author Rob Harrop
  * @since 19.03.2004
  * @see ConfigurableListableBeanFactory#getBeanDefinition
- * @see org.springframework.beans.factory.support.RootBeanDefinition
- * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition
+ * @see com.rocket.summer.framework.beans.factory.support.ChildBeanDefinition
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
@@ -46,10 +46,10 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
     /**
      * Role hint indicating that a <code>BeanDefinition</code> is a supporting
      * part of some larger configuration, typically an outer
-     * {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
+     * {@link com.rocket.summer.framework.beans.factory.parsing.ComponentDefinition}.
      * <code>SUPPORT</code> beans are considered important enough to be aware
      * of when looking more closely at a particular
-     * {@link org.springframework.beans.factory.parsing.ComponentDefinition},
+     * {@link com.rocket.summer.framework.beans.factory.parsing.ComponentDefinition},
      * but not when looking at the overall configuration of an application.
      */
     int ROLE_SUPPORT = 1;
@@ -58,7 +58,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
      * Role hint indicating that a <code>BeanDefinition</code> is providing an
      * entirely background role and has no relevance to the end-user. This hint is
      * used when registering beans that are completely part of the internal workings
-     * of a {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
+     * of a {@link com.rocket.summer.framework.beans.factory.parsing.ComponentDefinition}.
      */
     int ROLE_INFRASTRUCTURE = 2;
 

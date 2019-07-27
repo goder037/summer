@@ -2,7 +2,7 @@ package com.rocket.summer.framework.core;
 
 /**
  * Common interface for managing aliases. Serves as super-interface for
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}.
+ * {@link com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry}.
  *
  * @author Juergen Hoeller
  * @since 2.5.2

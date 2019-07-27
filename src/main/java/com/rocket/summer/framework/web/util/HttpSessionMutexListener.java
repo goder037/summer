@@ -23,7 +23,7 @@ import java.io.Serializable;
  * @since 1.2.7
  * @see WebUtils#SESSION_MUTEX_ATTRIBUTE
  * @see WebUtils#getSessionMutex(javax.servlet.http.HttpSession)
- * @see org.springframework.web.servlet.mvc.AbstractController#setSynchronizeOnSession
+ * @see com.rocket.summer.framework.web.servlet.mvc.AbstractController#setSynchronizeOnSession
  */
 public class HttpSessionMutexListener implements HttpSessionListener {
 

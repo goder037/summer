@@ -10,8 +10,8 @@ import com.rocket.summer.framework.context.event.ApplicationEvent;
  * @since 1.1.1
  * @see ApplicationContext
  * @see ApplicationEventPublisherAware
- * @see org.springframework.context.ApplicationEvent
- * @see org.springframework.context.event.EventPublicationInterceptor
+ * @see com.rocket.summer.framework.context.ApplicationEvent
+ * @see com.rocket.summer.framework.context.event.EventPublicationInterceptor
  */
 public interface ApplicationEventPublisher {
 
@@ -20,7 +20,7 @@ public interface ApplicationEventPublisher {
      * event. Events may be framework events (such as RequestHandledEvent)
      * or application-specific events.
      * @param event the event to publish
-     * @see org.springframework.web.context.support.RequestHandledEvent
+     * @see com.rocket.summer.framework.web.context.support.RequestHandledEvent
      */
     void publishEvent(ApplicationEvent event);
 

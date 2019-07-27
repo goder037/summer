@@ -9,7 +9,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor}
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor}
  * implementation that passes the ServletContext to beans that implement
  * the {@link ServletContextAware} interface.
  *
@@ -18,8 +18,8 @@ import javax.servlet.ServletContext;
  *
  * @author Juergen Hoeller
  * @since 12.03.2004
- * @see org.springframework.web.context.ServletContextAware
- * @see org.springframework.web.context.support.XmlWebApplicationContext#postProcessBeanFactory
+ * @see com.rocket.summer.framework.web.context.ServletContextAware
+ * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext#postProcessBeanFactory
  */
 public class ServletContextAwareProcessor implements BeanPostProcessor {
 

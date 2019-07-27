@@ -22,10 +22,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor} implementation
  * that invokes annotated init and destroy methods. Allows for an annotation
- * alternative to Spring's {@link org.springframework.beans.factory.InitializingBean}
- * and {@link org.springframework.beans.factory.DisposableBean} callback interfaces.
+ * alternative to Spring's {@link com.rocket.summer.framework.beans.factory.InitializingBean}
+ * and {@link com.rocket.summer.framework.beans.factory.DisposableBean} callback interfaces.
  *
  * <p>The actual annotation types that this post-processor checks for can be
  * configured through the {@link #setInitAnnotationType "initAnnotationType"}
@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * may be annotated, but it is recommended to only annotate one single
  * init method and destroy method, respectively.
  *
- * <p>Spring's {@link org.springframework.context.annotation.CommonAnnotationBeanPostProcessor}
+ * <p>Spring's {@link com.rocket.summer.framework.context.annotation.CommonAnnotationBeanPostProcessor}
  * supports the JSR-250 {@link javax.annotation.PostConstruct} and {@link javax.annotation.PreDestroy}
  * annotations out of the box, as init annotation and destroy annotation, respectively.
  * Furthermore, it also supports the {@link javax.annotation.Resource} annotation
@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2.5
  * @see #setInitAnnotationType
  * @see #setDestroyAnnotationType
- * @see org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+ * @see com.rocket.summer.framework.context.annotation.CommonAnnotationBeanPostProcessor
  */
 public class InitDestroyAnnotationBeanPostProcessor
         implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor, PriorityOrdered, Serializable {

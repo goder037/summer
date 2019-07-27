@@ -3,10 +3,7 @@ package com.rocket.summer.framework.beans.factory.support;
 import com.rocket.summer.framework.beans.FatalBeanException;
 import com.rocket.summer.framework.beans.TypeConverter;
 import com.rocket.summer.framework.beans.factory.*;
-import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
-import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
-import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
-import com.rocket.summer.framework.beans.factory.config.DependencyDescriptor;
+import com.rocket.summer.framework.beans.factory.config.*;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.CollectionFactory;
 import com.rocket.summer.framework.util.Assert;
@@ -689,4 +686,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         this.allowEagerClassLoading = allowEagerClassLoading;
     }
 
+    @Override
+    public String resolveEmbeddedValue(String value) {
+        return null;
+    }
 }

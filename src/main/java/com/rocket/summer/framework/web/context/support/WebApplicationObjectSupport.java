@@ -65,7 +65,7 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
      * Subclasses may override this for custom initialization based
      * on the ServletContext that this application object runs in.
      * <p>The default implementation is empty. Called by
-     * {@link #initApplicationContext(org.springframework.context.ApplicationContext)}
+     * {@link #initApplicationContext(com.rocket.summer.framework.context.ApplicationContext)}
      * as well as {@link #setServletContext(javax.servlet.ServletContext)}.
      * @param servletContext the ServletContext that this application object runs in
      * (never <code>null</code>)
@@ -117,7 +117,7 @@ public abstract class WebApplicationObjectSupport extends ApplicationObjectSuppo
      * as provided by the servlet container.
      * @return the File representing the temporary directory
      * @throws IllegalStateException if not running within a ServletContext
-     * @see org.springframework.web.util.WebUtils#getTempDir(javax.servlet.ServletContext)
+     * @see com.rocket.summer.framework.web.util.WebUtils#getTempDir(javax.servlet.ServletContext)
      */
     protected final File getTempDir() throws IllegalStateException {
         return WebUtils.getTempDir(getServletContext());

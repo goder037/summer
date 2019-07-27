@@ -4,7 +4,7 @@ import com.rocket.summer.framework.beans.factory.config.BeanPostProcessor;
 import com.rocket.summer.framework.context.*;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor}
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor}
  * implementation that passes the ApplicationContext to beans that
  * implement the {@link ResourceLoaderAware}, {@link MessageSourceAware},
  * {@link ApplicationEventPublisherAware} and/or
@@ -16,11 +16,11 @@ import com.rocket.summer.framework.context.*;
  *
  * @author Juergen Hoeller
  * @since 10.10.2003
- * @see org.springframework.context.ResourceLoaderAware
- * @see org.springframework.context.MessageSourceAware
- * @see org.springframework.context.ApplicationEventPublisherAware
- * @see org.springframework.context.ApplicationContextAware
- * @see org.springframework.context.support.AbstractApplicationContext#refresh()
+ * @see com.rocket.summer.framework.context.ResourceLoaderAware
+ * @see com.rocket.summer.framework.context.MessageSourceAware
+ * @see com.rocket.summer.framework.context.ApplicationEventPublisherAware
+ * @see com.rocket.summer.framework.context.ApplicationContextAware
+ * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#refresh()
  */
 class ApplicationContextAwareProcessor implements BeanPostProcessor {
 

@@ -24,7 +24,7 @@ import java.net.URL;
  * @see UrlResource
  * @see ByteArrayResource
  * @see InputStreamResource
- * @see org.springframework.web.context.support.ServletContextResource
+ * @see com.rocket.summer.framework.web.context.support.ServletContextResource
  */
 public interface Resource extends InputStreamSource {
 

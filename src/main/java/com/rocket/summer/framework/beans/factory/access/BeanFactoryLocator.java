@@ -4,9 +4,9 @@ import com.rocket.summer.framework.context.BeansException;
 
 /**
  * Defines a contract for the lookup, use, and release of a
- * {@link org.springframework.beans.factory.BeanFactory},
+ * {@link com.rocket.summer.framework.beans.factory.BeanFactory},
  * or a <code>BeanFactory</code> subclass such as an
- * {@link org.springframework.context.ApplicationContext}.
+ * {@link com.rocket.summer.framework.context.ApplicationContext}.
  *
  * <p>Where this interface is implemented as a singleton class such as
  * {@link SingletonBeanFactoryLocator}, the Spring team <strong>strongly</strong>
@@ -30,15 +30,15 @@ import com.rocket.summer.framework.context.BeansException;
  * to demand load these contexts.
  *
  * @author Colin Sampaleanu
- * @see org.springframework.beans.factory.BeanFactory
- * @see org.springframework.context.access.DefaultLocatorFactory
- * @see org.springframework.context.ApplicationContext
+ * @see com.rocket.summer.framework.beans.factory.BeanFactory
+ * @see com.rocket.summer.framework.context.access.DefaultLocatorFactory
+ * @see com.rocket.summer.framework.context.ApplicationContext
  */
 public interface BeanFactoryLocator {
 
     /**
-     * Use the {@link org.springframework.beans.factory.BeanFactory} (or derived
-     * interface such as {@link org.springframework.context.ApplicationContext})
+     * Use the {@link com.rocket.summer.framework.beans.factory.BeanFactory} (or derived
+     * interface such as {@link com.rocket.summer.framework.context.ApplicationContext})
      * specified by the <code>factoryKey</code> parameter.
      * <p>The definition is possibly loaded/created as needed.
      * @param factoryKey a resource name specifying which <code>BeanFactory</code> the

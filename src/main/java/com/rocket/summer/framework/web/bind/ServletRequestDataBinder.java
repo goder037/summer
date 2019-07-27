@@ -8,7 +8,7 @@ import com.rocket.summer.framework.web.util.WebUtils;
 import javax.servlet.ServletRequest;
 
 /**
- * Special {@link org.springframework.validation.DataBinder} to perform data binding
+ * Special {@link com.rocket.summer.framework.validation.DataBinder} to perform data binding
  * from servlet request parameters to JavaBeans, including support for multipart files.
  *
  * <p>See the DataBinder/WebDataBinder superclasses for customization options,
@@ -43,7 +43,7 @@ import javax.servlet.ServletRequest;
  * @see #setAllowedFields
  * @see #setRequiredFields
  * @see #setFieldMarkerPrefix
- * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
+ * @see com.rocket.summer.framework.web.servlet.mvc.BaseCommandController#initBinder
  */
 public class ServletRequestDataBinder extends WebDataBinder {
 
@@ -81,10 +81,10 @@ public class ServletRequestDataBinder extends WebDataBinder {
      * byte[], or String. The latter two receive the contents of the uploaded file;
      * all metadata like original file name, content type, etc are lost in those cases.
      * @param request request with parameters to bind (can be multipart)
-     * @see org.springframework.web.multipart.MultipartHttpServletRequest
-     * @see org.springframework.web.multipart.MultipartFile
+     * @see com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest
+     * @see com.rocket.summer.framework.web.multipart.MultipartFile
      * @see #bindMultipartFiles
-     * @see #bind(org.springframework.beans.PropertyValues)
+     * @see #bind(com.rocket.summer.framework.beans.PropertyValues)
      */
     public void bind(ServletRequest request) {
         MutablePropertyValues mpvs = new ServletRequestParameterPropertyValues(request);

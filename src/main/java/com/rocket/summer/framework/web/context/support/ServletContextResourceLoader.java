@@ -17,9 +17,9 @@ import javax.servlet.ServletContext;
  * @since 1.0.2
  * @see #getResourceByPath
  * @see ServletContextResource
- * @see org.springframework.web.context.WebApplicationContext
- * @see org.springframework.web.servlet.HttpServletBean
- * @see org.springframework.web.filter.GenericFilterBean
+ * @see com.rocket.summer.framework.web.context.WebApplicationContext
+ * @see com.rocket.summer.framework.web.servlet.HttpServletBean
+ * @see com.rocket.summer.framework.web.filter.GenericFilterBean
  */
 public class ServletContextResourceLoader extends DefaultResourceLoader {
 

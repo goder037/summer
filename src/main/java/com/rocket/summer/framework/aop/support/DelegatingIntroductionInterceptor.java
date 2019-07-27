@@ -8,7 +8,7 @@ import org.aopalliance.intercept.MethodInvocation;
 
 /**
  * Convenient implementation of the
- * {@link org.springframework.aop.IntroductionInterceptor} interface.
+ * {@link com.rocket.summer.framework.aop.IntroductionInterceptor} interface.
  *
  * <p>Subclasses merely need to extend this class and implement the interfaces
  * to be introduced themselves. In this case the delegate is the subclass

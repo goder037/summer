@@ -14,8 +14,8 @@ import com.rocket.summer.framework.context.event.ApplicationEvent;
  * @author Juergen Hoeller
  * @since January 17, 2001
  * @see ServletRequestHandledEvent
- * @see org.springframework.web.servlet.FrameworkServlet
- * @see org.springframework.context.ApplicationContext#publishEvent
+ * @see com.rocket.summer.framework.web.servlet.FrameworkServlet
+ * @see com.rocket.summer.framework.context.ApplicationContext#publishEvent
  */
 public class RequestHandledEvent extends ApplicationEvent {
 

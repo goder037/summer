@@ -35,15 +35,15 @@ import java.util.Set;
  * applies exclude and include filters to the resulting classes to find candidates.
  *
  * <p>This implementation is based on Spring's
- * {@link org.springframework.core.type.classreading.MetadataReader MetadataReader}
+ * {@link com.rocket.summer.framework.core.type.classreading.MetadataReader MetadataReader}
  * facility, backed by an ASM {@link org.objectweb.asm.ClassReader ClassReader}.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
  * @since 2.5
- * @see org.springframework.core.type.classreading.MetadataReaderFactory
- * @see org.springframework.core.type.AnnotationMetadata
+ * @see com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory
+ * @see com.rocket.summer.framework.core.type.AnnotationMetadata
  * @see ScannedGenericBeanDefinition
  */
 public class ClassPathScanningCandidateComponentProvider implements ResourceLoaderAware {
@@ -84,8 +84,8 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
      * This will typically be a ResourcePatternResolver implementation.
      * <p>Default is PathMatchingResourcePatternResolver, also capable of
      * resource pattern resolving through the ResourcePatternResolver interface.
-     * @see org.springframework.core.io.support.ResourcePatternResolver
-     * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver
      */
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);

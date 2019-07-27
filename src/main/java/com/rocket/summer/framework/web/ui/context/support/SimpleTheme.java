@@ -6,7 +6,7 @@ import com.rocket.summer.framework.web.ui.context.Theme;
 
 /**
  * Default {@link Theme} implementation, wrapping a name and an
- * underlying {@link org.springframework.context.MessageSource}.
+ * underlying {@link com.rocket.summer.framework.context.MessageSource}.
  *
  * @author Juergen Hoeller
  * @since 17.06.2003

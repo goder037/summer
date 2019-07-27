@@ -11,11 +11,11 @@ import com.rocket.summer.framework.beans.factory.ObjectFactory;
  * with custom further scopes, registered for a
  * {@link ConfigurableBeanFactory#registerScope(String, Scope) specific key}.
  *
- * <p>{@link org.springframework.context.ApplicationContext} implementations
- * such as a {@link org.springframework.web.context.WebApplicationContext}
+ * <p>{@link com.rocket.summer.framework.context.ApplicationContext} implementations
+ * such as a {@link com.rocket.summer.framework.web.context.WebApplicationContext}
  * may register additional standard scopes specific to their environment,
- * e.g. {@link org.springframework.web.context.WebApplicationContext#SCOPE_REQUEST "request"}
- * and {@link org.springframework.web.context.WebApplicationContext#SCOPE_SESSION "session"},
+ * e.g. {@link com.rocket.summer.framework.web.context.WebApplicationContext#SCOPE_REQUEST "request"}
+ * and {@link com.rocket.summer.framework.web.context.WebApplicationContext#SCOPE_SESSION "session"},
  * based on this Scope SPI.
  *
  * <p>Even if its primary use is for extended scopes in a web environment,
@@ -36,15 +36,15 @@ import com.rocket.summer.framework.beans.factory.ObjectFactory;
  * @since 2.0
  * @see ConfigurableBeanFactory#registerScope
  * @see CustomScopeConfigurer
- * @see org.springframework.aop.scope.ScopedProxyFactoryBean
- * @see org.springframework.web.context.request.RequestScope
- * @see org.springframework.web.context.request.SessionScope
+ * @see com.rocket.summer.framework.aop.scope.ScopedProxyFactoryBean
+ * @see com.rocket.summer.framework.web.context.request.RequestScope
+ * @see com.rocket.summer.framework.web.context.request.SessionScope
  */
 public interface Scope {
 
     /**
      * Return the object with the given name from the underlying scope,
-     * {@link org.springframework.beans.factory.ObjectFactory#getObject() creating it}
+     * {@link com.rocket.summer.framework.beans.factory.ObjectFactory#getObject() creating it}
      * if not found in the underlying storage mechanism.
      * <p>This is the central operation of a Scope, and the only operation
      * that is absolutely required.
@@ -55,7 +55,7 @@ public interface Scope {
      */
     /**
      * Return the object with the given name from the underlying scope,
-     * {@link org.springframework.beans.factory.ObjectFactory#getObject() creating it}
+     * {@link com.rocket.summer.framework.beans.factory.ObjectFactory#getObject() creating it}
      * if not found in the underlying storage mechanism.
      * <p>This is the central operation of a Scope, and the only operation
      * that is absolutely required.
@@ -84,6 +84,14 @@ public interface Scope {
     Object remove(String name);
 
     /**
+     * Resolve the contextual object for the given key, if any.
+     * E.g. the HttpServletRequest object for key "request".
+     * @param key the contextual key
+     * @return the corresponding object, or <code>null</code> if none found
+     */
+    Object resolveContextualObject(String key);
+
+    /**
      * Register a callback to be executed on destruction of the specified
      * object in the scope (or at destruction of the entire scope, if the
      * scope does not destroy individual objects but rather only terminates
@@ -107,8 +115,8 @@ public interface Scope {
      * so it can safely be executed without an enclosing try-catch block.
      * Furthermore, the Runnable will usually be serializable, provided
      * that its target object is serializable as well.
-     * @see org.springframework.beans.factory.DisposableBean
-     * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getDestroyMethodName()
+     * @see com.rocket.summer.framework.beans.factory.DisposableBean
+     * @see com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition#getDestroyMethodName()
      * @see DestructionAwareBeanPostProcessor
      */
     void registerDestructionCallback(String name, Runnable callback);

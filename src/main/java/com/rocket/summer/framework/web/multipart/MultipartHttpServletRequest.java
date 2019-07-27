@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.web.multipart;
 
+import com.rocket.summer.framework.http.HttpHeaders;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -10,9 +12,9 @@ import javax.servlet.http.HttpServletRequest;
  * multipart parameters available.
  *
  * <p>A concrete implementation is
- * {@link org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest}.
+ * {@link com.rocket.summer.framework.web.multipart.support.DefaultMultipartHttpServletRequest}.
  * As an intermediate step,
- * {@link org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest}
+ * {@link com.rocket.summer.framework.web.multipart.support.AbstractMultipartHttpServletRequest}
  * can be subclassed.
  *
  * @author Juergen Hoeller
@@ -23,9 +25,16 @@ import javax.servlet.http.HttpServletRequest;
  * @see javax.servlet.http.HttpServletRequest#getParameter
  * @see javax.servlet.http.HttpServletRequest#getParameterNames
  * @see javax.servlet.http.HttpServletRequest#getParameterMap
- * @see org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
- * @see org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest
+ * @see com.rocket.summer.framework.web.multipart.support.DefaultMultipartHttpServletRequest
+ * @see com.rocket.summer.framework.web.multipart.support.AbstractMultipartHttpServletRequest
  */
 public interface MultipartHttpServletRequest extends HttpServletRequest, MultipartRequest {
+
+    /**
+     * Return the headers associated with the specified part of the multipart request.
+     * <p>If the underlying implementation supports access to headers, then all headers are returned.
+     * Otherwise, the returned headers will include a 'Content-Type' header at the very least.
+     */
+    HttpHeaders getMultipartHeaders(String paramOrFileName);
 
 }

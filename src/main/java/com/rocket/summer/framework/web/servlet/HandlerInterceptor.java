@@ -39,11 +39,11 @@ import javax.servlet.http.HttpServletResponse;
  * @author Juergen Hoeller
  * @since 20.06.2003
  * @see HandlerExecutionChain#getInterceptors
- * @see org.springframework.web.servlet.handler.HandlerInterceptorAdapter
- * @see org.springframework.web.servlet.handler.AbstractHandlerMapping#setInterceptors
- * @see org.springframework.web.servlet.handler.UserRoleAuthorizationInterceptor
- * @see org.springframework.web.servlet.i18n.LocaleChangeInterceptor
- * @see org.springframework.web.servlet.theme.ThemeChangeInterceptor
+ * @see com.rocket.summer.framework.web.servlet.handler.HandlerInterceptorAdapter
+ * @see com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMapping#setInterceptors
+ * @see com.rocket.summer.framework.web.servlet.handler.UserRoleAuthorizationInterceptor
+ * @see com.rocket.summer.framework.web.servlet.i18n.LocaleChangeInterceptor
+ * @see com.rocket.summer.framework.web.servlet.theme.ThemeChangeInterceptor
  * @see javax.servlet.Filter
  */
 public interface HandlerInterceptor {

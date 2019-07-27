@@ -31,7 +31,7 @@ public interface HandlerMethodReturnValueHandler {
      * @param returnValue the value returned from the handler method
      * @param returnType the type of the return value. This type must have
      * previously been passed to
-     * {@link #supportsReturnType(org.springframework.core.MethodParameter)}
+     * {@link #supportsReturnType(com.rocket.summer.framework.core.MethodParameter)}
      * and it must have returned {@code true}
      * @param mavContainer the ModelAndViewContainer for the current request
      * @param webRequest the current request

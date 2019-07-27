@@ -33,13 +33,13 @@ import com.rocket.summer.framework.core.io.ResourceLoader;
  * @author Juergen Hoeller
  * @since 10.03.2004
  * @see ApplicationContextAware
- * @see org.springframework.beans.factory.InitializingBean
- * @see org.springframework.core.io.Resource
- * @see org.springframework.core.io.support.ResourcePatternResolver
- * @see org.springframework.core.io.support.ResourcePatternUtils#getResourcePatternResolver
- * @see org.springframework.core.io.DefaultResourceLoader
- * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
- * @see org.springframework.context.support.ReloadableResourceBundleMessageSource
+ * @see com.rocket.summer.framework.beans.factory.InitializingBean
+ * @see com.rocket.summer.framework.core.io.Resource
+ * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+ * @see com.rocket.summer.framework.core.io.support.ResourcePatternUtils#getResourcePatternResolver
+ * @see com.rocket.summer.framework.core.io.DefaultResourceLoader
+ * @see com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver
+ * @see com.rocket.summer.framework.context.support.ReloadableResourceBundleMessageSource
  */
 public interface ResourceLoaderAware {
 
@@ -52,8 +52,8 @@ public interface ResourceLoaderAware {
      * like InitializingBean's <code>afterPropertiesSet</code> or a custom init-method.
      * Invoked before ApplicationContextAware's <code>setApplicationContext</code>.
      * @param resourceLoader ResourceLoader object to be used by this object
-     * @see org.springframework.core.io.support.ResourcePatternResolver
-     * @see org.springframework.core.io.support.ResourcePatternUtils#getResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternUtils#getResourcePatternResolver
      */
     void setResourceLoader(ResourceLoader resourceLoader);
 

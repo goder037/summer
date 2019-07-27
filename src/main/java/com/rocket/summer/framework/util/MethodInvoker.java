@@ -13,16 +13,16 @@ import java.lang.reflect.Modifier;
  * invoke the method any number of times, obtaining the invocation result.
  *
  * <p>Typically not used directly but via its subclasses
- * {@link org.springframework.beans.factory.config.MethodInvokingFactoryBean} and
- * {@link org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean}.
+ * {@link com.rocket.summer.framework.beans.factory.config.MethodInvokingFactoryBean} and
+ * {@link com.rocket.summer.framework.scheduling.quartz.MethodInvokingJobDetailFactoryBean}.
  *
  * @author Colin Sampaleanu
  * @author Juergen Hoeller
  * @since 19.02.2004
  * @see #prepare
  * @see #invoke
- * @see org.springframework.beans.factory.config.MethodInvokingFactoryBean
- * @see org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean
+ * @see com.rocket.summer.framework.beans.factory.config.MethodInvokingFactoryBean
+ * @see com.rocket.summer.framework.scheduling.quartz.MethodInvokingJobDetailFactoryBean
  */
 public class MethodInvoker {
 

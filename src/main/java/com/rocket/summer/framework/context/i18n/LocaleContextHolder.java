@@ -20,8 +20,8 @@ import java.util.Locale;
  * @author Juergen Hoeller
  * @since 1.2
  * @see LocaleContext
- * @see org.springframework.context.support.MessageSourceAccessor
- * @see org.springframework.web.servlet.DispatcherServlet
+ * @see com.rocket.summer.framework.context.support.MessageSourceAccessor
+ * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
  */
 public abstract class LocaleContextHolder {
 

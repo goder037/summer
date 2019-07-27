@@ -16,17 +16,17 @@ import java.io.IOException;
 
 /**
  * Generic ApplicationContext implementation that holds a single internal
- * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+ * {@link com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory}
  * instance and does not assume a specific bean definition format. Implements
- * the {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
+ * the {@link com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry}
  * interface in order to allow for applying any bean definition readers to it.
  *
  * <p>Typical usage is to register a variety of bean definitions via the
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
+ * {@link com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry}
  * interface and then call {@link #refresh()} to initialize those beans
  * with application context semantics (handling
- * {@link org.springframework.context.ApplicationContextAware}, auto-detecting
- * {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessors},
+ * {@link com.rocket.summer.framework.context.ApplicationContextAware}, auto-detecting
+ * {@link com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor BeanFactoryPostProcessors},
  * etc).
  *
  * <p>In contrast to other ApplicationContext implementations that create a new
@@ -52,7 +52,7 @@ import java.io.IOException;
  * which are easier to set up - but less flexible, since you can just use standard
  * resource locations for XML bean definitions, rather than mixing arbitrary bean
  * definition formats. The equivalent in a web environment is
- * {@link org.springframework.web.context.support.XmlWebApplicationContext}.
+ * {@link com.rocket.summer.framework.web.context.support.XmlWebApplicationContext}.
  *
  * <p>For custom application context implementations that are supposed to read
  * special bean definition formats in a refreshable manner, consider deriving
@@ -62,8 +62,8 @@ import java.io.IOException;
  * @since 1.1.2
  * @see #registerBeanDefinition
  * @see #refresh()
- * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
- * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
+ * @see com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader
+ * @see com.rocket.summer.framework.beans.factory.support.PropertiesBeanDefinitionReader
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 
@@ -121,7 +121,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
     /**
      * Set the parent of this application context, also setting
      * the parent of the internal BeanFactory accordingly.
-     * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
+     * @see com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
      */
     public void setParent(ApplicationContext parent) {
         super.setParent(parent);
@@ -141,9 +141,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
      * be autodetected by the context and used for <code>getResources</code>
      * calls as well. Else, default resource pattern matching will apply.
      * @see #getResource
-     * @see org.springframework.core.io.DefaultResourceLoader
-     * @see org.springframework.core.io.FileSystemResourceLoader
-     * @see org.springframework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.DefaultResourceLoader
+     * @see com.rocket.summer.framework.core.io.FileSystemResourceLoader
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
      * @see #getResources
      */
     public void setResourceLoader(ResourceLoader resourceLoader) {

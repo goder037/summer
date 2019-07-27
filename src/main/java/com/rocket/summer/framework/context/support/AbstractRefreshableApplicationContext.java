@@ -69,8 +69,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
      * @param beanFactory the bean factory to load bean definitions into
      * @throws IOException if loading of bean definition files failed
      * @throws BeansException if parsing of the bean definitions failed
-     * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
-     * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+     * @see com.rocket.summer.framework.beans.factory.support.PropertiesBeanDefinitionReader
+     * @see com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader
      */
     protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory)
             throws IOException, BeansException;
@@ -113,15 +113,15 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
      * Create an internal bean factory for this context.
      * Called for each {@link #refresh()} attempt.
      * <p>The default implementation creates a
-     * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
+     * {@link com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory}
      * with the {@link #getInternalParentBeanFactory() internal bean factory} of this
      * context's parent as parent bean factory. Can be overridden in subclasses,
      * for example to customize DefaultListableBeanFactory's settings.
      * @return the bean factory for this context
-     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
-     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
-     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
-     * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowEagerClassLoading
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
      */
     protected DefaultListableBeanFactory createBeanFactory() {
         return new DefaultListableBeanFactory(getInternalParentBeanFactory());

@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 /**
  * Static utility methods for composing
- * {@link org.springframework.aop.MethodMatcher MethodMatchers}.
+ * {@link com.rocket.summer.framework.aop.MethodMatcher MethodMatchers}.
  *
  * <p>A MethodMatcher may be evaluated statically (based on method
  * and target class) or need further evaluation dynamically
@@ -62,7 +62,7 @@ public abstract class MethodMatchers {
 
     /**
      * Apply the given MethodMatcher to the given Method, supporting an
-     * {@link org.springframework.aop.IntroductionAwareMethodMatcher}
+     * {@link com.rocket.summer.framework.aop.IntroductionAwareMethodMatcher}
      * (if applicable).
      * @param mm the MethodMatcher to apply (may be an IntroductionAwareMethodMatcher)
      * @param method the candidate method

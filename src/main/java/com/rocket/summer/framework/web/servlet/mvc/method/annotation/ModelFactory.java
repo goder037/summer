@@ -14,7 +14,7 @@ import com.rocket.summer.framework.web.method.HandlerMethod;
 import com.rocket.summer.framework.web.method.support.InvocableHandlerMethod;
 import com.rocket.summer.framework.web.method.support.ModelAndViewContainer;
 import com.rocket.summer.framework.web.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import com.rocket.summer.framework.web.bind.annotation.ModelAttribute;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

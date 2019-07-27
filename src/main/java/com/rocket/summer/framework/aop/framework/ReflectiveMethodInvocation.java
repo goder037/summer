@@ -15,7 +15,7 @@ import java.util.Map;
  * Spring's implementation of the AOP Alliance
  * {@link org.aopalliance.intercept.MethodInvocation} interface,
  * implementing the extended
- * {@link org.springframework.aop.ProxyMethodInvocation} interface.
+ * {@link com.rocket.summer.framework.aop.ProxyMethodInvocation} interface.
  *
  * <p>Invokes the target object using reflection. Subclasses can override the
  * {@link #invokeJoinpoint()} method to change this behavior, so this is also

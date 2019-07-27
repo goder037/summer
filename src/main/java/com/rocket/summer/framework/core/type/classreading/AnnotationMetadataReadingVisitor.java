@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * ASM class visitor which looks for the class name and implemented types as
  * well as for the annotations defined on the class, exposing them through
- * the {@link org.springframework.core.type.AnnotationMetadata} interface.
+ * the {@link com.rocket.summer.framework.core.type.AnnotationMetadata} interface.
  *
  * @author Juergen Hoeller
  * @author Mark Fisher

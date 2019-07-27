@@ -13,8 +13,8 @@ package com.rocket.summer.framework.beans.factory;
  * @see BeanNameAware
  * @see BeanFactoryAware
  * @see BeanFactory
- * @see org.springframework.beans.factory.support.RootBeanDefinition#getInitMethodName
- * @see org.springframework.context.ApplicationContextAware
+ * @see com.rocket.summer.framework.beans.factory.support.RootBeanDefinition#getInitMethodName
+ * @see com.rocket.summer.framework.context.ApplicationContextAware
  */
 public interface InitializingBean {
 

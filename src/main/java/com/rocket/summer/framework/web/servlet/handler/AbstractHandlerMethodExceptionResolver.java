@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Abstract base class for
- * {@link org.springframework.web.servlet.HandlerExceptionResolver HandlerExceptionResolver}
+ * {@link com.rocket.summer.framework.web.servlet.HandlerExceptionResolver HandlerExceptionResolver}
  * implementations that support handling exceptions from handlers of type {@link HandlerMethod}.
  *
  * @author Rossen Stoyanchev

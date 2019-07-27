@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.web.bind.annotation.RequestMapping#params()
+ * @see com.rocket.summer.framework.web.bind.annotation.RequestMapping#params()
  */
 public class UnsatisfiedServletRequestParameterException extends ServletRequestBindingException {
 
@@ -55,7 +55,7 @@ public class UnsatisfiedServletRequestParameterException extends ServletRequestB
 
     /**
      * Return the parameter conditions that have been violated.
-     * @see org.springframework.web.bind.annotation.RequestMapping#params()
+     * @see com.rocket.summer.framework.web.bind.annotation.RequestMapping#params()
      */
     public final String[] getParamConditions() {
         return this.paramConditions;

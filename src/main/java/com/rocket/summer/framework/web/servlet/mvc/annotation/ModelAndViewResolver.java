@@ -28,7 +28,7 @@ import java.lang.reflect.Method;
  * }</pre>
  *
  * @author Arjen Poutsma
- * @see org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter#setCustomModelAndViewResolvers
+ * @see com.rocket.summer.framework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter#setCustomModelAndViewResolvers
  * @since 3.0
  */
 public interface ModelAndViewResolver {

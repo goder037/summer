@@ -7,7 +7,7 @@ import com.rocket.summer.framework.util.ObjectUtils;
 import java.io.Serializable;
 
 /**
- * Implementation of the {@link org.springframework.aop.TargetSource} interface
+ * Implementation of the {@link com.rocket.summer.framework.aop.TargetSource} interface
  * that holds a given object. This is the default implementation of the TargetSource
  * interface, as used by the Spring AOP framework. There is usually no need to
  * create objects of this class in application code.
@@ -17,7 +17,7 @@ import java.io.Serializable;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.aop.framework.AdvisedSupport#setTarget(Object)
+ * @see com.rocket.summer.framework.aop.framework.AdvisedSupport#setTarget(Object)
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
 

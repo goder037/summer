@@ -79,7 +79,7 @@ public class UrlResource extends AbstractResource {
      * @param originalUrl the original URL
      * @param originalPath the original URL path
      * @return the cleaned URL
-     * @see org.springframework.util.StringUtils#cleanPath
+     * @see com.rocket.summer.framework.util.StringUtils#cleanPath
      */
     private URL getCleanedUrl(URL originalUrl, String originalPath) {
         try {
@@ -130,7 +130,7 @@ public class UrlResource extends AbstractResource {
     /**
      * This implementation returns a File reference for the underlying URL/URI,
      * provided that it refers to a file in the file system.
-     * @see org.springframework.util.ResourceUtils#getFile(java.net.URL, String)
+     * @see com.rocket.summer.framework.util.ResourceUtils#getFile(java.net.URL, String)
      */
     public File getFile() throws IOException {
         if (this.uri != null) {

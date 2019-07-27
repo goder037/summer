@@ -8,7 +8,7 @@ package com.rocket.summer.framework.core;
  * <p>An error code can be resolved by a MessageSource, for example.
  *
  * @author Rod Johnson
- * @see org.springframework.context.MessageSource
+ * @see com.rocket.summer.framework.context.MessageSource
  */
 public interface ErrorCoded {
 

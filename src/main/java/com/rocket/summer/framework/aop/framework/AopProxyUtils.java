@@ -10,12 +10,12 @@ import java.util.Arrays;
  * Utility methods for AOP proxy factories.
  * Mainly for internal use within the AOP framework.
  *
- * <p>See {@link org.springframework.aop.support.AopUtils} for a collection of
+ * <p>See {@link com.rocket.summer.framework.aop.support.AopUtils} for a collection of
  * generic AOP utility methods which do not depend on AOP framework internals.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
- * @see org.springframework.aop.support.AopUtils
+ * @see com.rocket.summer.framework.aop.support.AopUtils
  */
 public abstract class AopProxyUtils {
 
@@ -26,7 +26,7 @@ public abstract class AopProxyUtils {
      * @param candidate the instance to check (might be an AOP proxy)
      * @return the target class (or the plain class of the given object as fallback)
      * @deprecated as of Spring 2.0.3, in favor of <code>AopUtils.getTargetClass</code>
-     * @see org.springframework.aop.support.AopUtils#getTargetClass(Object)
+     * @see com.rocket.summer.framework.aop.support.AopUtils#getTargetClass(Object)
      */
     public static Class getTargetClass(Object candidate) {
         Assert.notNull(candidate, "Candidate object must not be null");
@@ -43,10 +43,10 @@ public abstract class AopProxyUtils {
      * Determine the complete set of interfaces to proxy for the given AOP configuration.
      * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
      * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
-     * {@link org.springframework.aop.SpringProxy} marker interface.
+     * {@link com.rocket.summer.framework.aop.SpringProxy} marker interface.
      * @return the complete set of interfaces to proxy
      * @see Advised
-     * @see org.springframework.aop.SpringProxy
+     * @see com.rocket.summer.framework.aop.SpringProxy
      */
     public static Class[] completeProxiedInterfaces(AdvisedSupport advised) {
         Class[] specifiedInterfaces = advised.getProxiedInterfaces();

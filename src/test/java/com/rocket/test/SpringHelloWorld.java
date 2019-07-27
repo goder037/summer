@@ -1,6 +1,6 @@
 package com.rocket.test;
 
-import org.springframework.stereotype.Service;
+import com.rocket.summer.framework.stereotype.Service;
 
 @Service
 public class SpringHelloWorld {

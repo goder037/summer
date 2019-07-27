@@ -22,7 +22,7 @@ public interface Model {
 
     /**
      * Add the supplied attribute to this <code>Map</code> using a
-     * {@link org.springframework.core.Conventions#getVariableName generated name}.
+     * {@link com.rocket.summer.framework.core.Conventions#getVariableName generated name}.
      * <p><emphasis>Note: Empty {@link java.util.Collection Collections} are not added to
      * the model when using this method because we cannot correctly determine
      * the true convention name. View code should check for <code>null</code> rather

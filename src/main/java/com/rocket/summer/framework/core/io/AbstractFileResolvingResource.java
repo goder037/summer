@@ -27,7 +27,7 @@ public abstract class AbstractFileResolvingResource extends AbstractResource {
     /**
      * This implementation returns a File reference for the underlying class path
      * resource, provided that it refers to a file in the file system.
-     * @see org.springframework.util.ResourceUtils#getFile(java.net.URL, String)
+     * @see com.rocket.summer.framework.util.ResourceUtils#getFile(java.net.URL, String)
      */
     @Override
     public File getFile() throws IOException {
@@ -54,7 +54,7 @@ public abstract class AbstractFileResolvingResource extends AbstractResource {
     /**
      * This implementation returns a File reference for the underlying class path
      * resource, provided that it refers to a file in the file system.
-     * @see org.springframework.util.ResourceUtils#getFile(java.net.URI, String)
+     * @see com.rocket.summer.framework.util.ResourceUtils#getFile(java.net.URI, String)
      */
     protected File getFile(URI uri) throws IOException {
         return ResourceUtils.getFile(uri, getDescription());

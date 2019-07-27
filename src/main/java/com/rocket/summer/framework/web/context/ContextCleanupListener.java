@@ -18,7 +18,7 @@ import java.util.Enumeration;
  *
  * @author Juergen Hoeller
  * @since 3.0
- * @see org.springframework.web.context.support.ServletContextScope
+ * @see com.rocket.summer.framework.web.context.support.ServletContextScope
  * @see ContextLoaderListener
  */
 public class ContextCleanupListener implements ServletContextListener {
@@ -43,7 +43,7 @@ public class ContextCleanupListener implements ServletContextListener {
         Enumeration attrNames = sc.getAttributeNames();
         while (attrNames.hasMoreElements()) {
             String attrName = (String) attrNames.nextElement();
-            if (attrName.startsWith("org.springframework.")) {
+            if (attrName.startsWith("com.rocket.summer.framework.")) {
                 Object attrValue = sc.getAttribute(attrName);
                 if (attrValue instanceof DisposableBean) {
                     try {

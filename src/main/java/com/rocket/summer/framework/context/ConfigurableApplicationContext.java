@@ -7,7 +7,7 @@ import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBean
  * SPI interface to be implemented by most if not all application contexts.
  * Provides facilities to configure an application context in addition
  * to the application context client methods in the
- * {@link org.springframework.context.ApplicationContext} interface.
+ * {@link com.rocket.summer.framework.context.ApplicationContext} interface.
  *
  * <p>Configuration and lifecycle methods are encapsulated here to avoid
  * making them obvious to ApplicationContext client code. The present
@@ -21,9 +21,9 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     /**
      * Any number of these characters are considered delimiters between
      * multiple context config paths in a single String value.
-     * @see org.springframework.context.support.AbstractXmlApplicationContext#setConfigLocation
-     * @see org.springframework.web.context.ContextLoader#CONFIG_LOCATION_PARAM
-     * @see org.springframework.web.servlet.FrameworkServlet#setContextConfigLocation
+     * @see com.rocket.summer.framework.context.support.AbstractXmlApplicationContext#setConfigLocation
+     * @see com.rocket.summer.framework.web.context.ContextLoader#CONFIG_LOCATION_PARAM
+     * @see com.rocket.summer.framework.web.servlet.FrameworkServlet#setContextConfigLocation
      */
     String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
 
@@ -31,7 +31,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * Name of the LoadTimeWeaver bean in the factory. If such a bean is supplied,
      * the context will use a temporary ClassLoader for type matching, in order
      * to allow the LoadTimeWeaver to process all actual bean classes.
-     * @see org.springframework.instrument.classloading.LoadTimeWeaver
+     * @see com.rocket.summer.framework.instrument.classloading.LoadTimeWeaver
      */
     String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
 
@@ -42,7 +42,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * a constructor if it isn't available when an object of this class is created,
      * for example in case of WebApplicationContext setup.
      * @param parent the parent context
-     * @see org.springframework.web.context.ConfigurableWebApplicationContext
+     * @see com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext
      */
     void setParent(ApplicationContext parent);
 
@@ -61,8 +61,8 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * on refresh of this context. If a listener is added after the initial
      * refresh, it will be applied on next refresh of the context.
      * @param listener the ApplicationListener to register
-     * @see org.springframework.context.event.ContextRefreshedEvent
-     * @see org.springframework.context.event.ContextClosedEvent
+     * @see com.rocket.summer.framework.context.event.ContextRefreshedEvent
+     * @see com.rocket.summer.framework.context.event.ContextClosedEvent
      */
     void addApplicationListener(ApplicationListener listener);
 

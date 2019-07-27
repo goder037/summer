@@ -2,8 +2,8 @@ package com.rocket.summer.framework.http;
 
 /**
  * Java 5 enumeration of HTTP request methods. Intended for use
- * with {@link org.springframework.http.client.ClientHttpRequest}
- * and {@link org.springframework.web.client.RestTemplate}.
+ * with {@link com.rocket.summer.framework.http.client.ClientHttpRequest}
+ * and {@link com.rocket.summer.framework.web.client.RestTemplate}.
  *
  * @author Arjen Poutsma
  * @since 3.0

@@ -11,9 +11,9 @@ import com.rocket.summer.framework.web.context.request.WebRequest;
  * @author Juergen Hoeller
  * @since 2.5
  * @see #setAttributeNamePrefix
- * @see org.springframework.web.context.request.WebRequest#setAttribute
- * @see org.springframework.web.context.request.WebRequest#getAttribute
- * @see org.springframework.web.context.request.WebRequest#removeAttribute
+ * @see com.rocket.summer.framework.web.context.request.WebRequest#setAttribute
+ * @see com.rocket.summer.framework.web.context.request.WebRequest#getAttribute
+ * @see com.rocket.summer.framework.web.context.request.WebRequest#removeAttribute
  */
 public class DefaultSessionAttributeStore implements SessionAttributeStore {
 

@@ -16,7 +16,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 
 /**
- * Abstract base class for {@link org.springframework.http.converter.HttpMessageConverter HttpMessageConverters}
+ * Abstract base class for {@link com.rocket.summer.framework.http.converter.HttpMessageConverter HttpMessageConverters}
  * that convert from/to XML.
  *
  * <p>By default, subclasses of this converter support {@code text/xml}, {@code application/xml}, and {@code
@@ -68,7 +68,7 @@ public abstract class AbstractXmlHttpMessageConverter<T> extends AbstractHttpMes
      * @param source the HTTP input body
      * @return the converted object
      * @throws IOException in case of I/O errors
-     * @throws org.springframework.http.converter.HttpMessageConversionException in case of conversion errors
+     * @throws com.rocket.summer.framework.http.converter.HttpMessageConversionException in case of conversion errors
      */
     protected abstract T readFromSource(Class<? extends T> clazz, HttpHeaders headers, Source source)
             throws IOException;

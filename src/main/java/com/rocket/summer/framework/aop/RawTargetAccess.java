@@ -14,7 +14,7 @@ package com.rocket.summer.framework.aop;
  *
  * @author Juergen Hoeller
  * @since 2.0.5
- * @see org.springframework.aop.scope.ScopedObject
+ * @see com.rocket.summer.framework.aop.scope.ScopedObject
  */
 public interface RawTargetAccess {
 

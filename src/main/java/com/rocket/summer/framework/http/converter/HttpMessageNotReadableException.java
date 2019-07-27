@@ -2,7 +2,7 @@ package com.rocket.summer.framework.http.converter;
 
 /**
  * Thrown by {@link HttpMessageConverter} implementations when the
- * {@link HttpMessageConverter#read(Class, org.springframework.http.HttpInputMessage) read} method fails.
+ * {@link HttpMessageConverter#read(Class, com.rocket.summer.framework.http.HttpInputMessage) read} method fails.
  *
  * @author Arjen Poutsma
  * @since 3.0

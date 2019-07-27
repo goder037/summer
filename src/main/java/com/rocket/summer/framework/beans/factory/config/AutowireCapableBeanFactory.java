@@ -7,14 +7,14 @@ import com.rocket.summer.framework.context.BeansException;
 import java.util.Set;
 
 /**
- * Extension of the {@link org.springframework.beans.factory.BeanFactory}
+ * Extension of the {@link com.rocket.summer.framework.beans.factory.BeanFactory}
  * interface to be implemented by bean factories that are capable of
  * autowiring, provided that they want to expose this functionality for
  * existing bean instances.
  *
  * <p>This subinterface of BeanFactory is not meant to be used in normal
- * application code: stick to {@link org.springframework.beans.factory.BeanFactory}
- * or {@link org.springframework.beans.factory.ListableBeanFactory} for
+ * application code: stick to {@link com.rocket.summer.framework.beans.factory.BeanFactory}
+ * or {@link com.rocket.summer.framework.beans.factory.ListableBeanFactory} for
  * typical use cases.
  *
  * <p>Integration code for other frameworks can leverage this interface to
@@ -23,22 +23,22 @@ import java.util.Set;
  * Tapestry Page objects, for example.
  *
  * <p>Note that this interface is not implemented by
- * {@link org.springframework.context.ApplicationContext} facades,
+ * {@link com.rocket.summer.framework.context.ApplicationContext} facades,
  * as it is hardly ever used by application code. That said, it is available
  * from an application context too, accessible through ApplicationContext's
- * {@link org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()}
+ * {@link com.rocket.summer.framework.context.ApplicationContext#getAutowireCapableBeanFactory()}
  * method.
  *
- * <p>You may also implement the {@link org.springframework.beans.factory.BeanFactoryAware}
+ * <p>You may also implement the {@link com.rocket.summer.framework.beans.factory.BeanFactoryAware}
  * interface, which exposes the internal BeanFactory even when running in an
  * ApplicationContext, to get access to an AutowireCapableBeanFactory:
  * simply cast the passed-in BeanFactory to AutowireCapableBeanFactory.
  *
  * @author Juergen Hoeller
  * @since 04.12.2003
- * @see org.springframework.beans.factory.BeanFactoryAware
- * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory
- * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
+ * @see com.rocket.summer.framework.beans.factory.BeanFactoryAware
+ * @see com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory
+ * @see com.rocket.summer.framework.context.ApplicationContext#getAutowireCapableBeanFactory()
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
 
@@ -102,7 +102,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
      * @return the new bean instance
      * @throws BeansException if instantiation or wiring failed
      */
-    Object createBean(Class beanClass) throws BeansException;
+    <T> T createBean(Class<T> beanClass) throws BeansException;
 
     /**
      * Populate the given bean instance through applying after-instantiation callbacks
@@ -128,7 +128,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
      * @param beanName the name of the bean, to be passed to it if necessary
      * (a bean definition of that name has to be available)
      * @return the bean instance to use, either the original or a wrapped one
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if there is no bean definition with the given name
      * @throws BeansException if the initialization failed
      * @see #initializeBean
@@ -235,7 +235,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
      * @param existingBean the existing bean instance
      * @param beanName the name of the bean definition in the bean factory
      * (a bean definition of that name has to be available)
-     * @throws org.springframework.beans.factory.NoSuchBeanDefinitionException
+     * @throws com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException
      * if there is no bean definition with the given name
      * @throws BeansException if applying the property values failed
      * @see #autowireBeanProperties

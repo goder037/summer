@@ -6,10 +6,10 @@ import java.util.Map;
 /**
  * Strategy interface for <code>String</code>-based path matching.
  *
- * <p>Used by {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver},
- * {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping},
- * {@link org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver},
- * and {@link org.springframework.web.servlet.mvc.WebContentInterceptor}.
+ * <p>Used by {@link com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver},
+ * {@link com.rocket.summer.framework.web.servlet.handler.AbstractUrlHandlerMapping},
+ * {@link com.rocket.summer.framework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver},
+ * and {@link com.rocket.summer.framework.web.servlet.mvc.WebContentInterceptor}.
  *
  * <p>The default implementation is {@link AntPathMatcher}, supporting the
  * Ant-style pattern syntax.

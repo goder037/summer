@@ -29,7 +29,7 @@ import java.util.*;
  * for all typical use cases. Caches introspection results for efficiency.
  *
  * <p>Note: Auto-registers default property editors from the
- * <code>org.springframework.beans.propertyeditors</code> package, which apply
+ * <code>com.rocket.summer.framework.beans.propertyeditors</code> package, which apply
  * in addition to the JDK's standard PropertyEditors. Applications can call
  * the {@link #registerCustomEditor(Class, java.beans.PropertyEditor)} method
  * to register an editor for a particular instance (i.e. they are not shared

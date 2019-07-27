@@ -6,7 +6,7 @@ package com.rocket.summer.framework.core;
  *
  * @author Rod Johnson
  * @since 28.04.2003
- * @see org.springframework.core.Constants
+ * @see com.rocket.summer.framework.core.Constants
  */
 public class ConstantException extends IllegalArgumentException {
 

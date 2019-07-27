@@ -18,8 +18,8 @@ import java.util.Locale;
  *
  * @author Juergen Hoeller
  * @since 27.02.2003
- * @see org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver
- * @see org.springframework.web.servlet.support.RequestContext#getLocale
+ * @see com.rocket.summer.framework.web.servlet.i18n.AcceptHeaderLocaleResolver
+ * @see com.rocket.summer.framework.web.servlet.support.RequestContext#getLocale
  */
 public interface LocaleResolver {
 

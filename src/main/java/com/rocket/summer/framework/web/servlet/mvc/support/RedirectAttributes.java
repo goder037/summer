@@ -12,7 +12,7 @@ import java.util.Map;
  * redirect attributes is very explicit --  i.e. to be used for a redirect URL,
  * attribute values may be formatted as Strings and stored that way to make
  * them eligible to be appended to the query string or expanded as URI
- * variables in {@code org.springframework.web.servlet.view.RedirectView}.
+ * variables in {@code com.rocket.summer.framework.web.servlet.view.RedirectView}.
  *
  * <p>This interface also provides a way to add flash attributes. For a
  * general overview of flash attributes see {@link FlashMap}. You can use
@@ -60,7 +60,7 @@ public interface RedirectAttributes extends Model {
 
     /**
      * Add the given flash storage using a
-     * {@link org.springframework.core.Conventions#getVariableName generated name}.
+     * {@link com.rocket.summer.framework.core.Conventions#getVariableName generated name}.
      * @param attributeValue the flash attribute value; never {@code null}
      */
     RedirectAttributes addFlashAttribute(Object attributeValue);

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  * the concrete view will be determined by the ViewResolver.
  *
  * <p>An alternative to the ParameterizableViewController is a
- * {@link org.springframework.web.servlet.mvc.multiaction.MultiActionController MultiActionController},
+ * {@link com.rocket.summer.framework.web.servlet.mvc.multiaction.MultiActionController MultiActionController},
  * which can define a variety of handler methods that just return a plain
  * ModelAndView instance for a given view name.
  *

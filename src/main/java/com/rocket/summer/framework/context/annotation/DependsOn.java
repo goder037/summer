@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * hence it needs to be specified per concrete bean definition.
  *
  * <p>May be used on any class directly or indirectly annotated with
- * {@link org.springframework.stereotype.Component} or on methods annotated
+ * {@link com.rocket.summer.framework.stereotype.Component} or on methods annotated
  * with {@link Bean}.
  *
  * <p>Using {@link DependsOn} at the class level has no effect unless component-scanning

@@ -17,9 +17,9 @@ public interface AdvisorAdapterRegistry {
      * Return an Advisor wrapping the given advice.
      * <p>Should by default at least support
      * {@link org.aopalliance.intercept.MethodInterceptor},
-     * {@link org.springframework.aop.MethodBeforeAdvice},
-     * {@link org.springframework.aop.AfterReturningAdvice},
-     * {@link org.springframework.aop.ThrowsAdvice}.
+     * {@link com.rocket.summer.framework.aop.MethodBeforeAdvice},
+     * {@link com.rocket.summer.framework.aop.AfterReturningAdvice},
+     * {@link com.rocket.summer.framework.aop.ThrowsAdvice}.
      * @param advice object that should be an advice
      * @return an Advisor wrapping the given advice. Never returns <code>null</code>.
      * If the advice parameter is an Advisor, return it.

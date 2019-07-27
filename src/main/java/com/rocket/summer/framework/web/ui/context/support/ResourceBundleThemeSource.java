@@ -21,7 +21,7 @@ import java.util.Map;
  * @author Juergen Hoeller
  * @see #setBasenamePrefix
  * @see java.util.ResourceBundle
- * @see org.springframework.context.support.ResourceBundleMessageSource
+ * @see com.rocket.summer.framework.context.support.ResourceBundleMessageSource
  */
 public class ResourceBundleThemeSource implements HierarchicalThemeSource {
 
@@ -103,8 +103,8 @@ public class ResourceBundleThemeSource implements HierarchicalThemeSource {
      * configured ReloadableResourceBundleMessageSource, for example.
      * @param basename the basename to create a MessageSource for
      * @return the MessageSource
-     * @see org.springframework.context.support.ResourceBundleMessageSource
-     * @see org.springframework.context.support.ReloadableResourceBundleMessageSource
+     * @see com.rocket.summer.framework.context.support.ResourceBundleMessageSource
+     * @see com.rocket.summer.framework.context.support.ReloadableResourceBundleMessageSource
      */
     protected MessageSource createMessageSource(String basename) {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();

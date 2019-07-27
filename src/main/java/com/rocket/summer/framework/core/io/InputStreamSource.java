@@ -32,7 +32,7 @@ public interface InputStreamSource {
      * creating mail attachments. For such a use case, it is <i>required</i>
      * that each <code>getInputStream()</code> call returns a fresh stream.
      * @throws IOException if the stream could not be opened
-     * @see org.springframework.mail.javamail.MimeMessageHelper#addAttachment(String, InputStreamSource)
+     * @see com.rocket.summer.framework.mail.javamail.MimeMessageHelper#addAttachment(String, InputStreamSource)
      */
     InputStream getInputStream() throws IOException;
 

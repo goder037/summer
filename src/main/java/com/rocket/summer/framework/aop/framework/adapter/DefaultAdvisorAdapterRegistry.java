@@ -12,9 +12,9 @@ import java.util.List;
 /**
  * Default implementation of the {@link AdvisorAdapterRegistry} interface.
  * Supports {@link org.aopalliance.intercept.MethodInterceptor},
- * {@link org.springframework.aop.MethodBeforeAdvice},
- * {@link org.springframework.aop.AfterReturningAdvice},
- * {@link org.springframework.aop.ThrowsAdvice}.
+ * {@link com.rocket.summer.framework.aop.MethodBeforeAdvice},
+ * {@link com.rocket.summer.framework.aop.AfterReturningAdvice},
+ * {@link com.rocket.summer.framework.aop.ThrowsAdvice}.
  *
  * @author Rod Johnson
  * @author Rob Harrop

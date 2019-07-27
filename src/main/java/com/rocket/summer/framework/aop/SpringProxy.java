@@ -6,7 +6,7 @@ package com.rocket.summer.framework.aop;
  *
  * @author Rob Harrop
  * @since 2.0.1
- * @see org.springframework.aop.support.AopUtils#isAopProxy(Object)
+ * @see com.rocket.summer.framework.aop.support.AopUtils#isAopProxy(Object)
  */
 public interface SpringProxy {
 

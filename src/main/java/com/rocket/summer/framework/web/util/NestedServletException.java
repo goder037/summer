@@ -21,8 +21,8 @@ import javax.servlet.ServletException;
  * @since 1.2.5
  * @see #getMessage
  * @see #printStackTrace
- * @see org.springframework.core.NestedCheckedException
- * @see org.springframework.core.NestedRuntimeException
+ * @see com.rocket.summer.framework.core.NestedCheckedException
+ * @see com.rocket.summer.framework.core.NestedRuntimeException
  */
 public class NestedServletException extends ServletException {
 

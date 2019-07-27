@@ -16,11 +16,11 @@ import java.net.URL;
 
 /**
  * PropertyEditorRegistrar implementation that populates a given
- * {@link org.springframework.beans.PropertyEditorRegistry}
- * (typically a {@link org.springframework.beans.BeanWrapper} used for bean
- * creation within an {@link org.springframework.context.ApplicationContext})
+ * {@link com.rocket.summer.framework.beans.PropertyEditorRegistry}
+ * (typically a {@link com.rocket.summer.framework.beans.BeanWrapper} used for bean
+ * creation within an {@link com.rocket.summer.framework.context.ApplicationContext})
  * with resource editors. Used by
- * {@link org.springframework.context.support.AbstractApplicationContext}.
+ * {@link com.rocket.summer.framework.context.support.AbstractApplicationContext}.
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -34,8 +34,8 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
      * Create a new ResourceEditorRegistrar for the given ResourceLoader
      * @param resourceLoader the ResourceLoader (or ResourcePatternResolver)
      * to create editors for (usually an ApplicationContext)
-     * @see org.springframework.core.io.support.ResourcePatternResolver
-     * @see org.springframework.context.ApplicationContext
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.context.ApplicationContext
      */
     public ResourceEditorRegistrar(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -45,15 +45,15 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
     /**
      * Populate the given bean factory with the following resource editors:
      * ResourceEditor, InputStreamEditor, FileEditor, URLEditor, ClassEditor, URIEditor.
-     * <p>In case of a {@link org.springframework.core.io.support.ResourcePatternResolver},
+     * <p>In case of a {@link com.rocket.summer.framework.core.io.support.ResourcePatternResolver},
      * a ResourceArrayPropertyEditor will be registered as well.
-     * @see org.springframework.core.io.ResourceEditor
+     * @see com.rocket.summer.framework.core.io.ResourceEditor
      * @see com.rocket.summer.framework.beans.propertyeditors.InputStreamEditor
      * @see com.rocket.summer.framework.beans.propertyeditors.FileEditor
      * @see com.rocket.summer.framework.beans.propertyeditors.URLEditor
      * @see com.rocket.summer.framework.beans.propertyeditors.ClassEditor
      * @see com.rocket.summer.framework.beans.propertyeditors.URIEditor
-     * @see org.springframework.core.io.support.ResourceArrayPropertyEditor
+     * @see com.rocket.summer.framework.core.io.support.ResourceArrayPropertyEditor
      */
     @Override
     public void registerCustomEditors(PropertyEditorRegistry registry) {

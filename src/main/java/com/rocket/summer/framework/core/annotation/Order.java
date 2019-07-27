@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 2.0
- * @see org.springframework.core.Ordered
+ * @see com.rocket.summer.framework.core.Ordered
  * @see AnnotationAwareOrderComparator
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -6,6 +6,7 @@ import com.rocket.summer.framework.beans.PropertyAccessorFactory;
 import com.rocket.summer.framework.util.Assert;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Default implementation of the {@link Errors} and {@link BindingResult}
@@ -16,7 +17,7 @@ import java.io.Serializable;
  * properties. Normally, application code will work with the
  * <code>Errors</code> interface or the <code>BindingResult</code> interface.
  * A {@link DataBinder} returns its <code>BindingResult</code> via
- * {@link org.springframework.validation.DataBinder#getBindingResult()}.
+ * {@link com.rocket.summer.framework.validation.DataBinder#getBindingResult()}.
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -65,6 +66,11 @@ public class BeanPropertyBindingResult extends AbstractPropertyBindingResult imp
         return this.target;
     }
 
+    @Override
+    public void addError(ObjectError error) {
+
+    }
+
     /**
      * Returns the {@link BeanWrapper} that this instance uses.
      * Creates a new one if none existed before.
@@ -90,5 +96,8 @@ public class BeanPropertyBindingResult extends AbstractPropertyBindingResult imp
         return PropertyAccessorFactory.forBeanPropertyAccess(this.target);
     }
 
+    @Override
+    public List<ObjectError> getGlobalErrors() {
+        return null;
+    }
 }
-

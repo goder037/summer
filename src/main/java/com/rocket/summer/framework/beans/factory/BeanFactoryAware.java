@@ -19,7 +19,7 @@ import com.rocket.summer.framework.context.BeansException;
  * @see BeanNameAware
  * @see BeanClassLoaderAware
  * @see InitializingBean
- * @see org.springframework.context.ApplicationContextAware
+ * @see com.rocket.summer.framework.context.ApplicationContextAware
  */
 public interface BeanFactoryAware {
 

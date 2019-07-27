@@ -26,7 +26,7 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
      * @param beanClass the raw class of the bean
      * @param beanName the name of the bean
      * @return the type of the bean, or <code>null</code> if not predictable
-     * @throws org.springframework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      */
     Class predictBeanType(Class beanClass, String beanName) throws BeansException;
 
@@ -35,7 +35,7 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
      * @param beanClass the raw class of the bean (never <code>null</code>)
      * @param beanName the name of the bean
      * @return the candidate constructors, or <code>null</code> if none specified
-     * @throws org.springframework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      */
     Constructor[] determineCandidateConstructors(Class beanClass, String beanName) throws BeansException;
 
@@ -57,7 +57,7 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
      * @param beanName the name of the bean
      * @return the object to expose as bean reference
      * (typically with the passed-in bean instance as default)
-     * @throws org.springframework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      */
     Object getEarlyBeanReference(Object bean, String beanName) throws BeansException;
 

@@ -20,8 +20,8 @@ import java.io.IOException;
  * @author Juergen Hoeller
  * @since 1.0.1
  * @see java.io.InputStream
- * @see org.springframework.core.io.ResourceEditor
- * @see org.springframework.core.io.ResourceLoader
+ * @see com.rocket.summer.framework.core.io.ResourceEditor
+ * @see com.rocket.summer.framework.core.io.ResourceLoader
  * @see URLEditor
  * @see FileEditor
  */

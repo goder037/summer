@@ -33,11 +33,11 @@ import java.util.Set;
  * behavior of HttpServlet (<code>doGet</code>, <code>doPost</code>, etc).
  *
  * <p>This generic servlet base class has no dependency on the Spring
- * {@link org.springframework.context.ApplicationContext} concept. Simple
+ * {@link com.rocket.summer.framework.context.ApplicationContext} concept. Simple
  * servlets usually don't load their own context but rather access service
  * beans from the Spring root application context, accessible via the
  * filter's {@link #getServletContext() ServletContext} (see
- * {@link org.springframework.web.context.support.WebApplicationContextUtils}).
+ * {@link com.rocket.summer.framework.web.context.support.WebApplicationContextUtils}).
  *
  * <p>The {@link FrameworkServlet} class is a more specific servlet base
  * class which loads its own application context. FrameworkServlet serves
@@ -115,7 +115,7 @@ public abstract class HttpServletBean extends HttpServlet {
      * <p>This default implementation is empty.
      * @param bw the BeanWrapper to initialize
      * @throws BeansException if thrown by BeanWrapper methods
-     * @see org.springframework.beans.BeanWrapper#registerCustomEditor
+     * @see com.rocket.summer.framework.beans.BeanWrapper#registerCustomEditor
      */
     protected void initBeanWrapper(BeanWrapper bw) throws BeansException {
     }

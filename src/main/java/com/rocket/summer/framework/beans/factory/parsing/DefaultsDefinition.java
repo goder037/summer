@@ -11,7 +11,7 @@ import com.rocket.summer.framework.beans.BeanMetadataElement;
  *
  * @author Juergen Hoeller
  * @since 2.0.2
- * @see org.springframework.beans.factory.xml.DocumentDefaultsDefinition
+ * @see com.rocket.summer.framework.beans.factory.xml.DocumentDefaultsDefinition
  * @see ReaderEventListener#defaultsRegistered(DefaultsDefinition)
  */
 public interface DefaultsDefinition extends BeanMetadataElement {
