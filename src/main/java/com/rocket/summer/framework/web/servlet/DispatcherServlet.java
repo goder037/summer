@@ -10,6 +10,7 @@ import com.rocket.summer.framework.core.io.ClassPathResource;
 import com.rocket.summer.framework.core.io.support.PropertiesLoaderUtils;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.web.context.WebApplicationContext;
 import com.rocket.summer.framework.web.context.request.ServletWebRequest;
 import com.rocket.summer.framework.web.multipart.MultipartException;
 import com.rocket.summer.framework.web.multipart.MultipartHttpServletRequest;
@@ -21,6 +22,7 @@ import com.rocket.summer.framework.web.util.WebUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -257,6 +259,48 @@ public class DispatcherServlet extends FrameworkServlet {
     private List<ViewResolver> viewResolvers;
 
 
+    /**
+     * Create a new {@code DispatcherServlet} with the given web application context. This
+     * constructor is useful in Servlet 3.0+ environments where instance-based registration
+     * of servlets is possible through the {@link ServletContext#addServlet} API.
+     * <p>Using this constructor indicates that the following properties / init-params
+     * will be ignored:
+     * <ul>
+     * <li>{@link #setContextClass(Class)} / 'contextClass'</li>
+     * <li>{@link #setContextConfigLocation(String)} / 'contextConfigLocation'</li>
+     * <li>{@link #setContextAttribute(String)} / 'contextAttribute'</li>
+     * <li>{@link #setNamespace(String)} / 'namespace'</li>
+     * </ul>
+     * <p>The given web application context may or may not yet be {@linkplain
+     * ConfigurableApplicationContext#refresh() refreshed}. If it has <strong>not</strong>
+     * already been refreshed (the recommended approach), then the following will occur:
+     * <ul>
+     * <li>If the given context does not already have a {@linkplain
+     * ConfigurableApplicationContext#setParent parent}, the root application context
+     * will be set as the parent.</li>
+     * <li>If the given context has not already been assigned an {@linkplain
+     * ConfigurableApplicationContext#setId id}, one will be assigned to it</li>
+     * <li>{@code ServletContext} and {@code ServletConfig} objects will be delegated to
+     * the application context</li>
+     * <li>{@link #postProcessWebApplicationContext} will be called</li>
+     * <li>Any {@code ApplicationContextInitializer}s specified through the
+     * "contextInitializerClasses" init-param or through the {@link
+     * #setContextInitializers} property will be applied.</li>
+     * <li>{@link ConfigurableApplicationContext#refresh refresh()} will be called if the
+     * context implements {@link ConfigurableApplicationContext}</li>
+     * </ul>
+     * If the context has already been refreshed, none of the above will occur, under the
+     * assumption that the user has performed these actions (or not) per their specific
+     * needs.
+     * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+     * @param webApplicationContext the context to use
+     * @see #initWebApplicationContext
+     * @see #configureAndRefreshWebApplicationContext
+     * @see org.springframework.web.WebApplicationInitializer
+     */
+    public DispatcherServlet(WebApplicationContext webApplicationContext) {
+        super(webApplicationContext);
+    }
     /**
      * Set whether to detect all HandlerMapping beans in this servlet's context. Otherwise,
      * just a single bean with name "handlerMapping" will be expected.

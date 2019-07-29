@@ -32,6 +32,9 @@ public abstract class EnumerablePropertySource<T> extends PropertySource<T> {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
+    protected EnumerablePropertySource(String name) {
+        super(name);
+    }
 
     public EnumerablePropertySource(String name, T source) {
         super(name, source);

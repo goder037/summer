@@ -2,6 +2,7 @@ package com.rocket.summer.framework.core.convert.support;
 
 import com.rocket.summer.framework.core.convert.ConversionService;
 import com.rocket.summer.framework.core.convert.converter.ConverterRegistry;
+import com.rocket.summer.framework.util.ClassUtils;
 
 import java.util.Locale;
 
@@ -17,6 +18,10 @@ import java.util.Locale;
  * @since 3.1
  */
 public class DefaultConversionService extends GenericConversionService {
+
+    /** Java 8's java.util.stream.Stream class available? */
+    private static final boolean streamAvailable = ClassUtils.isPresent(
+            "java.util.stream.Stream", DefaultConversionService.class.getClassLoader());
 
     /**
      * Create a new {@code DefaultConversionService} with the set of
@@ -66,8 +71,16 @@ public class DefaultConversionService extends GenericConversionService {
         converterRegistry.addConverter(new StringToPropertiesConverter());
     }
 
-    private static void addCollectionConverters(ConverterRegistry converterRegistry) {
+    /**
+     * Add common collection converters.
+     * @param converterRegistry the registry of converters to add to
+     * (must also be castable to ConversionService, e.g. being a {@link ConfigurableConversionService})
+     * @throws ClassCastException if the given ConverterRegistry could not be cast to a ConversionService
+     * @since 4.2.3
+     */
+    public static void addCollectionConverters(ConverterRegistry converterRegistry) {
         ConversionService conversionService = (ConversionService) converterRegistry;
+
         converterRegistry.addConverter(new ArrayToCollectionConverter(conversionService));
         converterRegistry.addConverter(new CollectionToArrayConverter(conversionService));
 
@@ -86,6 +99,10 @@ public class DefaultConversionService extends GenericConversionService {
 
         converterRegistry.addConverter(new CollectionToObjectConverter(conversionService));
         converterRegistry.addConverter(new ObjectToCollectionConverter(conversionService));
+
+        if (streamAvailable) {
+            converterRegistry.addConverter(new StreamConverter(conversionService));
+        }
     }
 
     private static void addFallbackConverters(ConverterRegistry converterRegistry) {

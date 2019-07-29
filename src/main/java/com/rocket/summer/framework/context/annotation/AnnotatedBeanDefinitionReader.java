@@ -6,6 +6,8 @@ import com.rocket.summer.framework.beans.factory.support.AutowireCandidateQualif
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionReaderUtils;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
+import com.rocket.summer.framework.core.env.Environment;
+import com.rocket.summer.framework.core.env.StandardEnvironment;
 
 import java.lang.annotation.Annotation;
 
@@ -26,6 +28,7 @@ public class AnnotatedBeanDefinitionReader {
 
     private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
+    private ConditionEvaluator conditionEvaluator;
 
     /**
      * Create a new AnnotatedBeanDefinitionReader for the given bean factory.
@@ -35,6 +38,16 @@ public class AnnotatedBeanDefinitionReader {
     public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
         this.registry = registry;
         AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
+    }
+
+    /**
+     * Set the Environment to use when evaluating whether
+     * {@link Conditional @Conditional}-annotated component classes should be registered.
+     * <p>The default is a {@link StandardEnvironment}.
+     * @see #registerBean(Class, String, Class...)
+     */
+    public void setEnvironment(Environment environment) {
+        this.conditionEvaluator = new ConditionEvaluator(this.registry, environment, null);
     }
 
 

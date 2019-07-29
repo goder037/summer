@@ -89,7 +89,6 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
     /**
      * Default context class for FrameworkServlet.
-     * @see com.rocket.summer.framework.web.context.support.XmlWebApplicationContext
      */
     public static final Class DEFAULT_CONTEXT_CLASS = AnnotationConfigWebApplicationContext.class;
 
@@ -136,6 +135,50 @@ public abstract class FrameworkServlet extends HttpServletBean {
     /** Flag used to detect whether onRefresh has already been called */
     private boolean refreshEventReceived = false;
 
+
+    /**
+     * Create a new {@code FrameworkServlet} with the given web application context. This
+     * constructor is useful in Servlet 3.0+ environments where instance-based registration
+     * of servlets is possible through the {@link ServletContext#addServlet} API.
+     * <p>Using this constructor indicates that the following properties / init-params
+     * will be ignored:
+     * <ul>
+     * <li>{@link #setContextClass(Class)} / 'contextClass'</li>
+     * <li>{@link #setContextConfigLocation(String)} / 'contextConfigLocation'</li>
+     * <li>{@link #setContextAttribute(String)} / 'contextAttribute'</li>
+     * <li>{@link #setNamespace(String)} / 'namespace'</li>
+     * </ul>
+     * <p>The given web application context may or may not yet be {@linkplain
+     * ConfigurableApplicationContext#refresh() refreshed}. If it (a) is an implementation
+     * of {@link ConfigurableWebApplicationContext} and (b) has <strong>not</strong>
+     * already been refreshed (the recommended approach), then the following will occur:
+     * <ul>
+     * <li>If the given context does not already have a {@linkplain
+     * ConfigurableApplicationContext#setParent parent}, the root application context
+     * will be set as the parent.</li>
+     * <li>If the given context has not already been assigned an {@linkplain
+     * ConfigurableApplicationContext#setId id}, one will be assigned to it</li>
+     * <li>{@code ServletContext} and {@code ServletConfig} objects will be delegated to
+     * the application context</li>
+     * <li>{@link #postProcessWebApplicationContext} will be called</li>
+     * <li>Any {@link ApplicationContextInitializer}s specified through the
+     * "contextInitializerClasses" init-param or through the {@link
+     * #setContextInitializers} property will be applied.</li>
+     * <li>{@link ConfigurableApplicationContext#refresh refresh()} will be called</li>
+     * </ul>
+     * If the context has already been refreshed or does not implement
+     * {@code ConfigurableWebApplicationContext}, none of the above will occur under the
+     * assumption that the user has performed these actions (or not) per his or her
+     * specific needs.
+     * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+     * @param webApplicationContext the context to use
+     * @see #initWebApplicationContext
+     * @see #configureAndRefreshWebApplicationContext
+     * @see com.rocket.summer.framework.web.WebApplicationInitializer
+     */
+    public FrameworkServlet(WebApplicationContext webApplicationContext) {
+        this.webApplicationContext = webApplicationContext;
+    }
 
     /**
      * Set the name of the ServletContext attribute which should be used to retrieve the

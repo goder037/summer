@@ -22,6 +22,8 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
     protected final Log logger = LogFactory.getLog(getClass());
 
+    private boolean ignoreUnresolvableNestedPlaceholders = false;
+
     protected ConfigurableConversionService conversionService = new DefaultConversionService();
 
     private PropertyPlaceholderHelper nonStrictHelper;
@@ -134,6 +136,20 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
                 return getProperty(placeholderName);
             }
         });
+    }
+
+    /**
+     * Set whether to throw an exception when encountering an unresolvable placeholder
+     * nested within the value of a given property. A {@code false} value indicates strict
+     * resolution, i.e. that an exception will be thrown. A {@code true} value indicates
+     * that unresolvable nested placeholders should be passed through in their unresolved
+     * ${...} form.
+     * <p>The default is {@code false}.
+     * @since 3.2
+     */
+    @Override
+    public void setIgnoreUnresolvableNestedPlaceholders(boolean ignoreUnresolvableNestedPlaceholders) {
+        this.ignoreUnresolvableNestedPlaceholders = ignoreUnresolvableNestedPlaceholders;
     }
 
 }

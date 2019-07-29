@@ -1,6 +1,8 @@
 package com.rocket.summer.framework.beans.factory.support;
 
 import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
+import com.rocket.summer.framework.core.env.Environment;
+import com.rocket.summer.framework.core.env.EnvironmentCapable;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver;
@@ -24,7 +26,7 @@ import java.util.Set;
  * @see BeanDefinitionReaderUtils
  * @since 11.12.2003
  */
-public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader {
+public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable, BeanDefinitionReader {
 
     /**
      * Logger available to subclasses
@@ -36,6 +38,8 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     private ResourceLoader resourceLoader;
 
     private ClassLoader beanClassLoader;
+
+    private Environment environment;
 
     private BeanNameGenerator beanNameGenerator = new DefaultBeanNameGenerator();
 
@@ -62,6 +66,20 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
         else {
             this.resourceLoader = new PathMatchingResourcePatternResolver();
         }
+    }
+
+    @Override
+    public Environment getEnvironment() {
+        return this.environment;
+    }
+
+    /**
+     * Set the Environment to use when reading bean definitions. Most often used
+     * for evaluating profile information to determine which bean definitions
+     * should be read and which should be omitted.
+     */
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
     @Override

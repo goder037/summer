@@ -3,10 +3,7 @@ package com.rocket.summer.framework.validation;
 import com.rocket.summer.framework.beans.*;
 import com.rocket.summer.framework.core.MethodParameter;
 import com.rocket.summer.framework.core.convert.ConversionService;
-import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.ObjectUtils;
-import com.rocket.summer.framework.util.PatternMatchUtils;
-import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,6 +84,18 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 
     private Validator validator;
 
+    private static Class<?> javaUtilOptionalClass = null;
+
+    static {
+        try {
+            javaUtilOptionalClass =
+                    ClassUtils.forName("java.util.Optional", DataBinder.class.getClassLoader());
+        }
+        catch (ClassNotFoundException ex) {
+            // Java 8 not available - Optional references simply not supported then.
+        }
+    }
+
     private ConversionService conversionService;
 
     private SimpleTypeConverter typeConverter;
@@ -102,6 +111,8 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
     private String[] requiredFields;
 
     private String[] allowedFields;
+
+    private MessageCodesResolver messageCodesResolver;
 
     private boolean ignoreUnknownFields = true;
 
@@ -146,6 +157,25 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
     }
 
     /**
+     * Bind the given property values to this binder's target.
+     * <p>This call can create field errors, representing basic binding
+     * errors like a required field (code "required"), or type mismatch
+     * between value and bean property (code "typeMismatch").
+     * <p>Note that the given PropertyValues should be a throwaway instance:
+     * For efficiency, it will be modified to just contain allowed fields if it
+     * implements the MutablePropertyValues interface; else, an internal mutable
+     * copy will be created for this purpose. Pass in a copy of the PropertyValues
+     * if you want your original instance to stay unmodified in any case.
+     * @param pvs property values to bind
+     * @see #doBind(org.springframework.beans.MutablePropertyValues)
+     */
+    public void bind(PropertyValues pvs) {
+        MutablePropertyValues mpvs = (pvs instanceof MutablePropertyValues) ?
+                (MutablePropertyValues) pvs : new MutablePropertyValues(pvs);
+        doBind(mpvs);
+    }
+
+    /**
      * Create a new DataBinder instance.
      * @param target the target object to bind onto (or <code>null</code>
      * if the binder is just used to convert a plain parameter value)
@@ -166,6 +196,25 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
      */
     protected ConfigurablePropertyAccessor getPropertyAccessor() {
         return getInternalBindingResult().getPropertyAccessor();
+    }
+
+    /**
+     * Create the {@link AbstractPropertyBindingResult} instance using standard
+     * JavaBean property access.
+     * @since 4.2.1
+     */
+    protected AbstractPropertyBindingResult createBeanPropertyBindingResult() {
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(getTarget(),
+                getObjectName(), isAutoGrowNestedPaths(), getAutoGrowCollectionLimit());
+
+        if (this.conversionService != null) {
+            result.initConversion(this.conversionService);
+        }
+        if (this.messageCodesResolver != null) {
+            result.setMessageCodesResolver(this.messageCodesResolver);
+        }
+
+        return result;
     }
 
     /**
@@ -379,6 +428,48 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
         String[] disallowed = getDisallowedFields();
         return ((ObjectUtils.isEmpty(allowed) || PatternMatchUtils.simpleMatch(allowed, field)) &&
                 (ObjectUtils.isEmpty(disallowed) || !PatternMatchUtils.simpleMatch(disallowed, field)));
+    }
+
+    /**
+     * Set whether to ignore unknown fields, that is, whether to ignore bind
+     * parameters that do not have corresponding fields in the target object.
+     * <p>Default is "true". Turn this off to enforce that all bind parameters
+     * must have a matching field in the target object.
+     * <p>Note that this setting only applies to <i>binding</i> operations
+     * on this DataBinder, not to <i>retrieving</i> values via its
+     * {@link #getBindingResult() BindingResult}.
+     * @see #bind
+     */
+    public void setIgnoreUnknownFields(boolean ignoreUnknownFields) {
+        this.ignoreUnknownFields = ignoreUnknownFields;
+    }
+
+    /**
+     * Set whether to ignore invalid fields, that is, whether to ignore bind
+     * parameters that have corresponding fields in the target object which are
+     * not accessible (for example because of null values in the nested path).
+     * <p>Default is "false". Turn this on to ignore bind parameters for
+     * nested objects in non-existing parts of the target object graph.
+     * <p>Note that this setting only applies to <i>binding</i> operations
+     * on this DataBinder, not to <i>retrieving</i> values via its
+     * {@link #getBindingResult() BindingResult}.
+     * @see #bind
+     */
+    public void setIgnoreInvalidFields(boolean ignoreInvalidFields) {
+        this.ignoreInvalidFields = ignoreInvalidFields;
+    }
+
+    /**
+     * Specify the limit for array and collection auto-growing.
+     * <p>Default is 256, preventing OutOfMemoryErrors in case of large indexes.
+     * Raise this limit if your auto-growing needs are unusually high.
+     * @see #initBeanPropertyAccess()
+     * @see org.springframework.beans.BeanWrapper#setAutoGrowCollectionLimit
+     */
+    public void setAutoGrowCollectionLimit(int autoGrowCollectionLimit) {
+        Assert.state(this.bindingResult == null,
+                "DataBinder is already initialized - call setAutoGrowCollectionLimit before other configuration methods");
+        this.autoGrowCollectionLimit = autoGrowCollectionLimit;
     }
 
     /**

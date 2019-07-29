@@ -60,6 +60,17 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
     }
 
     /**
+     * Create a new PathMatchingResourcePatternResolver with a DefaultResourceLoader.
+     * @param classLoader the ClassLoader to load classpath resources with,
+     * or {@code null} for using the thread context class loader
+     * at the time of actual resource access
+     * @see org.springframework.core.io.DefaultResourceLoader
+     */
+    public PathMatchingResourcePatternResolver(ClassLoader classLoader) {
+        this.resourceLoader = new DefaultResourceLoader(classLoader);
+    }
+
+    /**
      * Return the ClassLoader that this pattern resolver works with
      * (never <code>null</code>).
      */

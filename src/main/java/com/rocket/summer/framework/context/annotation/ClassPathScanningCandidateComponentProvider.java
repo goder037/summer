@@ -4,6 +4,8 @@ import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
 import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.context.ResourceLoaderAware;
+import com.rocket.summer.framework.core.env.Environment;
+import com.rocket.summer.framework.core.env.StandardEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver;
@@ -59,6 +61,10 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
     private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
+    private Environment environment;
+
+    private ConditionEvaluator conditionEvaluator;
+
     private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
 
     private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
@@ -78,6 +84,17 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
         }
     }
 
+    /**
+     * Set the Environment to use when resolving placeholders and evaluating
+     * {@link Conditional @Conditional}-annotated component classes.
+     * <p>The default is a {@link StandardEnvironment}.
+     * @param environment the Environment to use
+     */
+    public void setEnvironment(Environment environment) {
+        Assert.notNull(environment, "Environment must not be null");
+        this.environment = environment;
+        this.conditionEvaluator = null;
+    }
 
     /**
      * Set the ResourceLoader to use for resource locations.

@@ -39,6 +39,25 @@ public class CachedIntrospectionResults {
     private static final Log logger = LogFactory.getLog(CachedIntrospectionResults.class);
 
     /**
+     * System property that instructs Spring to use the {@link Introspector#IGNORE_ALL_BEANINFO}
+     * mode when calling the JavaBeans {@link Introspector}: "spring.beaninfo.ignore", with a
+     * value of "true" skipping the search for {@code BeanInfo} classes (typically for scenarios
+     * where no such classes are being defined for beans in the application in the first place).
+     * <p>The default is "false", considering all {@code BeanInfo} metadata classes, like for
+     * standard {@link Introspector#getBeanInfo(Class)} calls. Consider switching this flag to
+     * "true" if you experience repeated ClassLoader access for non-existing {@code BeanInfo}
+     * classes, in case such access is expensive on startup or on lazy loading.
+     * <p>Note that such an effect may also indicate a scenario where caching doesn't work
+     * effectively: Prefer an arrangement where the Spring jars live in the same ClassLoader
+     * as the application classes, which allows for clean caching along with the application's
+     * lifecycle in any case. For a web application, consider declaring a local
+     * {@link org.springframework.web.util.IntrospectorCleanupListener} in {@code web.xml}
+     * in case of a multi-ClassLoader layout, which will allow for effective caching as well.
+     * @see Introspector#getBeanInfo(Class, int)
+     */
+    public static final String IGNORE_BEANINFO_PROPERTY_NAME = "spring.beaninfo.ignore";
+
+    /**
      * Set of ClassLoaders that this CachedIntrospectionResults class will always
      * accept classes from, even if the classes do not qualify as cache-safe.
      */

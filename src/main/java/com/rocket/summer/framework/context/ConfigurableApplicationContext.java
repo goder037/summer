@@ -2,6 +2,7 @@ package com.rocket.summer.framework.context;
 
 import com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 
 /**
  * SPI interface to be implemented by most if not all application contexts.
@@ -35,6 +36,21 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      */
     String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
 
+    /**
+     * Set the {@code Environment} for this application context.
+     * @param environment the new environment
+     * @since 3.1
+     */
+    void setEnvironment(ConfigurableEnvironment environment);
+
+
+    /**
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * @since 3.1
+     */
+    @Override
+    ConfigurableEnvironment getEnvironment();
 
     /**
      * Set the parent of this application context.
