@@ -1,6 +1,9 @@
 package com.rocket.summer.framework.core.type;
 
+import com.rocket.summer.framework.util.StringUtils;
+
 import java.lang.reflect.Modifier;
+import java.util.LinkedHashSet;
 
 /**
  * {@link ClassMetadata} implementation that uses standard reflection
@@ -76,4 +79,17 @@ public class StandardClassMetadata implements ClassMetadata {
         return ifcNames;
     }
 
+    @Override
+    public boolean isAnnotation() {
+        return this.introspectedClass.isAnnotation();
+    }
+
+    @Override
+    public String[] getMemberClassNames() {
+        LinkedHashSet<String> memberClassNames = new LinkedHashSet<String>(4);
+        for (Class<?> nestedClass : this.introspectedClass.getDeclaredClasses()) {
+            memberClassNames.add(nestedClass.getName());
+        }
+        return StringUtils.toStringArray(memberClassNames);
+    }
 }

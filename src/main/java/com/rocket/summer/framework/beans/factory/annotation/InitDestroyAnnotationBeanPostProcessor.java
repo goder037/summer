@@ -15,10 +15,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -158,6 +155,11 @@ public class InitDestroyAnnotationBeanPostProcessor
         }
     }
 
+    @Override
+    public boolean requiresDestruction(Object bean) {
+        return findLifecycleMetadata(bean.getClass()).hasDestroyMethods();
+    }
+
 
     private LifecycleMetadata findLifecycleMetadata(Class clazz) {
         if (this.lifecycleMetadataCache == null) {
@@ -213,6 +215,8 @@ public class InitDestroyAnnotationBeanPostProcessor
 
         private final Set<LifecycleElement> initMethods = new LinkedHashSet<LifecycleElement>();
 
+        private volatile Set<LifecycleElement> checkedDestroyMethods;
+
         private final Set<LifecycleElement> destroyMethods = new LinkedHashSet<LifecycleElement>();
 
         public void addInitMethod(Method method) {
@@ -253,6 +257,12 @@ public class InitDestroyAnnotationBeanPostProcessor
                     element.invoke(target);
                 }
             }
+        }
+
+        public boolean hasDestroyMethods() {
+            Collection<LifecycleElement> destroyMethodsToUse =
+                    (this.checkedDestroyMethods != null ? this.checkedDestroyMethods : this.destroyMethods);
+            return !destroyMethodsToUse.isEmpty();
         }
     }
 

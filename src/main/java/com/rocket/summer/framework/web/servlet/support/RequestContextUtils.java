@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.web.servlet.support;
 
+import com.rocket.summer.framework.web.context.ContextLoader;
 import com.rocket.summer.framework.web.context.WebApplicationContext;
 import com.rocket.summer.framework.web.context.support.WebApplicationContextUtils;
 import com.rocket.summer.framework.web.servlet.*;
@@ -27,6 +28,13 @@ import java.util.Map;
 public abstract class RequestContextUtils {
 
     /**
+     * The name of the bean to use to look up in an implementation of
+     * {@link RequestDataValueProcessor} has been configured.
+     * @since 4.2.1
+     */
+    public static final String REQUEST_DATA_VALUE_PROCESSOR_BEAN_NAME = "requestDataValueProcessor";
+
+    /**
      * Look for the WebApplicationContext associated with the DispatcherServlet
      * that has initiated request processing.
      * @param request current HTTP request
@@ -37,6 +45,38 @@ public abstract class RequestContextUtils {
             throws IllegalStateException {
 
         return getWebApplicationContext(request, null);
+    }
+
+    /**
+     * Look for the WebApplicationContext associated with the DispatcherServlet
+     * that has initiated request processing, and for the global context if none
+     * was found associated with the current request. The global context will
+     * be found via the ServletContext or via ContextLoader's current context.
+     * <p>NOTE: This variant remains compatible with Servlet 2.5, explicitly
+     * checking a given ServletContext instead of deriving it from the request.
+     * @param request current HTTP request
+     * @param servletContext current servlet context
+     * @return the request-specific WebApplicationContext, or the global one
+     * if no request-specific context has been found, or {@code null} if none
+     * @since 4.2.1
+     * @see DispatcherServlet#WEB_APPLICATION_CONTEXT_ATTRIBUTE
+     * @see WebApplicationContextUtils#getWebApplicationContext(ServletContext)
+     * @see ContextLoader#getCurrentWebApplicationContext()
+     */
+    public static WebApplicationContext findWebApplicationContext(
+            HttpServletRequest request, ServletContext servletContext) {
+
+        WebApplicationContext webApplicationContext = (WebApplicationContext) request.getAttribute(
+                DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        if (webApplicationContext == null) {
+            if (servletContext != null) {
+                webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            }
+            if (webApplicationContext == null) {
+                webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+            }
+        }
+        return webApplicationContext;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.core.type.classreading;
 
+import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.MethodMetadata;
 import com.rocket.summer.framework.util.CollectionUtils;
@@ -7,10 +8,7 @@ import com.rocket.summer.framework.util.LinkedMultiValueMap;
 import com.rocket.summer.framework.util.MultiValueMap;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.EmptyVisitor;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -24,7 +22,15 @@ import java.util.*;
  */
 class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor implements AnnotationMetadata {
 
-    private final Map<String, Map<String, Object>> attributesMap = new LinkedHashMap<>();
+    /**
+     * Declared as a {@link LinkedMultiValueMap} instead of a {@link MultiValueMap}
+     * to ensure that the hierarchical ordering of the entries is preserved.
+     * @see AnnotationReadingVisitorUtils#getMergedAnnotationAttributes
+     */
+    protected final LinkedMultiValueMap<String, AnnotationAttributes> attributesMap =
+            new LinkedMultiValueMap<String, AnnotationAttributes>(4);
+
+    protected final Set<String> annotationSet = new LinkedHashSet<String>(4);
 
     private final Map<String, Set<String>> metaAnnotationMap = new LinkedHashMap<>();
 
@@ -40,40 +46,11 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
     }
 
     @Override
-    public AnnotationVisitor visitAnnotation(final String desc, boolean visible) {
-        final String className = Type.getType(desc).getClassName();
-        final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-        return new EmptyVisitor() {
-            public void visit(String name, Object value) {
-                // Explicitly defined annotation attribute value.
-                attributes.put(name, value);
-            }
-            public void visitEnd() {
-                try {
-                    Class annotationClass = classLoader.loadClass(className);
-                    // Check declared default values of attributes in the annotation type.
-                    Method[] annotationAttributes = annotationClass.getMethods();
-                    for (Method annotationAttribute : annotationAttributes) {
-                        String attributeName = annotationAttribute.getName();
-                        Object defaultValue = annotationAttribute.getDefaultValue();
-                        if (defaultValue != null && !attributes.containsKey(attributeName)) {
-                            attributes.put(attributeName, defaultValue);
-                        }
-                    }
-                    // Register annotations that the annotation type is annotated with.
-                    Annotation[] metaAnnotations = annotationClass.getAnnotations();
-                    Set<String> metaAnnotationTypeNames = new HashSet<>();
-                    for (Annotation metaAnnotation : metaAnnotations) {
-                        metaAnnotationTypeNames.add(metaAnnotation.annotationType().getName());
-                    }
-                    metaAnnotationMap.put(className, metaAnnotationTypeNames);
-                }
-                catch (ClassNotFoundException ex) {
-                    // Class not found - can't determine meta-annotations.
-                }
-                attributesMap.put(className, attributes);
-            }
-        };
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        String className = Type.getType(desc).getClassName();
+        this.annotationSet.add(className);
+        return new AnnotationAttributesReadingVisitor(
+                className, this.attributesMap, this.metaAnnotationMap, this.classLoader);
     }
 
 
@@ -136,6 +113,27 @@ class AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor imple
             }
         }
         return result;
+    }
+
+    @Override
+    public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName) {
+        return getAllAnnotationAttributes(annotationName, false);
+    }
+
+    @Override
+    public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName, boolean classValuesAsString) {
+        MultiValueMap<String, Object> allAttributes = new LinkedMultiValueMap<String, Object>();
+        List<AnnotationAttributes> attributes = this.attributesMap.get(annotationName);
+        if (attributes == null) {
+            return null;
+        }
+        for (AnnotationAttributes raw : attributes) {
+            for (Map.Entry<String, Object> entry : AnnotationReadingVisitorUtils.convertClassValues(
+                    "class '" + getClassName() + "'", this.classLoader, raw, classValuesAsString).entrySet()) {
+                allAttributes.add(entry.getKey(), entry.getValue());
+            }
+        }
+        return allAttributes;
     }
 
     @Override

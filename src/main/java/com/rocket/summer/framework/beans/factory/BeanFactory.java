@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans.factory;
 
 import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.core.ResolvableType;
 
 /**
  * The root interface for accessing a Spring bean container.
@@ -210,23 +211,6 @@ public interface BeanFactory {
     boolean isPrototype(String name) throws NoSuchBeanDefinitionException;
 
     /**
-     * Check whether the bean with the given name matches the specified type.
-     * More specifically, check whether a {@link #getBean} call for the given name
-     * would return an object that is assignable to the specified target type.
-     * <p>Translates aliases back to the corresponding canonical bean name.
-     * Will ask the parent factory if the bean cannot be found in this factory instance.
-     * @param name the name of the bean to query
-     * @param targetType the type to match against
-     * @return <code>true</code> if the bean type matches,
-     * <code>false</code> if it doesn't match or cannot be determined yet
-     * @throws NoSuchBeanDefinitionException if there is no bean with the given name
-     * @since 2.0.1
-     * @see #getBean
-     * @see #getType
-     */
-    boolean isTypeMatch(String name, Class targetType) throws NoSuchBeanDefinitionException;
-
-    /**
      * Determine the type of the bean with the given name. More specifically,
      * determine the type of object that {@link #getBean} would return for the given name.
      * <p>For a {@link FactoryBean}, return the type of object that the FactoryBean creates,
@@ -254,6 +238,40 @@ public interface BeanFactory {
      * @see #getBean
      */
     String[] getAliases(String name);
+
+    /**
+     * Check whether the bean with the given name matches the specified type.
+     * More specifically, check whether a {@link #getBean} call for the given name
+     * would return an object that is assignable to the specified target type.
+     * <p>Translates aliases back to the corresponding canonical bean name.
+     * Will ask the parent factory if the bean cannot be found in this factory instance.
+     * @param name the name of the bean to query
+     * @param typeToMatch the type to match against (as a {@code ResolvableType})
+     * @return {@code true} if the bean type matches,
+     * {@code false} if it doesn't match or cannot be determined yet
+     * @throws NoSuchBeanDefinitionException if there is no bean with the given name
+     * @since 4.2
+     * @see #getBean
+     * @see #getType
+     */
+    boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException;
+
+    /**
+     * Check whether the bean with the given name matches the specified type.
+     * More specifically, check whether a {@link #getBean} call for the given name
+     * would return an object that is assignable to the specified target type.
+     * <p>Translates aliases back to the corresponding canonical bean name.
+     * Will ask the parent factory if the bean cannot be found in this factory instance.
+     * @param name the name of the bean to query
+     * @param typeToMatch the type to match against (as a {@code Class})
+     * @return {@code true} if the bean type matches,
+     * {@code false} if it doesn't match or cannot be determined yet
+     * @throws NoSuchBeanDefinitionException if there is no bean with the given name
+     * @since 2.0.1
+     * @see #getBean
+     * @see #getType
+     */
+    boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException;
 
 }
 

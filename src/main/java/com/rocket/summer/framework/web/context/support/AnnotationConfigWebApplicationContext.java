@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.web.context.support;
 
+import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
@@ -7,6 +8,7 @@ import com.rocket.summer.framework.context.annotation.AnnotatedBeanDefinitionRea
 import com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner;
 import com.rocket.summer.framework.context.annotation.Configuration;
 import com.rocket.summer.framework.context.annotation.ScopeMetadataResolver;
+import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
 
@@ -148,10 +150,8 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
     }
 
     @Override
-    public ConfigurableWebEnvironment getEnvironment() {
-        return null;
+    public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+        return false;
     }
-
-
 }
 

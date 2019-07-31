@@ -72,6 +72,20 @@ public class UrlPathHelper {
     }
 
     /**
+     * Return the servlet path for the given request, detecting an include request
+     * URL if called within a RequestDispatcher include.
+     * @param request current HTTP request
+     * @return the servlet path
+     */
+    public String getOriginatingServletPath(HttpServletRequest request) {
+        String servletPath = (String) request.getAttribute(WebUtils.FORWARD_SERVLET_PATH_ATTRIBUTE);
+        if (servletPath == null) {
+            servletPath = request.getServletPath();
+        }
+        return servletPath;
+    }
+
+    /**
      * Set the default character encoding to use for URL decoding.
      * Default is ISO-8859-1, according to the Servlet spec.
      * <p>If the request specifies a character encoding itself, the request

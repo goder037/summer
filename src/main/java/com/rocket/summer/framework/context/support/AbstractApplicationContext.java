@@ -29,6 +29,7 @@ import com.rocket.summer.framework.core.OrderComparator;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.PriorityOrdered;
 import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
+import com.rocket.summer.framework.core.env.StandardEnvironment;
 import com.rocket.summer.framework.core.io.DefaultResourceLoader;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
@@ -169,11 +170,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         this.resourcePatternResolver = getResourcePatternResolver();
     }
 
-    public ConfigurableEnvironment getEnvironment() {
-        return this.environment;
-    }
-
-
     //---------------------------------------------------------------------
     // Implementation of ApplicationContext interface
     //---------------------------------------------------------------------
@@ -229,6 +225,43 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      */
     public long getStartupDate() {
         return this.startupDate;
+    }
+
+    /**
+     * Set the {@code Environment} for this application context.
+     * <p>Default value is determined by {@link #createEnvironment()}. Replacing the
+     * default with this method is one option but configuration through {@link
+     * #getEnvironment()} should also be considered. In either case, such modifications
+     * should be performed <em>before</em> {@link #refresh()}.
+     * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#createEnvironment
+     */
+    @Override
+    public void setEnvironment(ConfigurableEnvironment environment) {
+        this.environment = environment;
+    }
+
+
+    /**
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * <p>If none specified, a default environment will be initialized via
+     * {@link #createEnvironment()}.
+     */
+    @Override
+    public ConfigurableEnvironment getEnvironment() {
+        if (this.environment == null) {
+            this.environment = createEnvironment();
+        }
+        return this.environment;
+    }
+
+    /**
+     * Create and return a new {@link StandardEnvironment}.
+     * <p>Subclasses may override this method in order to supply
+     * a custom {@link ConfigurableEnvironment} implementation.
+     */
+    protected ConfigurableEnvironment createEnvironment() {
+        return new StandardEnvironment();
     }
 
     /**
@@ -416,7 +449,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         beanFactory.setBeanClassLoader(getClassLoader());
 
         // Populate the bean factory with context-specific resource editors.
-        beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this));
+        beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
         // Configure the bean factory with context callbacks.
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));

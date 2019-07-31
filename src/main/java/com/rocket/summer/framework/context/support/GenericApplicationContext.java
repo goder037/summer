@@ -7,6 +7,8 @@ import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBean
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.core.ResolvableType;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
@@ -62,7 +64,6 @@ import java.io.IOException;
  * @since 1.1.2
  * @see #registerBeanDefinition
  * @see #refresh()
- * @see com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader
  * @see com.rocket.summer.framework.beans.factory.support.PropertiesBeanDefinitionReader
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
@@ -116,7 +117,6 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
         this(beanFactory);
         setParent(parent);
     }
-
 
     /**
      * Set the parent of this application context, also setting
@@ -256,5 +256,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
         return this.beanFactory.isAlias(beanName);
     }
 
+    @Override
+    public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+        return false;
+    }
 }
 

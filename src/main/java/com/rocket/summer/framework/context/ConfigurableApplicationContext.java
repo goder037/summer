@@ -4,6 +4,8 @@ import com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 
+import java.io.Closeable;
+
 /**
  * SPI interface to be implemented by most if not all application contexts.
  * Provides facilities to configure an application context in addition
@@ -17,7 +19,7 @@ import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
  * @author Juergen Hoeller
  * @since 03.11.2003
  */
-public interface ConfigurableApplicationContext extends ApplicationContext, Lifecycle {
+public interface ConfigurableApplicationContext extends ApplicationContext, Lifecycle, Closeable {
 
     /**
      * Any number of these characters are considered delimiters between

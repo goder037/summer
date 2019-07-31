@@ -310,21 +310,16 @@ class TypeConverterDelegate {
     /**
      * Convert the value to the required type (if necessary from a String),
      * using the given property editor.
-     * @param oldValue the previous value, if available (may be <code>null</code>)
+     * @param oldValue the previous value, if available (may be {@code null})
      * @param newValue the proposed new value
      * @param requiredType the type we must convert to
-     * (or <code>null</code> if not known, for example in case of a collection element)
+     * (or {@code null} if not known, for example in case of a collection element)
      * @param editor the PropertyEditor to use
      * @return the new value, possibly the result of type conversion
      * @throws IllegalArgumentException if type conversion failed
      */
     private Object doConvertValue(Object oldValue, Object newValue, Class<?> requiredType, PropertyEditor editor) {
         Object convertedValue = newValue;
-        boolean sharedEditor = false;
-
-        if (editor != null) {
-            sharedEditor = this.propertyEditorRegistry.isSharedEditor(editor);
-        }
 
         if (editor != null && !(convertedValue instanceof String)) {
             // Not a String -> use PropertyEditor's setValue.
@@ -332,19 +327,8 @@ class TypeConverterDelegate {
             // we just want to allow special PropertyEditors to override setValue
             // for type conversion from non-String values to the required type.
             try {
-                Object newConvertedValue;
-                if (sharedEditor) {
-                    // Synchronized access to shared editor instance.
-                    synchronized (editor) {
-                        editor.setValue(convertedValue);
-                        newConvertedValue = editor.getValue();
-                    }
-                }
-                else {
-                    // Unsynchronized access to non-shared editor instance.
-                    editor.setValue(convertedValue);
-                    newConvertedValue = editor.getValue();
-                }
+                editor.setValue(convertedValue);
+                Object newConvertedValue = editor.getValue();
                 if (newConvertedValue != convertedValue) {
                     convertedValue = newConvertedValue;
                     // Reset PropertyEditor: It already did a proper conversion.
@@ -379,18 +363,9 @@ class TypeConverterDelegate {
                     logger.trace("Converting String to [" + requiredType + "] using property editor [" + editor + "]");
                 }
                 String newTextValue = (String) convertedValue;
-                if (sharedEditor) {
-                    // Synchronized access to shared editor instance.
-                    synchronized (editor) {
-                        return doConvertTextValue(oldValue, newTextValue, editor);
-                    }
-                }
-                else {
-                    // Unsynchronized access to non-shared editor instance.
-                    return doConvertTextValue(oldValue, newTextValue, editor);
-                }
+                return doConvertTextValue(oldValue, newTextValue, editor);
             }
-            else if (String.class.equals(requiredType)) {
+            else if (String.class == requiredType) {
                 returnValue = convertedValue;
             }
         }
