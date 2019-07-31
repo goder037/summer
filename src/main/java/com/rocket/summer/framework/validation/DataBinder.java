@@ -167,7 +167,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
      * copy will be created for this purpose. Pass in a copy of the PropertyValues
      * if you want your original instance to stay unmodified in any case.
      * @param pvs property values to bind
-     * @see #doBind(org.springframework.beans.MutablePropertyValues)
+     * @see #doBind(com.rocket.summer.framework.beans.MutablePropertyValues)
      */
     public void bind(PropertyValues pvs) {
         MutablePropertyValues mpvs = (pvs instanceof MutablePropertyValues) ?
@@ -464,7 +464,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
      * <p>Default is 256, preventing OutOfMemoryErrors in case of large indexes.
      * Raise this limit if your auto-growing needs are unusually high.
      * @see #initBeanPropertyAccess()
-     * @see org.springframework.beans.BeanWrapper#setAutoGrowCollectionLimit
+     * @see com.rocket.summer.framework.beans.BeanWrapper#setAutoGrowCollectionLimit
      */
     public void setAutoGrowCollectionLimit(int autoGrowCollectionLimit) {
         Assert.state(this.bindingResult == null,

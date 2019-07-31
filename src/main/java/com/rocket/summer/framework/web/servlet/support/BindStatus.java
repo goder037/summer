@@ -4,6 +4,7 @@ import com.rocket.summer.framework.beans.BeanWrapper;
 import com.rocket.summer.framework.beans.PropertyAccessorFactory;
 import com.rocket.summer.framework.context.NoSuchMessageException;
 import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.validation.BindingResult;
 import com.rocket.summer.framework.validation.Errors;
 import com.rocket.summer.framework.validation.ObjectError;
 import com.rocket.summer.framework.web.util.HtmlUtils;

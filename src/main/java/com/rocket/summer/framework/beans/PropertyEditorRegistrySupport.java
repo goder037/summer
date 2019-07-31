@@ -103,7 +103,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
     /**
      * Activate config value editors which are only intended for configuration purposes,
-     * such as {@link org.springframework.beans.propertyeditors.StringArrayPropertyEditor}.
+     * such as {@link com.rocket.summer.framework.beans.propertyeditors.StringArrayPropertyEditor}.
      * <p>Those editors are not registered by default simply because they are in
      * general inappropriate for data binding purposes. Of course, you may register
      * them individually in any case, through {@link #registerCustomEditor}.

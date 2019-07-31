@@ -6,7 +6,7 @@ package com.rocket.summer.framework.boot.autoconfigure;
  * of auto-configuration classes before their bytecode is even read.
  * <p>
  * An {@link AutoConfigurationImportFilter} may implement any of the following
- * {@link org.springframework.beans.factory.Aware Aware} interfaces, and their respective
+ * {@link com.rocket.summer.framework.beans.factory.Aware Aware} interfaces, and their respective
  * methods will be called prior to {@link #match}:
  * <ul>
  * <li>{@link EnvironmentAware}</li>

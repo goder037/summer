@@ -292,11 +292,11 @@ public class DispatcherServlet extends FrameworkServlet {
      * If the context has already been refreshed, none of the above will occur, under the
      * assumption that the user has performed these actions (or not) per their specific
      * needs.
-     * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+     * <p>See {@link com.rocket.summer.framework.web.WebApplicationInitializer} for usage examples.
      * @param webApplicationContext the context to use
      * @see #initWebApplicationContext
      * @see #configureAndRefreshWebApplicationContext
-     * @see org.springframework.web.WebApplicationInitializer
+     * @see com.rocket.summer.framework.web.WebApplicationInitializer
      */
     public DispatcherServlet(WebApplicationContext webApplicationContext) {
         super(webApplicationContext);

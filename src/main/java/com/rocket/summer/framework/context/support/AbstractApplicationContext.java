@@ -175,6 +175,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     //---------------------------------------------------------------------
 
     /**
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * <p>If none specified, a default environment will be initialized via
+     * {@link #createEnvironment()}.
+     */
+    @Override
+    public ConfigurableEnvironment getEnvironment() {
+        if (this.environment == null) {
+            this.environment = createEnvironment();
+        }
+        return this.environment;
+    }
+
+    /**
      * Set the unique id of this application context.
      * <p>Default is the object id of the context instance, or the name
      * of the context bean if the context is itself defined as a bean.
@@ -228,6 +242,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     }
 
     /**
+     * <p>Replace any stub property sources with actual instances.
+     * @see com.rocket.summer.framework.core.env.PropertySource.StubPropertySource
+     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#initServletPropertySources
+     */
+    protected void initPropertySources() {
+        // For subclasses: do nothing by default.
+    }
+
+    @Override
+    public String getApplicationName() {
+        return "";
+    }
+
+    /**
      * Set the {@code Environment} for this application context.
      * <p>Default value is determined by {@link #createEnvironment()}. Replacing the
      * default with this method is one option but configuration through {@link
@@ -238,21 +266,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     @Override
     public void setEnvironment(ConfigurableEnvironment environment) {
         this.environment = environment;
-    }
-
-
-    /**
-     * Return the {@code Environment} for this application context in configurable
-     * form, allowing for further customization.
-     * <p>If none specified, a default environment will be initialized via
-     * {@link #createEnvironment()}.
-     */
-    @Override
-    public ConfigurableEnvironment getEnvironment() {
-        if (this.environment == null) {
-            this.environment = createEnvironment();
-        }
-        return this.environment;
     }
 
     /**

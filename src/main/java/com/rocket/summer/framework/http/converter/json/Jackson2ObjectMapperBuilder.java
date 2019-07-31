@@ -9,6 +9,13 @@ import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.beans.FatalBeanException;
+import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.util.*;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLResolver;

@@ -33,7 +33,7 @@ import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
 class SharedMetadataReaderFactoryContextInitializer
         implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    public static final String BEAN_NAME = "org.springframework.boot.autoconfigure."
+    public static final String BEAN_NAME = "com.rocket.summer.framework.boot.autoconfigure."
             + "internalCachingMetadataReaderFactory";
 
     @Override

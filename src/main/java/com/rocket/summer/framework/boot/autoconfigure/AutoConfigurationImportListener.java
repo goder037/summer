@@ -7,7 +7,7 @@ import java.util.EventListener;
  * imported auto-configurations.
  * <p>
  * An {@link AutoConfigurationImportListener} may implement any of the following
- * {@link org.springframework.beans.factory.Aware Aware} interfaces, and their respective
+ * {@link com.rocket.summer.framework.beans.factory.Aware Aware} interfaces, and their respective
  * methods will be called prior to
  * {@link #onAutoConfigurationImportEvent(AutoConfigurationImportEvent)}:
  * <ul>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.rocket.summer.framework.http.converter.json.Jackson2ObjectMapperBuilder;
 import com.rocket.summer.framework.http.converter.json.MappingJacksonValue;
 import com.rocket.summer.framework.util.CollectionUtils;
 import com.rocket.summer.framework.util.StringUtils;

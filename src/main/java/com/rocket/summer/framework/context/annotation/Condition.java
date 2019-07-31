@@ -26,8 +26,8 @@ public interface Condition {
     /**
      * Determine if the condition matches.
      * @param context the condition context
-     * @param metadata metadata of the {@link org.springframework.core.type.AnnotationMetadata class}
-     * or {@link org.springframework.core.type.MethodMetadata method} being checked.
+     * @param metadata metadata of the {@link com.rocket.summer.framework.core.type.AnnotationMetadata class}
+     * or {@link com.rocket.summer.framework.core.type.MethodMetadata method} being checked.
      * @return {@code true} if the condition matches and the component can be registered
      * or {@code false} to veto registration.
      */

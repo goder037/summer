@@ -8,13 +8,13 @@ import com.rocket.summer.framework.core.type.AnnotationMetadata;
  * more annotation attributes.
  *
  * <p>An {@link ImportSelector} may implement any of the following
- * {@link org.springframework.beans.factory.Aware Aware} interfaces,
+ * {@link com.rocket.summer.framework.beans.factory.Aware Aware} interfaces,
  * and their respective methods will be called prior to {@link #selectImports}:
  * <ul>
- * <li>{@link org.springframework.context.EnvironmentAware EnvironmentAware}</li>
- * <li>{@link org.springframework.beans.factory.BeanFactoryAware BeanFactoryAware}</li>
- * <li>{@link org.springframework.beans.factory.BeanClassLoaderAware BeanClassLoaderAware}</li>
- * <li>{@link org.springframework.context.ResourceLoaderAware ResourceLoaderAware}</li>
+ * <li>{@link com.rocket.summer.framework.context.EnvironmentAware EnvironmentAware}</li>
+ * <li>{@link com.rocket.summer.framework.beans.factory.BeanFactoryAware BeanFactoryAware}</li>
+ * <li>{@link com.rocket.summer.framework.beans.factory.BeanClassLoaderAware BeanClassLoaderAware}</li>
+ * <li>{@link com.rocket.summer.framework.context.ResourceLoaderAware ResourceLoaderAware}</li>
  * </ul>
  *
  * <p>{@code ImportSelector} implementations are usually processed in the same way

@@ -17,7 +17,7 @@ public enum FilterType {
 
     /**
      * Filter candidates marked with a given annotation.
-     * @see org.springframework.core.type.filter.AnnotationTypeFilter
+     * @see com.rocket.summer.framework.core.type.filter.AnnotationTypeFilter
      */
     ANNOTATION,
 
@@ -28,7 +28,7 @@ public enum FilterType {
     ASSIGNABLE_TYPE,
 
     /** Filter candidates using a given custom
-     * {@link org.springframework.core.type.filter.TypeFilter} implementation
+     * {@link com.rocket.summer.framework.core.type.filter.TypeFilter} implementation
      */
     CUSTOM
 

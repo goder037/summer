@@ -53,6 +53,12 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	String getDisplayName();
 
 	/**
+	 * Return a name for the deployed application that this context belongs to.
+	 * @return a name for the deployed application, or the empty String by default
+	 */
+	String getApplicationName();
+
+	/**
 	 * Return the timestamp when this context was first loaded.
 	 * @return the timestamp (ms) when this context was first loaded
 	 */

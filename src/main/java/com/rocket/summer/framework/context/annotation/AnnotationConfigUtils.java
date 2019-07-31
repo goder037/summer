@@ -44,7 +44,7 @@ public class AnnotationConfigUtils {
      * @since 3.1.1
      */
     public static final String CONFIGURATION_BEAN_NAME_GENERATOR =
-            "org.springframework.context.annotation.internalConfigurationBeanNameGenerator";
+            "com.rocket.summer.framework.context.annotation.internalConfigurationBeanNameGenerator";
 
     /**
      * The bean name of the internally managed Autowired annotation processor.

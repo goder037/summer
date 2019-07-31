@@ -21,8 +21,8 @@ import java.io.IOException;
  * @author Juergen Hoeller
  * @since 4.2
  * @see java.io.Reader
- * @see org.springframework.core.io.ResourceEditor
- * @see org.springframework.core.io.ResourceLoader
+ * @see com.rocket.summer.framework.core.io.ResourceEditor
+ * @see com.rocket.summer.framework.core.io.ResourceLoader
  * @see InputStreamEditor
  */
 public class ReaderEditor extends PropertyEditorSupport {
