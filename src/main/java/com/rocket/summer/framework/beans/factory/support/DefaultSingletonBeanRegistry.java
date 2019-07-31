@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generic registry for shared bean instances, implementing the
@@ -81,8 +82,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
     /** Map between containing bean names: bean name --> Set of bean names that the bean contains */
     private final Map containedBeanMap = CollectionFactory.createConcurrentMapIfPossible(16);
 
+    /** Names of beans currently excluded from in creation checks */
+    private final Set<String> inCreationCheckExclusions =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(16));
+
     /** Map between dependent bean names: bean name --> Set of dependent bean names */
-    private final Map dependentBeanMap = CollectionFactory.createConcurrentMapIfPossible(16);
+    /** Map between dependent bean names: bean name --> Set of dependent bean names */
+    private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
 
     /** Map between depending bean names: bean name --> Set of bean names for the bean's dependencies */
     private final Map dependenciesForBeanMap = CollectionFactory.createConcurrentMapIfPossible(16);
@@ -116,6 +122,43 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
     }
 
     /**
+     * Determine whether the specified dependent bean has been registered as
+     * dependent on the given bean or on any of its transitive dependencies.
+     * @param beanName the name of the bean to check
+     * @param dependentBeanName the name of the dependent bean
+     * @since 4.0
+     */
+    protected boolean isDependent(String beanName, String dependentBeanName) {
+        synchronized (this.dependentBeanMap) {
+            return isDependent(beanName, dependentBeanName, null);
+        }
+    }
+
+    private boolean isDependent(String beanName, String dependentBeanName, Set<String> alreadySeen) {
+        if (alreadySeen != null && alreadySeen.contains(beanName)) {
+            return false;
+        }
+        String canonicalName = canonicalName(beanName);
+        Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
+        if (dependentBeans == null) {
+            return false;
+        }
+        if (dependentBeans.contains(dependentBeanName)) {
+            return true;
+        }
+        for (String transitiveDependency : dependentBeans) {
+            if (alreadySeen == null) {
+                alreadySeen = new HashSet<String>();
+            }
+            alreadySeen.add(beanName);
+            if (isDependent(transitiveDependency, dependentBeanName, alreadySeen)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Add the given singleton factory for building the specified singleton
      * if necessary.
      * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -132,6 +175,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
                 this.registeredSingletons.add(beanName);
             }
         }
+    }
+
+    public boolean isCurrentlyInCreation(String beanName) {
+        Assert.notNull(beanName, "Bean name must not be null");
+        return (!this.inCreationCheckExclusions.contains(beanName) && isActuallyInCreation(beanName));
+    }
+
+    protected boolean isActuallyInCreation(String beanName) {
+        return isSingletonCurrentlyInCreation(beanName);
     }
 
     public Object getSingleton(String beanName) {

@@ -84,6 +84,31 @@ public abstract class ObjectUtils {
 	}
 
 	/**
+	 * Append the given object to the given array, returning a new array
+	 * consisting of the input array contents plus the given object.
+	 * @param array the array to append to (can be {@code null})
+	 * @param obj the object to append
+	 * @return the new array (of the same component type; never {@code null})
+	 */
+	public static <A, O extends A> A[] addObjectToArray(A[] array, O obj) {
+		Class<?> compType = Object.class;
+		if (array != null) {
+			compType = array.getClass().getComponentType();
+		}
+		else if (obj != null) {
+			compType = obj.getClass();
+		}
+		int newArrLength = (array != null ? array.length + 1 : 1);
+		@SuppressWarnings("unchecked")
+		A[] newArr = (A[]) Array.newInstance(compType, newArrLength);
+		if (array != null) {
+			System.arraycopy(array, 0, newArr, 0, array.length);
+		}
+		newArr[newArr.length - 1] = obj;
+		return newArr;
+	}
+
+	/**
 	 * Return a content-based String representation if <code>obj</code> is
 	 * not <code>null</code>; otherwise returns an empty String.
 	 * <p>Differs from {@link #nullSafeToString(Object)} in that it returns

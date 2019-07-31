@@ -38,6 +38,8 @@ public class MethodParameter {
 
     private int nestingLevel = 1;
 
+    private volatile Class<?> containingClass;
+
     /** Map from Integer level to Integer type index */
     Map<Integer, Integer> typeIndexesPerLevel;
 
@@ -45,6 +47,12 @@ public class MethodParameter {
 
     private int hash = 0;
 
+    /**
+     * Set a containing class to resolve the parameter type against.
+     */
+    void setContainingClass(Class<?> containingClass) {
+        this.containingClass = containingClass;
+    }
 
     /**
      * Create a new MethodParameter for the given method, with nesting level 1.
@@ -119,6 +127,9 @@ public class MethodParameter {
         this.hash = original.hash;
     }
 
+    public Class<?> getContainingClass() {
+        return (this.containingClass != null ? this.containingClass : getDeclaringClass());
+    }
 
     /**
      * Return the wrapped Method, if any.

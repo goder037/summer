@@ -682,9 +682,4 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public void setAllowEagerClassLoading(boolean allowEagerClassLoading) {
         this.allowEagerClassLoading = allowEagerClassLoading;
     }
-
-    @Override
-    public String resolveEmbeddedValue(String value) {
-        return null;
-    }
 }

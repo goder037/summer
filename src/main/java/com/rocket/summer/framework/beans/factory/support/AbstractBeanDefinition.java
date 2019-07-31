@@ -10,6 +10,7 @@ import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -47,6 +48,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      * @see #setAutowireMode
      */
     public static final int AUTOWIRE_AUTODETECT = AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT;
+
+    /**
+     * Constant that indicates the container should attempt to infer the
+     * {@link #setDestroyMethodName destroy method name} for a bean as opposed to
+     * explicit specification of a method name. The value {@value} is specifically
+     * designed to include characters otherwise illegal in a method name, ensuring
+     * no possibility of collisions with legitimately named methods having the same
+     * name.
+     * <p>Currently, the method names detected during destroy method inference
+     * are "close" and "shutdown", if present on the specific bean class.
+     */
+    public static final String INFER_METHOD = "(inferred)";
 
 
     /**
@@ -87,6 +100,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     private boolean prototype = false;
 
+    private boolean nonPublicAccessAllowed = true;
+
     private boolean abstractFlag = false;
 
     private boolean lazyInit = false;
@@ -125,6 +140,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     private Resource resource;
 
+    private boolean lenientConstructorResolution = true;
+
     /**
      * Create a new AbstractBeanDefinition with default settings.
      */
@@ -141,6 +158,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         setConstructorArgumentValues(cargs);
         setPropertyValues(pvs);
     }
+
     /**
      * Create a new AbstractBeanDefinition as deep copy of the given
      * bean definition.
@@ -183,6 +201,119 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
             setResourceDescription(original.getResourceDescription());
         }
     }
+
+    /**
+     * Return whether to allow access to non-public constructors and methods.
+     */
+    public boolean isNonPublicAccessAllowed() {
+        return this.nonPublicAccessAllowed;
+    }
+
+    /**
+     * Override settings in this bean definition (presumably a copied parent
+     * from a parent-child inheritance relationship) from the given bean
+     * definition (presumably the child).
+     * <ul>
+     * <li>Will override beanClass if specified in the given bean definition.
+     * <li>Will always take {@code abstract}, {@code scope},
+     * {@code lazyInit}, {@code autowireMode}, {@code dependencyCheck},
+     * and {@code dependsOn} from the given bean definition.
+     * <li>Will add {@code constructorArgumentValues}, {@code propertyValues},
+     * {@code methodOverrides} from the given bean definition to existing ones.
+     * <li>Will override {@code factoryBeanName}, {@code factoryMethodName},
+     * {@code initMethodName}, and {@code destroyMethodName} if specified
+     * in the given bean definition.
+     * </ul>
+     */
+    public void overrideFrom(BeanDefinition other) {
+        if (StringUtils.hasLength(other.getBeanClassName())) {
+            setBeanClassName(other.getBeanClassName());
+        }
+        if (StringUtils.hasLength(other.getScope())) {
+            setScope(other.getScope());
+        }
+        setAbstract(other.isAbstract());
+        setLazyInit(other.isLazyInit());
+        if (StringUtils.hasLength(other.getFactoryBeanName())) {
+            setFactoryBeanName(other.getFactoryBeanName());
+        }
+        if (StringUtils.hasLength(other.getFactoryMethodName())) {
+            setFactoryMethodName(other.getFactoryMethodName());
+        }
+        getConstructorArgumentValues().addArgumentValues(other.getConstructorArgumentValues());
+        getPropertyValues().addPropertyValues(other.getPropertyValues());
+        setRole(other.getRole());
+        setSource(other.getSource());
+        copyAttributesFrom(other);
+
+        if (other instanceof AbstractBeanDefinition) {
+            AbstractBeanDefinition otherAbd = (AbstractBeanDefinition) other;
+            if (otherAbd.hasBeanClass()) {
+                setBeanClass(otherAbd.getBeanClass());
+            }
+            setAutowireMode(otherAbd.getAutowireMode());
+            setDependencyCheck(otherAbd.getDependencyCheck());
+            setDependsOn(otherAbd.getDependsOn());
+            setAutowireCandidate(otherAbd.isAutowireCandidate());
+            setPrimary(otherAbd.isPrimary());
+            copyQualifiersFrom(otherAbd);
+            setNonPublicAccessAllowed(otherAbd.isNonPublicAccessAllowed());
+            setLenientConstructorResolution(otherAbd.isLenientConstructorResolution());
+            getMethodOverrides().addOverrides(otherAbd.getMethodOverrides());
+            if (StringUtils.hasLength(otherAbd.getInitMethodName())) {
+                setInitMethodName(otherAbd.getInitMethodName());
+                setEnforceInitMethod(otherAbd.isEnforceInitMethod());
+            }
+            if (otherAbd.getDestroyMethodName() != null) {
+                setDestroyMethodName(otherAbd.getDestroyMethodName());
+                setEnforceDestroyMethod(otherAbd.isEnforceDestroyMethod());
+            }
+            setSynthetic(otherAbd.isSynthetic());
+            setResource(otherAbd.getResource());
+        }
+        else {
+            setResourceDescription(other.getResourceDescription());
+        }
+    }
+
+    /**
+     * Return whether to resolve constructors in lenient mode or in strict mode.
+     */
+    public boolean isLenientConstructorResolution() {
+        return this.lenientConstructorResolution;
+    }
+
+    /**
+     * Specify whether to resolve constructors in lenient mode ({@code true},
+     * which is the default) or to switch to strict resolution (throwing an exception
+     * in case of ambiguous constructors that all match when converting the arguments,
+     * whereas lenient mode would use the one with the 'closest' type matches).
+     */
+    public void setLenientConstructorResolution(boolean lenientConstructorResolution) {
+        this.lenientConstructorResolution = lenientConstructorResolution;
+    }
+
+    /**
+     * Specify whether to allow access to non-public constructors and methods,
+     * for the case of externalized metadata pointing to those. The default is
+     * {@code true}; switch this to {@code false} for public access only.
+     * <p>This applies to constructor resolution, factory method resolution,
+     * and also init/destroy methods. Bean property accessors have to be public
+     * in any case and are not affected by this setting.
+     * <p>Note that annotation-driven configuration will still access non-public
+     * members as far as they have been annotated. This setting applies to
+     * externalized metadata in this bean definition only.
+     */
+    public void setNonPublicAccessAllowed(boolean nonPublicAccessAllowed) {
+        this.nonPublicAccessAllowed = nonPublicAccessAllowed;
+    }
+
+    /**
+     * Clone this bean definition.
+     * To be implemented by concrete subclasses.
+     * @return the cloned bean definition object
+     */
+    public abstract AbstractBeanDefinition cloneBeanDefinition();
 
     public void setBeanClassName(String beanClassName) {
         this.beanClass = beanClassName;

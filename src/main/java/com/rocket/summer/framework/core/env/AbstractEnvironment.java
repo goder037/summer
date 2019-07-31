@@ -182,6 +182,11 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
     protected void customizePropertySources(MutablePropertySources propertySources) {
     }
 
+    @Override
+    public void setIgnoreUnresolvableNestedPlaceholders(boolean ignoreUnresolvableNestedPlaceholders) {
+        this.propertyResolver.setIgnoreUnresolvableNestedPlaceholders(ignoreUnresolvableNestedPlaceholders);
+    }
+
     /**
      * Return the set of reserved default profile names. This implementation returns
      * {@value #RESERVED_DEFAULT_PROFILE_NAME}. Subclasses may override in order to

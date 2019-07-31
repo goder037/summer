@@ -41,11 +41,11 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
     /**
      * Create a new {@link StandardAnnotationMetadata} wrapper for the given Class,
      * providing the option to return any nested annotations or annotation arrays in the
-     * form of {@link org.springframework.core.annotation.AnnotationAttributes} instead
+     * form of {@link com.rocket.summer.framework.core.annotation.AnnotationAttributes} instead
      * of actual {@link Annotation} instances.
      * @param introspectedClass the Class to introspect
      * @param nestedAnnotationsAsMap return nested annotations and annotation arrays as
-     * {@link org.springframework.core.annotation.AnnotationAttributes} for compatibility
+     * {@link com.rocket.summer.framework.core.annotation.AnnotationAttributes} for compatibility
      * with ASM-based {@link AnnotationMetadata} implementations
      * @since 3.1.1
      */
@@ -149,5 +149,4 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
             throw new IllegalStateException("Failed to introspect annotated methods on " + getIntrospectedClass(), ex);
         }
     }
-
 }

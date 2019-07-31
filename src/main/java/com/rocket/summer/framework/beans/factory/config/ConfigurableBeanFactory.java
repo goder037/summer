@@ -1,11 +1,16 @@
 package com.rocket.summer.framework.beans.factory.config;
 
 import com.rocket.summer.framework.beans.PropertyEditorRegistrar;
+import com.rocket.summer.framework.beans.PropertyEditorRegistry;
 import com.rocket.summer.framework.beans.TypeConverter;
+import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.HierarchicalBeanFactory;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
+import com.rocket.summer.framework.core.convert.ConversionService;
+import com.rocket.summer.framework.util.StringValueResolver;
 
 import java.beans.PropertyEditor;
+import java.security.AccessControlContext;
 
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
@@ -37,12 +42,121 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     BeanExpressionResolver getBeanExpressionResolver();
 
     /**
+     * Specify the resolution strategy for expressions in bean definition values.
+     * <p>There is no expression support active in a BeanFactory by default.
+     * An ApplicationContext will typically set a standard expression strategy
+     * here, supporting "#{...}" expressions in a Unified EL compatible style.
+     * @since 3.0
+     */
+    void setBeanExpressionResolver(BeanExpressionResolver resolver);
+
+    /**
+     * Set a custom type converter that this BeanFactory should use for converting
+     * bean property values, constructor argument values, etc.
+     * <p>This will override the default PropertyEditor mechanism and hence make
+     * any custom editors or custom editor registrars irrelevant.
+     * @see #addPropertyEditorRegistrar
+     * @see #registerCustomEditor
+     * @since 2.5
+     */
+    void setTypeConverter(TypeConverter typeConverter);
+
+    /**
+     * Set whether to cache bean metadata such as given bean definitions
+     * (in merged fashion) and resolved bean classes. Default is on.
+     * <p>Turn this flag off to enable hot-refreshing of bean definition objects
+     * and in particular bean classes. If this flag is off, any creation of a bean
+     * instance will re-query the bean class loader for newly resolved classes.
+     */
+    void setCacheBeanMetadata(boolean cacheBeanMetadata);
+
+    /**
+     * Determine whether an embedded value resolver has been registered with this
+     * bean factory, to be applied through {@link #resolveEmbeddedValue(String)}.
+     * @since 4.3
+     */
+    boolean hasEmbeddedValueResolver();
+
+    /**
+     * Add a String resolver for embedded values such as annotation attributes.
+     * @param valueResolver the String resolver to apply to embedded values
+     * @since 3.0
+     */
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    /**
+     * Return the names of all currently registered scopes.
+     * <p>This will only return the names of explicitly registered scopes.
+     * Built-in scopes such as "singleton" and "prototype" won't be exposed.
+     * @return the array of scope names, or an empty array if none
+     * @see #registerScope
+     */
+    String[] getRegisteredScopeNames();
+
+    /**
+     * Return the Scope implementation for the given scope name, if any.
+     * <p>This will only return explicitly registered scopes.
+     * Built-in scopes such as "singleton" and "prototype" won't be exposed.
+     * @param scopeName the name of the scope
+     * @return the registered Scope implementation, or {@code null} if none
+     * @see #registerScope
+     */
+    Scope getRegisteredScope(String scopeName);
+
+    /**
+     * Copy all relevant configuration from the given other factory.
+     * <p>Should include all standard configuration settings as well as
+     * BeanPostProcessors, Scopes, and factory-specific internal settings.
+     * Should not include any metadata of actual bean definitions,
+     * such as BeanDefinition objects and bean name aliases.
+     * @param otherFactory the other BeanFactory to copy from
+     */
+    void copyConfigurationFrom(ConfigurableBeanFactory otherFactory);
+
+    /**
+     * Initialize the given PropertyEditorRegistry with the custom editors
+     * that have been registered with this BeanFactory.
+     * @param registry the PropertyEditorRegistry to initialize
+     */
+    void copyRegisteredEditorsTo(PropertyEditorRegistry registry);
+
+    /**
+     * Provides a security access control context relevant to this factory.
+     * @return the applicable AccessControlContext (never {@code null})
+     * @since 3.0
+     */
+    AccessControlContext getAccessControlContext();
+
+    /**
+     * Return the associated ConversionService, if any.
+     * @since 3.0
+     */
+    ConversionService getConversionService();
+
+    /**
+     * Specify a Spring 3.0 ConversionService to use for converting
+     * property values, as an alternative to JavaBeans PropertyEditors.
+     * @since 3.0
+     */
+    void setConversionService(ConversionService conversionService);
+
+    /**
      * Resolve the given embedded value, e.g. an annotation attribute.
      * @param value the value to resolve
      * @return the resolved value (may be the original value as-is)
      * @since 3.0
      */
     String resolveEmbeddedValue(String value);
+
+    /**
+     * Destroy the given bean instance (usually a prototype instance
+     * obtained from this factory) according to its bean definition.
+     * <p>Any exception that arises during destruction should be caught
+     * and logged instead of propagated to the caller of this method.
+     * @param beanName the name of the bean definition
+     * @param beanInstance the bean instance to destroy
+     */
+    void destroyBean(String beanName, Object beanInstance);
 
     /**
      * Destroy all singleton beans in this factory, including inner beans that have
@@ -87,6 +201,17 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * or an empty array if none
      */
     String[] getDependenciesForBean(String beanName);
+
+    /**
+     * Set the parent of this bean factory.
+     * <p>Note that the parent cannot be changed: It should only be set outside
+     * a constructor if it isn't available at the time of factory instantiation.
+     * @param parentBeanFactory the parent BeanFactory
+     * @throws IllegalStateException if this factory is already associated with
+     * a parent BeanFactory
+     * @see #getParentBeanFactory()
+     */
+    void setParentBeanFactory(BeanFactory parentBeanFactory) throws IllegalStateException;
 
     /**
      * Register a dependent bean for the given bean,

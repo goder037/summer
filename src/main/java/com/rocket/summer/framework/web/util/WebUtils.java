@@ -78,6 +78,13 @@ public abstract class WebUtils {
     public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
 
     /**
+     * Use of response encoding for HTML escaping parameter at the servlet context level
+     * (i.e. a context-param in {@code web.xml}): "responseEncodedHtmlEscape".
+     * @since 4.1.2
+     */
+    public static final String RESPONSE_ENCODED_HTML_ESCAPE_CONTEXT_PARAM = "responseEncodedHtmlEscape";
+
+    /**
      * HTML escape parameter at the servlet context level
      * (i.e. a context-param in <code>web.xml</code>): "defaultHtmlEscape".
      */
@@ -131,6 +138,28 @@ public abstract class WebUtils {
         }
         System.setProperty(key, root);
         servletContext.log("Set web app root system property: '" + key + "' = [" + root + "]");
+    }
+
+    /**
+     * Return whether response encoding should be used when HTML escaping characters,
+     * thus only escaping XML markup significant characters with UTF-* encodings.
+     * This option is enabled for the web application with a ServletContext param,
+     * i.e. the value of the "responseEncodedHtmlEscape" context-param in {@code web.xml}
+     * (if any).
+     * <p>This method differentiates between no param specified at all and
+     * an actual boolean value specified, allowing to have a context-specific
+     * default in case of no setting at the global level.
+     * @param servletContext the servlet context of the web application
+     * @return whether response encoding is to be used for HTML escaping
+     * ({@code null} = no explicit default)
+     * @since 4.1.2
+     */
+    public static Boolean getResponseEncodedHtmlEscape(ServletContext servletContext) {
+        if (servletContext == null) {
+            return null;
+        }
+        String param = servletContext.getInitParameter(RESPONSE_ENCODED_HTML_ESCAPE_CONTEXT_PARAM);
+        return (StringUtils.hasText(param) ? Boolean.valueOf(param) : null);
     }
 
     /**

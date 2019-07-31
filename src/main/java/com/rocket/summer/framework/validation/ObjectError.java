@@ -8,14 +8,13 @@ import com.rocket.summer.framework.util.Assert;
  * an object.
  *
  * <p>See the {@link DefaultMessageCodesResolver} javadoc for details on
- * how a message code list is built for an <code>ObjectError</code>.
+ * how a message code list is built for an {@code ObjectError}.
  *
  * @author Juergen Hoeller
+ * @since 10.03.2003
  * @see FieldError
  * @see DefaultMessageCodesResolver
- * @since 10.03.2003
  */
-@SuppressWarnings("serial")
 public class ObjectError extends DefaultMessageSourceResolvable {
 
     private final String objectName;
@@ -42,5 +41,38 @@ public class ObjectError extends DefaultMessageSourceResolvable {
         Assert.notNull(objectName, "Object name must not be null");
         this.objectName = objectName;
     }
+
+
+    /**
+     * Return the name of the affected object.
+     */
+    public String getObjectName() {
+        return this.objectName;
+    }
+
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || other.getClass() != getClass() || !super.equals(other)) {
+            return false;
+        }
+        ObjectError otherError = (ObjectError) other;
+        return getObjectName().equals(otherError.getObjectName());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 29 + getObjectName().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Error in object '" + this.objectName + "': " + resolvableToString();
+    }
+
 }
+
 
