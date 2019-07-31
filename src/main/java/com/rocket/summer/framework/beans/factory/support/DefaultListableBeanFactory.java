@@ -21,6 +21,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     /** Whether to allow eager class loading even for lazy-init beans */
     private boolean allowEagerClassLoading = true;
 
+    /** Optional OrderComparator for dependency Lists and arrays */
+    private Comparator<Object> dependencyComparator;
+
     /** Whether bean definition metadata may be cached for all beans */
     private boolean configurationFrozen = false;
 
@@ -45,6 +48,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
      */
     public DefaultListableBeanFactory() {
         super();
+    }
+
+    /**
+     * Return the dependency comparator for this BeanFactory (may be {@code null}.
+     * @since 4.0
+     */
+    public Comparator<Object> getDependencyComparator() {
+        return this.dependencyComparator;
+    }
+
+    /**
+     * Return whether it should be allowed to override bean definitions by registering
+     * a different definition with the same name, automatically replacing the former.
+     * @since 4.1.2
+     */
+    public boolean isAllowBeanDefinitionOverriding() {
+        return this.allowBeanDefinitionOverriding;
     }
 
     /**
@@ -682,4 +702,5 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public void setAllowEagerClassLoading(boolean allowEagerClassLoading) {
         this.allowEagerClassLoading = allowEagerClassLoading;
     }
+
 }

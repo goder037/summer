@@ -29,6 +29,15 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     String SCOPE_PROTOTYPE = "prototype";
 
     /**
+     * Explicitly control the current in-creation status of the specified bean.
+     * For container-internal use only.
+     * @param beanName the name of the bean
+     * @param inCreation whether the bean is currently in creation
+     * @since 3.1
+     */
+    void setCurrentlyInCreation(String beanName, boolean inCreation);
+
+    /**
      * Register the given scope, backed by the given Scope implementation.
      * @param scopeName the scope identifier
      * @param scope the backing Scope implementation

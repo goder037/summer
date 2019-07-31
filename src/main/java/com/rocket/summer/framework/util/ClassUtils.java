@@ -79,6 +79,18 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Determine the name of the package of the given class,
+     * e.g. "java.lang" for the {@code java.lang.String} class.
+     * @param clazz the class
+     * @return the package name, or the empty String if the class
+     * is defined in the default package
+     */
+    public static String getPackageName(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        return getPackageName(clazz.getName());
+    }
+
+    /**
      * Determine whether the given class has a method with the given signature,
      * and return it if available (else return <code>null</code>).
      * <p>Essentially translates <code>NoSuchMethodException</code> to <code>null</code>.

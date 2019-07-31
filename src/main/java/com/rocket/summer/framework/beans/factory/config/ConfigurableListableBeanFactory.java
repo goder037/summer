@@ -25,6 +25,18 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
     void preInstantiateSingletons() throws BeansException;
 
     /**
+     * Clear the merged bean definition cache, removing entries for beans
+     * which are not considered eligible for full metadata caching yet.
+     * <p>Typically triggered after changes to the original bean definitions,
+     * e.g. after applying a {@link BeanFactoryPostProcessor}. Note that metadata
+     * for beans which have already been created at this point will be kept around.
+     * @since 4.2
+     * @see #getBeanDefinition
+     * @see #getMergedBeanDefinition
+     */
+    void clearMetadataCache();
+
+    /**
      * Return the registered BeanDefinition for the specified bean, allowing access
      * to its property values and constructor argument value (which can be
      * modified during bean factory post-processing).

@@ -106,6 +106,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
         }
     }
 
+    public void setCurrentlyInCreation(String beanName, boolean inCreation) {
+        Assert.notNull(beanName, "Bean name must not be null");
+        if (!inCreation) {
+            this.inCreationCheckExclusions.add(beanName);
+        }
+        else {
+            this.inCreationCheckExclusions.remove(beanName);
+        }
+    }
+
     /**
      * Add the given singleton object to the singleton cache of this factory.
      * <p>To be called for eager registration of singletons.

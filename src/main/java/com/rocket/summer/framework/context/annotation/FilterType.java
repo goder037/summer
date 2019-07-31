@@ -9,8 +9,8 @@ package com.rocket.summer.framework.context.annotation;
  * @author Chris Beams
  * @since 2.5
  * @see ComponentScan
- * @see ComponentScan.IncludeFilter
- * @see ComponentScan.ExcludeFilter
+ * @see ComponentScan#includeFilters()
+ * @see ComponentScan#excludeFilters()
  * @see com.rocket.summer.framework.core.type.filter.TypeFilter
  */
 public enum FilterType {
@@ -23,14 +23,25 @@ public enum FilterType {
 
     /**
      * Filter candidates assignable to a given type.
-     * @see AssignableTypeFilter
+     * @see com.rocket.summer.framework.core.type.filter.AssignableTypeFilter
      */
     ASSIGNABLE_TYPE,
 
+    /**
+     * Filter candidates matching a given AspectJ type pattern expression.
+     * @see com.rocket.summer.framework.core.type.filter.AspectJTypeFilter
+     */
+    ASPECTJ,
+
+    /**
+     * Filter candidates matching a given regex pattern.
+     * @see com.rocket.summer.framework.core.type.filter.RegexPatternTypeFilter
+     */
+    REGEX,
+
     /** Filter candidates using a given custom
-     * {@link com.rocket.summer.framework.core.type.filter.TypeFilter} implementation
+     * {@link com.rocket.summer.framework.core.type.filter.TypeFilter} implementation.
      */
     CUSTOM
 
 }
-

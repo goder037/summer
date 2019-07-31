@@ -71,6 +71,13 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 
     /**
+     * Protected constructor for flexible subclass initialization.
+     * @since 4.3.6
+     */
+    protected ClassPathScanningCandidateComponentProvider() {
+    }
+
+    /**
      * Create a ClassPathScanningCandidateComponentProvider.
      * @param useDefaultFilters whether to register the default filters for the
      * {@link Component @Component}, {@link Repository @Repository},

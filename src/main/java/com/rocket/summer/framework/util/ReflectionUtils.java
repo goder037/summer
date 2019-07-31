@@ -44,6 +44,27 @@ public abstract class ReflectionUtils {
     }
 
     /**
+     * Get the field represented by the supplied {@link Field field object} on the
+     * specified {@link Object target object}. In accordance with {@link Field#get(Object)}
+     * semantics, the returned value is automatically wrapped if the underlying field
+     * has a primitive type.
+     * <p>Thrown exceptions are handled via a call to {@link #handleReflectionException(Exception)}.
+     * @param field the field to get
+     * @param target the target object from which to get the field
+     * @return the field's current value
+     */
+    public static Object getField(Field field, Object target) {
+        try {
+            return field.get(target);
+        }
+        catch (IllegalAccessException ex) {
+            handleReflectionException(ex);
+            throw new IllegalStateException(
+                    "Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+    }
+
+    /**
      * Invoke the specified {@link Method} against the supplied target object
      * with no arguments. The target object can be <code>null</code> when
      * invoking a static {@link Method}.

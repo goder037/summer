@@ -3,6 +3,7 @@ package com.rocket.summer.framework.context.annotation;
 import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
 import com.rocket.summer.framework.beans.factory.support.GenericBeanDefinition;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
+import com.rocket.summer.framework.core.type.MethodMetadata;
 import com.rocket.summer.framework.core.type.classreading.MetadataReader;
 import com.rocket.summer.framework.util.Assert;
 
@@ -40,6 +41,11 @@ public class ScannedGenericBeanDefinition extends GenericBeanDefinition implemen
 
     public final AnnotationMetadata getMetadata() {
         return this.metadata;
+    }
+
+    @Override
+    public MethodMetadata getFactoryMethodMetadata() {
+        return null;
     }
 
 }
