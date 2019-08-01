@@ -4,6 +4,7 @@ import com.rocket.summer.framework.beans.factory.BeanFactoryUtils;
 import com.rocket.summer.framework.beans.factory.BeanInitializationException;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.context.i18n.LocaleContext;
 import com.rocket.summer.framework.core.OrderComparator;
 import com.rocket.summer.framework.core.io.ClassPathResource;
@@ -237,6 +238,9 @@ public class DispatcherServlet extends FrameworkServlet {
     /** MultipartResolver used by this servlet */
     private MultipartResolver multipartResolver;
 
+    /** Throw a NoHandlerFoundException if no Handler was found to process this request? **/
+    private boolean throwExceptionIfNoHandlerFound = false;
+
     /** LocaleResolver used by this servlet */
     private LocaleResolver localeResolver;
 
@@ -257,6 +261,28 @@ public class DispatcherServlet extends FrameworkServlet {
 
     /** List of ViewResolvers used by this servlet */
     private List<ViewResolver> viewResolvers;
+
+    /**
+     * Create a new {@code DispatcherServlet} that will create its own internal web
+     * application context based on defaults and values provided through servlet
+     * init-params. Typically used in Servlet 2.5 or earlier environments, where the only
+     * option for servlet registration is through {@code web.xml} which requires the use
+     * of a no-arg constructor.
+     * <p>Calling {@link #setContextConfigLocation} (init-param 'contextConfigLocation')
+     * will dictate which XML files will be loaded by the
+     * {@linkplain #DEFAULT_CONTEXT_CLASS default XmlWebApplicationContext}
+     * <p>Calling {@link #setContextClass} (init-param 'contextClass') overrides the
+     * default {@code XmlWebApplicationContext} and allows for specifying an alternative class,
+     * such as {@code AnnotationConfigWebApplicationContext}.
+     * <p>Calling {@link #setContextInitializerClasses} (init-param 'contextInitializerClasses')
+     * indicates which {@code ApplicationContextInitializer} classes should be used to
+     * further configure the internal application context prior to refresh().
+     * @see #DispatcherServlet(WebApplicationContext)
+     */
+    public DispatcherServlet() {
+        super();
+        setDispatchOptionsRequest(true);
+    }
 
 
     /**
@@ -319,6 +345,21 @@ public class DispatcherServlet extends FrameworkServlet {
      */
     public void setDetectAllHandlerAdapters(boolean detectAllHandlerAdapters) {
         this.detectAllHandlerAdapters = detectAllHandlerAdapters;
+    }
+
+    /**
+     * Set whether to throw a NoHandlerFoundException when no Handler was found for this request.
+     * This exception can then be caught with a HandlerExceptionResolver or an
+     * {@code @ExceptionHandler} controller method.
+     * <p>Note that if {@link com.rocket.summer.framework.web.servlet.resource.DefaultServletHttpRequestHandler}
+     * is used, then requests will always be forwarded to the default servlet and a
+     * NoHandlerFoundException would never be thrown in that case.
+     * <p>Default is "false", meaning the DispatcherServlet sends a NOT_FOUND error through the
+     * Servlet response.
+     * @since 4.0
+     */
+    public void setThrowExceptionIfNoHandlerFound(boolean throwExceptionIfNoHandlerFound) {
+        this.throwExceptionIfNoHandlerFound = throwExceptionIfNoHandlerFound;
     }
 
     /**

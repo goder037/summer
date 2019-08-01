@@ -15,6 +15,7 @@ import com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
+import com.rocket.summer.framework.context.EnvironmentAware;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.io.DefaultResourceLoader;
@@ -48,7 +49,7 @@ import static com.rocket.summer.framework.context.annotation.AnnotationConfigUti
  * @author Juergen Hoeller
  * @since 3.0
  */
-public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor, BeanClassLoaderAware {
+public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor, BeanClassLoaderAware, EnvironmentAware {
 
     /** Whether the CGLIB2 library is present on the classpath */
     private static final boolean cglibAvailable = ClassUtils.isPresent(
@@ -169,6 +170,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
         enhanceConfigurationClasses(beanFactory);
     }
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        Assert.notNull(environment, "Environment must not be null");
+        this.environment = environment;
+    }
 
     /**
      * Build and validate a configuration model based on the registry of

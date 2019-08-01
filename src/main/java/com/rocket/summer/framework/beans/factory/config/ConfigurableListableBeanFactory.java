@@ -4,6 +4,8 @@ import com.rocket.summer.framework.beans.factory.ListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 import com.rocket.summer.framework.context.BeansException;
 
+import java.util.Iterator;
+
 public interface ConfigurableListableBeanFactory extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
 
     /**
@@ -35,6 +37,21 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
      * @see #getMergedBeanDefinition
      */
     void clearMetadataCache();
+
+
+    /**
+     * Return a unified view over all bean names managed by this factory.
+     * <p>Includes bean definition names as well as names of manually registered
+     * singleton instances, with bean definition names consistently coming first,
+     * analogous to how type/annotation specific retrieval of bean names works.
+     * @return the composite iterator for the bean names view
+     * @since 4.1.2
+     * @see #containsBeanDefinition
+     * @see #registerSingleton
+     * @see #getBeanNamesForType
+     * @see #getBeanNamesForAnnotation
+     */
+    Iterator<String> getBeanNamesIterator();
 
     /**
      * Return the registered BeanDefinition for the specified bean, allowing access

@@ -73,7 +73,7 @@ public abstract class PropertiesLoaderUtils {
      * @param persister the PropertiesPersister to use
      * @throws IOException in case of I/O errors
      */
-    static void fillProperties(Properties props, EncodedResource resource, PropertiesPersister persister)
+    public static void fillProperties(Properties props, EncodedResource resource, PropertiesPersister persister)
             throws IOException {
 
         InputStream stream = null;

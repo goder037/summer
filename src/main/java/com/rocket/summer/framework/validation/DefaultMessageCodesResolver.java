@@ -153,4 +153,50 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
             }
         }
     }
+
+    /**
+     * Common message code formats.
+     * @see MessageCodeFormatter
+     * @see DefaultMessageCodesResolver#setMessageCodeFormatter(MessageCodeFormatter)
+     */
+    public enum Format implements MessageCodeFormatter {
+
+        /**
+         * Prefix the error code at the beginning of the generated message code. e.g.:
+         * {@code errorCode + "." + object name + "." + field}
+         */
+        PREFIX_ERROR_CODE {
+            @Override
+            public String format(String errorCode, String objectName, String field) {
+                return toDelimitedString(errorCode, objectName, field);
+            }
+        },
+
+        /**
+         * Postfix the error code at the end of the generated message code. e.g.:
+         * {@code object name + "." + field + "." + errorCode}
+         */
+        POSTFIX_ERROR_CODE {
+            @Override
+            public String format(String errorCode, String objectName, String field) {
+                return toDelimitedString(objectName, field, errorCode);
+            }
+        };
+
+        /**
+         * Concatenate the given elements, delimiting each with
+         * {@link DefaultMessageCodesResolver#CODE_SEPARATOR}, skipping zero-length or
+         * null elements altogether.
+         */
+        public static String toDelimitedString(String... elements) {
+            StringBuilder rtn = new StringBuilder();
+            for (String element : elements) {
+                if (StringUtils.hasLength(element)) {
+                    rtn.append(rtn.length() == 0 ? "" : CODE_SEPARATOR);
+                    rtn.append(element);
+                }
+            }
+            return rtn.toString();
+        }
+    }
 }

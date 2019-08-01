@@ -112,6 +112,40 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Copy the given {@code Collection} into a {@code Class} array.
+     * <p>The {@code Collection} must contain {@code Class} elements only.
+     * @param collection the {@code Collection} to copy
+     * @return the {@code Class} array
+     * @since 3.1
+     * @see StringUtils#toStringArray
+     */
+    public static Class<?>[] toClassArray(Collection<Class<?>> collection) {
+        if (collection == null) {
+            return null;
+        }
+        return collection.toArray(new Class<?>[collection.size()]);
+    }
+
+    /**
+     * Override the thread context ClassLoader with the environment's bean ClassLoader
+     * if necessary, i.e. if the bean ClassLoader is not equivalent to the thread
+     * context ClassLoader already.
+     * @param classLoaderToUse the actual ClassLoader to use for the thread context
+     * @return the original thread context ClassLoader, or {@code null} if not overridden
+     */
+    public static ClassLoader overrideThreadContextClassLoader(ClassLoader classLoaderToUse) {
+        Thread currentThread = Thread.currentThread();
+        ClassLoader threadContextClassLoader = currentThread.getContextClassLoader();
+        if (classLoaderToUse != null && !classLoaderToUse.equals(threadContextClassLoader)) {
+            currentThread.setContextClassLoader(classLoaderToUse);
+            return threadContextClassLoader;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
      * Return a descriptive name for the given object's type: usually simply
      * the class name, but component type class name + "[]" for arrays,
      * and an appended list of implemented interfaces for JDK proxies.

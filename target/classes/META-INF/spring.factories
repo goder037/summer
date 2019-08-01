@@ -14,4 +14,6 @@ com.rocket.summer.framework.boot.context.embedded.ServerPortInfoApplicationConte
 
 
 # Auto Configure
-
+com.rocket.summer.framework.boot.autoconfigure.EnableAutoConfiguration=\
+com.rocket.summer.framework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.web.DispatcherServletAutoConfiguration

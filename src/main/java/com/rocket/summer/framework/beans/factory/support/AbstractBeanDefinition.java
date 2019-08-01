@@ -61,6 +61,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      */
     public static final String INFER_METHOD = "(inferred)";
 
+    /**
+     * Set the names of the beans that this bean depends on being initialized.
+     * The bean factory will guarantee that these beans get initialized first.
+     * <p>Note that dependencies are normally expressed through bean properties or
+     * constructor arguments. This property should just be necessary for other kinds
+     * of dependencies like statics (*ugh*) or database preparation on startup.
+     */
+    @Override
+    public void setDependsOn(String... dependsOn) {
+        this.dependsOn = dependsOn;
+    }
+
 
     /**
      * Constant that indicates no dependency check at all.
@@ -522,17 +534,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      */
     public int getDependencyCheck() {
         return this.dependencyCheck;
-    }
-
-    /**
-     * Set the names of the beans that this bean depends on being initialized.
-     * The bean factory will guarantee that these beans get initialized before.
-     * <p>Note that dependencies are normally expressed through bean properties or
-     * constructor arguments. This property should just be necessary for other kinds
-     * of dependencies like statics (*ugh*) or database preparation on startup.
-     */
-    public void setDependsOn(String[] dependsOn) {
-        this.dependsOn = dependsOn;
     }
 
     /**

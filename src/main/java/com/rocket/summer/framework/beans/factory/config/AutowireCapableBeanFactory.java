@@ -150,6 +150,16 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
     //-------------------------------------------------------------------------
 
     /**
+     * Destroy the given bean instance (typically coming from {@link #createBean}),
+     * applying the {@link com.rocket.summer.framework.beans.factory.DisposableBean} contract as well as
+     * registered {@link DestructionAwareBeanPostProcessor DestructionAwareBeanPostProcessors}.
+     * <p>Any exception that arises during destruction should be caught
+     * and logged instead of propagated to the caller of this method.
+     * @param existingBean the bean instance to destroy
+     */
+    void destroyBean(Object existingBean);
+    
+    /**
      * Fully create a new bean instance of the given class with the specified
      * autowire strategy. All constants defined in this interface are supported here.
      * <p>Performs full initialization of the bean, including all applicable

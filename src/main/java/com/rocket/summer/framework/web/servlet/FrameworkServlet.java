@@ -1,10 +1,7 @@
 package com.rocket.summer.framework.web.servlet;
 
 import com.rocket.summer.framework.beans.BeanUtils;
-import com.rocket.summer.framework.context.ApplicationContext;
-import com.rocket.summer.framework.context.ApplicationContextException;
-import com.rocket.summer.framework.context.ApplicationListener;
-import com.rocket.summer.framework.context.ConfigurableApplicationContext;
+import com.rocket.summer.framework.context.*;
 import com.rocket.summer.framework.context.event.ContextRefreshedEvent;
 import com.rocket.summer.framework.context.event.SourceFilteringListener;
 import com.rocket.summer.framework.context.i18n.LocaleContext;
@@ -135,6 +132,26 @@ public abstract class FrameworkServlet extends HttpServletBean {
     /** Flag used to detect whether onRefresh has already been called */
     private boolean refreshEventReceived = false;
 
+
+    /**
+     * Create a new {@code FrameworkServlet} that will create its own internal web
+     * application context based on defaults and values provided through servlet
+     * init-params. Typically used in Servlet 2.5 or earlier environments, where the only
+     * option for servlet registration is through {@code web.xml} which requires the use
+     * of a no-arg constructor.
+     * <p>Calling {@link #setContextConfigLocation} (init-param 'contextConfigLocation')
+     * will dictate which XML files will be loaded by the
+     * {@linkplain #DEFAULT_CONTEXT_CLASS default XmlWebApplicationContext}
+     * <p>Calling {@link #setContextClass} (init-param 'contextClass') overrides the
+     * default {@code XmlWebApplicationContext} and allows for specifying an alternative class,
+     * such as {@code AnnotationConfigWebApplicationContext}.
+     * <p>Calling {@link #setContextInitializerClasses} (init-param 'contextInitializerClasses')
+     * indicates which {@link ApplicationContextInitializer} classes should be used to
+     * further configure the internal application context prior to refresh().
+     * @see #FrameworkServlet(WebApplicationContext)
+     */
+    public FrameworkServlet() {
+    }
 
     /**
      * Create a new {@code FrameworkServlet} with the given web application context. This
