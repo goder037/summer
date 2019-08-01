@@ -274,5 +274,14 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
         return (beanDefinition.getMetadata().isConcrete() && beanDefinition.getMetadata().isIndependent());
     }
 
+    /**
+     * Clear the underlying metadata cache, removing all cached class metadata.
+     */
+    public void clearCache() {
+        if (this.metadataReaderFactory instanceof CachingMetadataReaderFactory) {
+            ((CachingMetadataReaderFactory) this.metadataReaderFactory).clearCache();
+        }
+    }
+
 }
 

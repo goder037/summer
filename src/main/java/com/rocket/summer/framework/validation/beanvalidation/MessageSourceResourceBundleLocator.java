@@ -1,7 +1,9 @@
 package com.rocket.summer.framework.validation.beanvalidation;
 
 import com.rocket.summer.framework.context.MessageSource;
+import com.rocket.summer.framework.context.support.MessageSourceResourceBundle;
 import com.rocket.summer.framework.util.Assert;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

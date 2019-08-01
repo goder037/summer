@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.context.event;
 
 import com.rocket.summer.framework.context.ApplicationListener;
+import com.rocket.summer.framework.core.ResolvableType;
 
 /**
  * Interface to be implemented by objects that can manage a number
@@ -37,5 +38,16 @@ public interface ApplicationEventMulticaster {
      * @param event the event to multicast
      */
     void multicastEvent(ApplicationEvent event);
+
+
+    /**
+     * Multicast the given application event to appropriate listeners.
+     * <p>If the {@code eventType} is {@code null}, a default type is built
+     * based on the {@code event} instance.
+     * @param event the event to multicast
+     * @param eventType the type of event (can be null)
+     * @since 4.2
+     */
+    void multicastEvent(ApplicationEvent event, ResolvableType eventType);
 
 }

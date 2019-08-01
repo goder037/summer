@@ -12,6 +12,7 @@ import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.CollectionUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
 import javax.validation.*;
 import javax.validation.bootstrap.GenericBootstrap;

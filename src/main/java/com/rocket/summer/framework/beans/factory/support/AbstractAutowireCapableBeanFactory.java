@@ -365,6 +365,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }, acc);
     }
 
+    @Override
+    public void destroyBean(Object existingBean) {
+        new DisposableBeanAdapter(existingBean, getBeanPostProcessors(), getAccessControlContext()).destroy();
+    }
+
     /**
      * Actually create the specified bean. Pre-creation processing has already happened
      * at this point, e.g. checking <code>postProcessBeforeInstantiation</code> callbacks.
