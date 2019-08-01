@@ -20,7 +20,7 @@ import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.PriorityOrdered;
 import com.rocket.summer.framework.core.type.classreading.CachingMetadataReaderFactory;
 import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 
 /**
  * {@link ApplicationContextInitializer} to create a shared

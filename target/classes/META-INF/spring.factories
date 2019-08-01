@@ -4,7 +4,7 @@ com.rocket.summer.framework.boot.autoconfigure.SharedMetadataReaderFactoryContex
 com.rocket.summer.framework.boot.context.ConfigurationWarningsApplicationContextInitializer,\
 com.rocket.summer.framework.boot.context.ContextIdApplicationContextInitializer,\
 com.rocket.summer.framework.boot.context.config.DelegatingApplicationContextInitializer,\
-com.rocket.summer.framework.boot.web.context.ServerPortInfoApplicationContextInitializer
+com.rocket.summer.framework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
 
 # Application Listeners
 

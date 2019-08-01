@@ -6,7 +6,7 @@ import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.core.env.*;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 
 import java.util.HashMap;
 import java.util.Map;

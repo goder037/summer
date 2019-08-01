@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.web.context;
+package com.rocket.summer.framework.context;
 
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 

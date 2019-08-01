@@ -5,7 +5,7 @@ import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 
 /**
  * {@link ApplicationContextInitializer} that set the Spring

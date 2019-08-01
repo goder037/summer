@@ -21,7 +21,7 @@ import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.SpringFactoriesLoader;
 import com.rocket.summer.framework.util.*;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 import com.rocket.summer.framework.web.context.WebApplicationContext;
 import com.rocket.summer.framework.web.context.support.StandardServletEnvironment;
 import org.apache.commons.logging.Log;

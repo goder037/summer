@@ -10,7 +10,7 @@ import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 
 import java.util.ArrayList;
 import java.util.Collections;

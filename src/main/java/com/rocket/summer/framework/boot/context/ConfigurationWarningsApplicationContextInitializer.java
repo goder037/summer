@@ -14,7 +14,7 @@ import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

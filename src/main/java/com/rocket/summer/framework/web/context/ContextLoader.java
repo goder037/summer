@@ -5,6 +5,7 @@ import com.rocket.summer.framework.beans.factory.access.BeanFactoryLocator;
 import com.rocket.summer.framework.beans.factory.access.BeanFactoryReference;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextException;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
