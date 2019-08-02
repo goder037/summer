@@ -1,10 +1,7 @@
 package com.rocket.summer.framework.web.servlet;
 
 import com.rocket.summer.framework.beans.BeanUtils;
-import com.rocket.summer.framework.context.ApplicationContext;
-import com.rocket.summer.framework.context.ApplicationContextException;
-import com.rocket.summer.framework.context.ApplicationListener;
-import com.rocket.summer.framework.context.ConfigurableApplicationContext;
+import com.rocket.summer.framework.context.*;
 import com.rocket.summer.framework.context.event.ContextRefreshedEvent;
 import com.rocket.summer.framework.context.event.SourceFilteringListener;
 import com.rocket.summer.framework.context.i18n.LocaleContext;
@@ -137,6 +134,26 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
 
     /**
+     * Create a new {@code FrameworkServlet} that will create its own internal web
+     * application context based on defaults and values provided through servlet
+     * init-params. Typically used in Servlet 2.5 or earlier environments, where the only
+     * option for servlet registration is through {@code web.xml} which requires the use
+     * of a no-arg constructor.
+     * <p>Calling {@link #setContextConfigLocation} (init-param 'contextConfigLocation')
+     * will dictate which XML files will be loaded by the
+     * {@linkplain #DEFAULT_CONTEXT_CLASS default XmlWebApplicationContext}
+     * <p>Calling {@link #setContextClass} (init-param 'contextClass') overrides the
+     * default {@code XmlWebApplicationContext} and allows for specifying an alternative class,
+     * such as {@code AnnotationConfigWebApplicationContext}.
+     * <p>Calling {@link #setContextInitializerClasses} (init-param 'contextInitializerClasses')
+     * indicates which {@link ApplicationContextInitializer} classes should be used to
+     * further configure the internal application context prior to refresh().
+     * @see #FrameworkServlet(WebApplicationContext)
+     */
+    public FrameworkServlet() {
+    }
+
+    /**
      * Create a new {@code FrameworkServlet} with the given web application context. This
      * constructor is useful in Servlet 3.0+ environments where instance-based registration
      * of servlets is possible through the {@link ServletContext#addServlet} API.
@@ -170,7 +187,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
      * {@code ConfigurableWebApplicationContext}, none of the above will occur under the
      * assumption that the user has performed these actions (or not) per his or her
      * specific needs.
-     * <p>See {@link org.springframework.web.WebApplicationInitializer} for usage examples.
+     * <p>See {@link com.rocket.summer.framework.web.WebApplicationInitializer} for usage examples.
      * @param webApplicationContext the context to use
      * @see #initWebApplicationContext
      * @see #configureAndRefreshWebApplicationContext

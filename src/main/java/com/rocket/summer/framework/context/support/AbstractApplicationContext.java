@@ -24,6 +24,7 @@ import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBean
 import com.rocket.summer.framework.beans.factory.support.ResourceEditorRegistrar;
 import com.rocket.summer.framework.context.*;
 import com.rocket.summer.framework.context.event.*;
+import com.rocket.summer.framework.context.weaving.LoadTimeWeaverAwareProcessor;
 import com.rocket.summer.framework.core.JdkVersion;
 import com.rocket.summer.framework.core.OrderComparator;
 import com.rocket.summer.framework.core.Ordered;
@@ -175,6 +176,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     //---------------------------------------------------------------------
 
     /**
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * <p>If none specified, a default environment will be initialized via
+     * {@link #createEnvironment()}.
+     */
+    @Override
+    public ConfigurableEnvironment getEnvironment() {
+        if (this.environment == null) {
+            this.environment = createEnvironment();
+        }
+        return this.environment;
+    }
+
+    /**
      * Set the unique id of this application context.
      * <p>Default is the object id of the context instance, or the name
      * of the context bean if the context is itself defined as a bean.
@@ -228,6 +243,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     }
 
     /**
+     * <p>Replace any stub property sources with actual instances.
+     * @see com.rocket.summer.framework.core.env.PropertySource.StubPropertySource
+     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#initServletPropertySources
+     */
+    protected void initPropertySources() {
+        // For subclasses: do nothing by default.
+    }
+
+    @Override
+    public String getApplicationName() {
+        return "";
+    }
+
+    /**
      * Set the {@code Environment} for this application context.
      * <p>Default value is determined by {@link #createEnvironment()}. Replacing the
      * default with this method is one option but configuration through {@link
@@ -238,21 +267,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     @Override
     public void setEnvironment(ConfigurableEnvironment environment) {
         this.environment = environment;
-    }
-
-
-    /**
-     * Return the {@code Environment} for this application context in configurable
-     * form, allowing for further customization.
-     * <p>If none specified, a default environment will be initialized via
-     * {@link #createEnvironment()}.
-     */
-    @Override
-    public ConfigurableEnvironment getEnvironment() {
-        if (this.environment == null) {
-            this.environment = createEnvironment();
-        }
-        return this.environment;
     }
 
     /**
@@ -500,52 +514,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * <p>Must be called before singleton instantiation.
      */
     protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-        // Invoke factory processors registered with the context instance.
-        for (Object o : getBeanFactoryPostProcessors()) {
-            BeanFactoryPostProcessor factoryProcessor = (BeanFactoryPostProcessor) o;
-            factoryProcessor.postProcessBeanFactory(beanFactory);
+        PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
+
+        // Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
+        // (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
+        if (beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
+            beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
+            beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
         }
-
-        // Do not initialize FactoryBeans here: We need to leave all regular beans
-        // uninitialized to let the bean factory post-processors apply to them!
-        String[] postProcessorNames =
-                beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
-
-        // Separate between BeanFactoryPostProcessors that implement PriorityOrdered,
-        // Ordered, and the rest.
-        List priorityOrderedPostProcessors = new ArrayList();
-        List orderedPostProcessorNames = new ArrayList();
-        List nonOrderedPostProcessorNames = new ArrayList();
-        for (String processorName : postProcessorNames) {
-            if (isTypeMatch(processorName, PriorityOrdered.class)) {
-                priorityOrderedPostProcessors.add(beanFactory.getBean(processorName));
-            } else if (isTypeMatch(processorName, Ordered.class)) {
-                orderedPostProcessorNames.add(processorName);
-            } else {
-                nonOrderedPostProcessorNames.add(processorName);
-            }
-        }
-
-        // First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
-        Collections.sort(priorityOrderedPostProcessors, new OrderComparator());
-        invokeBeanFactoryPostProcessors(beanFactory, priorityOrderedPostProcessors);
-
-        // Next, invoke the BeanFactoryPostProcessors that implement Ordered.
-        List orderedPostProcessors = new ArrayList();
-        for (Iterator it = orderedPostProcessorNames.iterator(); it.hasNext();) {
-            String postProcessorName = (String) it.next();
-            orderedPostProcessors.add(getBean(postProcessorName));
-        }
-        Collections.sort(orderedPostProcessors, new OrderComparator());
-        invokeBeanFactoryPostProcessors(beanFactory, orderedPostProcessors);
-
-        // Finally, invoke all other BeanFactoryPostProcessors.
-        List nonOrderedPostProcessors = new ArrayList();
-        for (Object nonOrderedPostProcessorName : nonOrderedPostProcessorNames) {
-            String postProcessorName = (String) nonOrderedPostProcessorName;
-            nonOrderedPostProcessors.add(getBean(postProcessorName));
-        }
-        invokeBeanFactoryPostProcessors(beanFactory, nonOrderedPostProcessors);
     }
 
     /**

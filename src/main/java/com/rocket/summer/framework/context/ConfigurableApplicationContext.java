@@ -31,6 +31,14 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
 
     /**
+     * Name of the ConversionService bean in the factory.
+     * If none is supplied, default conversion rules apply.
+     * @since 3.0
+     * @see com.rocket.summer.framework.core.convert.ConversionService
+     */
+    String CONVERSION_SERVICE_BEAN_NAME = "conversionService";
+
+    /**
      * Name of the LoadTimeWeaver bean in the factory. If such a bean is supplied,
      * the context will use a temporary ClassLoader for type matching, in order
      * to allow the LoadTimeWeaver to process all actual bean classes.
@@ -76,13 +84,13 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * Add a new ApplicationListener that will be notified on context events
      * such as context refresh and context shutdown.
      * <p>Note that any ApplicationListener registered here will be applied
-     * on refresh of this context. If a listener is added after the initial
-     * refresh, it will be applied on next refresh of the context.
+     * on refresh if the context is not active yet, or on the fly with the
+     * current event multicaster in case of a context that is already active.
      * @param listener the ApplicationListener to register
-     * @see com.rocket.summer.framework.context.event.ContextRefreshedEvent
-     * @see com.rocket.summer.framework.context.event.ContextClosedEvent
+     * @seecom.rocket.summer.framework.context.event.ContextRefreshedEvent
+     * @seecom.rocket.summer.framework.context.event.ContextClosedEvent
      */
-    void addApplicationListener(ApplicationListener listener);
+    void addApplicationListener(ApplicationListener<?> listener);
 
     /**
      * Load or refresh the persistent representation of the configuration,

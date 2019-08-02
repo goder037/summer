@@ -71,6 +71,13 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
 
     /**
+     * Protected constructor for flexible subclass initialization.
+     * @since 4.3.6
+     */
+    protected ClassPathScanningCandidateComponentProvider() {
+    }
+
+    /**
      * Create a ClassPathScanningCandidateComponentProvider.
      * @param useDefaultFilters whether to register the default filters for the
      * {@link Component @Component}, {@link Repository @Repository},
@@ -265,6 +272,15 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
      */
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
         return (beanDefinition.getMetadata().isConcrete() && beanDefinition.getMetadata().isIndependent());
+    }
+
+    /**
+     * Clear the underlying metadata cache, removing all cached class metadata.
+     */
+    public void clearCache() {
+        if (this.metadataReaderFactory instanceof CachingMetadataReaderFactory) {
+            ((CachingMetadataReaderFactory) this.metadataReaderFactory).clearCache();
+        }
     }
 
 }

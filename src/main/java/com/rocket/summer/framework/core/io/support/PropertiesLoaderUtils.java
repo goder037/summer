@@ -3,9 +3,12 @@ package com.rocket.summer.framework.core.io.support;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.DefaultPropertiesPersister;
+import com.rocket.summer.framework.util.PropertiesPersister;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -25,6 +28,8 @@ import java.util.Properties;
  */
 public abstract class PropertiesLoaderUtils {
 
+    private static final String XML_FILE_EXTENSION = ".xml";
+
     /**
      * Load properties from the given resource.
      * @param resource the resource to load from
@@ -35,6 +40,67 @@ public abstract class PropertiesLoaderUtils {
         Properties props = new Properties();
         fillProperties(props, resource);
         return props;
+    }
+
+    /**
+     * Load properties from the given EncodedResource,
+     * potentially defining a specific encoding for the properties file.
+     * @see #fillProperties(java.util.Properties, EncodedResource)
+     */
+    public static Properties loadProperties(EncodedResource resource) throws IOException {
+        Properties props = new Properties();
+        fillProperties(props, resource);
+        return props;
+    }
+
+    /**
+     * Fill the given properties from the given EncodedResource,
+     * potentially defining a specific encoding for the properties file.
+     * @param props the Properties instance to load into
+     * @param resource the resource to load from
+     * @throws IOException in case of I/O errors
+     */
+    public static void fillProperties(Properties props, EncodedResource resource)
+            throws IOException {
+
+        fillProperties(props, resource, new DefaultPropertiesPersister());
+    }
+
+    /**
+     * Actually load properties from the given EncodedResource into the given Properties instance.
+     * @param props the Properties instance to load into
+     * @param resource the resource to load from
+     * @param persister the PropertiesPersister to use
+     * @throws IOException in case of I/O errors
+     */
+    public static void fillProperties(Properties props, EncodedResource resource, PropertiesPersister persister)
+            throws IOException {
+
+        InputStream stream = null;
+        Reader reader = null;
+        try {
+            String filename = resource.getResource().getFilename();
+            if (filename != null && filename.endsWith(XML_FILE_EXTENSION)) {
+                stream = resource.getInputStream();
+                persister.loadFromXml(props, stream);
+            }
+            else if (resource.requiresReader()) {
+                reader = resource.getReader();
+                persister.load(props, reader);
+            }
+            else {
+                stream = resource.getInputStream();
+                persister.load(props, stream);
+            }
+        }
+        finally {
+            if (stream != null) {
+                stream.close();
+            }
+            if (reader != null) {
+                reader.close();
+            }
+        }
     }
 
     /**

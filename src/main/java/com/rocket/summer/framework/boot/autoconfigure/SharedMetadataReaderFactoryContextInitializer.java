@@ -20,7 +20,7 @@ import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.PriorityOrdered;
 import com.rocket.summer.framework.core.type.classreading.CachingMetadataReaderFactory;
 import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 
 /**
  * {@link ApplicationContextInitializer} to create a shared
@@ -33,7 +33,7 @@ import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
 class SharedMetadataReaderFactoryContextInitializer
         implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    public static final String BEAN_NAME = "org.springframework.boot.autoconfigure."
+    public static final String BEAN_NAME = "com.rocket.summer.framework.boot.autoconfigure."
             + "internalCachingMetadataReaderFactory";
 
     @Override

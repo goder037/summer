@@ -5,6 +5,7 @@ import com.rocket.summer.framework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -17,8 +18,19 @@ import java.util.Map;
  */
 public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
-    private final Map<Resource, MetadataReader> classReaderCache = new HashMap<Resource, MetadataReader>();
+    /** Default maximum number of entries for the MetadataReader cache: 256 */
+    public static final int DEFAULT_CACHE_LIMIT = 256;
 
+
+    private volatile int cacheLimit = DEFAULT_CACHE_LIMIT;
+
+    private final Map<Resource, MetadataReader> metadataReaderCache =
+            new LinkedHashMap<Resource, MetadataReader>(DEFAULT_CACHE_LIMIT, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<Resource, MetadataReader> eldest) {
+                    return size() > getCacheLimit();
+                }
+            };
 
     /**
      * Create a new CachingMetadataReaderFactory for the default class loader.
@@ -44,15 +56,34 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
         super(classLoader);
     }
 
+    /**
+     * Return the maximum number of entries for the MetadataReader cache.
+     */
+    public int getCacheLimit() {
+        return this.cacheLimit;
+    }
 
+    @Override
     public MetadataReader getMetadataReader(Resource resource) throws IOException {
-        synchronized (this.classReaderCache) {
-            MetadataReader metadataReader = this.classReaderCache.get(resource);
+        if (getCacheLimit() <= 0) {
+            return super.getMetadataReader(resource);
+        }
+        synchronized (this.metadataReaderCache) {
+            MetadataReader metadataReader = this.metadataReaderCache.get(resource);
             if (metadataReader == null) {
                 metadataReader = super.getMetadataReader(resource);
-                this.classReaderCache.put(resource, metadataReader);
+                this.metadataReaderCache.put(resource, metadataReader);
             }
             return metadataReader;
+        }
+    }
+
+    /**
+     * Clear the entire MetadataReader cache, removing all cached class metadata.
+     */
+    public void clearCache() {
+        synchronized (this.metadataReaderCache) {
+            this.metadataReaderCache.clear();
         }
     }
 

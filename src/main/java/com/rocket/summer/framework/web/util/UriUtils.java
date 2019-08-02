@@ -200,6 +200,21 @@ public abstract class UriUtils {
     }
 
     /**
+     * Encode characters outside the unreserved character set as defined in
+     * <a href="https://tools.ietf.org/html/rfc3986#section-2">RFC 3986 Section 2</a>.
+     * <p>This can be used to ensure the given String will not contain any
+     * characters with reserved URI meaning regardless of URI component.
+     * @param source the String to be encoded
+     * @param encoding the character encoding to encode to
+     * @return the encoded String
+     * @throws UnsupportedEncodingException when the given encoding parameter is not supported
+     */
+    public static String encode(String source, String encoding) throws UnsupportedEncodingException {
+        HierarchicalUriComponents.Type type = HierarchicalUriComponents.Type.URI;
+        return HierarchicalUriComponents.encodeUriComponent(source, encoding, type);
+    }
+
+    /**
      * Encodes the given HTTP URI into an encoded String. All various URI components
      * are encoded according to their respective valid character sets.
      * <p><strong>Note</strong> that this method does not support fragments ({@code #}),
@@ -468,6 +483,31 @@ public abstract class UriUtils {
             }
         }
         return changed ? new String(bos.toByteArray(), encoding) : source;
+    }
+
+    /**
+     * Extract the file extension from the given URI path.
+     * @param path the URI path (e.g. "/products/index.html")
+     * @return the extracted file extension (e.g. "html")
+     * @since 4.3.2
+     */
+    public static String extractFileExtension(String path) {
+        int end = path.indexOf('?');
+        int fragmentIndex = path.indexOf('#');
+        if (fragmentIndex != -1 && (end == -1 || fragmentIndex < end)) {
+            end = fragmentIndex;
+        }
+        if (end == -1) {
+            end = path.length();
+        }
+        int begin = path.lastIndexOf('/', end) + 1;
+        int paramIndex = path.indexOf(';', begin);
+        end = (paramIndex != -1 && paramIndex < end ? paramIndex : end);
+        int extIndex = path.lastIndexOf('.', end);
+        if (extIndex != -1 && extIndex > begin) {
+            return path.substring(extIndex + 1, end);
+        }
+        return null;
     }
 
 }

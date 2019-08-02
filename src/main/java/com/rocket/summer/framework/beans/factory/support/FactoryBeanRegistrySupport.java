@@ -140,7 +140,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
      * @param object the object obtained from the FactoryBean.
      * @param beanName the name of the bean
      * @return the object to expose
-     * @throws com.rocket.summer.framework.beans.BeansException if any post-processing failed
+     * @throws com.rocket.summer.framework.context.BeansException if any post-processing failed
      */
     protected Object postProcessObjectFromFactoryBean(Object object, String beanName) throws BeansException {
         return object;

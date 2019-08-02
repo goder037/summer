@@ -48,6 +48,18 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
     public static final String ACTIVE_PROFILES_PROPERTY_NAME = "spring.profiles.active";
 
     /**
+     * System property that instructs Spring to ignore system environment variables,
+     * i.e. to never attempt to retrieve such a variable via {@link System#getenv()}.
+     * <p>The default is "false", falling back to system environment variable checks if a
+     * Spring environment property (e.g. a placeholder in a configuration String) isn't
+     * resolvable otherwise. Consider switching this flag to "true" if you experience
+     * log warnings from {@code getenv} calls coming from Spring, e.g. on WebSphere
+     * with strict SecurityManager settings and AccessControlExceptions warnings.
+     * @see #suppressGetenvAccess()
+     */
+    public static final String IGNORE_GETENV_PROPERTY_NAME = "spring.getenv.ignore";
+
+    /**
      * Name of property to set to specify profiles active by default: {@value}. Value may
      * be comma delimited.
      * <p>Note that certain shell environments such as Bash disallow the use of the period

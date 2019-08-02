@@ -28,7 +28,17 @@ import java.util.*;
  */
 public class HttpHeaders implements MultiValueMap<String, String> {
 
-    private static final String ACCEPT = "Accept";
+    /**
+     * The HTTP {@code Accept} header field name.
+     * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">Section 5.3.2 of RFC 7231</a>
+     */
+    public static final String ACCEPT = "Accept";
+
+    /**
+     * The HTTP {@code Transfer-Encoding} header field name.
+     * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.1">Section 3.3.1 of RFC 7230</a>
+     */
+    public static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
     private static final String ACCEPT_CHARSET = "Accept-Charset";
 
@@ -43,6 +53,12 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     private static final String CONTENT_TYPE = "Content-Type";
 
     private static final String DATE = "Date";
+
+    /**
+     * The HTTP {@code Cookie} header field name.
+     * @see <a href="https://tools.ietf.org/html/rfc2109#section-4.3.4">Section 4.3.4 of RFC 2109</a>
+     */
+    public static final String COOKIE = "Cookie";
 
     private static final String ETAG = "ETag";
 

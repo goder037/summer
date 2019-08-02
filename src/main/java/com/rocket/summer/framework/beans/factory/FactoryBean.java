@@ -15,8 +15,8 @@ package com.rocket.summer.framework.beans.factory;
  * interface allows for exposing more fine-grained behavioral metadata.
  *
  * <p>This interface is heavily used within the framework itself, for example for
- * the AOP {@link org.springframework.aop.framework.ProxyFactoryBean} or the
- * {@link org.springframework.jndi.JndiObjectFactoryBean}. It can be used for
+ * the AOP {@link com.rocket.summer.framework.aop.framework.ProxyFactoryBean} or the
+ * {@link com.rocket.summer.framework.jndi.JndiObjectFactoryBean}. It can be used for
  * custom components as well; however, this is only common for infrastructure code.
  *
  * <p><b>{@code FactoryBean} is a programmatic contract. Implementations are not
@@ -33,9 +33,9 @@ package com.rocket.summer.framework.beans.factory;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 08.03.2003
- * @see org.springframework.beans.factory.BeanFactory
- * @see org.springframework.aop.framework.ProxyFactoryBean
- * @see org.springframework.jndi.JndiObjectFactoryBean
+ * @see com.rocket.summer.framework.beans.factory.BeanFactory
+ * @see com.rocket.summer.framework.aop.framework.ProxyFactoryBean
+ * @see com.rocket.summer.framework.jndi.JndiObjectFactoryBean
  */
 public interface FactoryBean<T> {
 

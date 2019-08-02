@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.web.context;
 
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -89,9 +90,12 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
     String[] getConfigLocations();
 
     /**
-     * Return the {@link ConfigurableWebEnvironment} used by this web application context.
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * @since 3.1
      */
-    ConfigurableWebEnvironment getEnvironment();
+    @Override
+    ConfigurableEnvironment getEnvironment();
 
 }
 

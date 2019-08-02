@@ -34,6 +34,14 @@ public interface View {
     String RESPONSE_STATUS_ATTRIBUTE = View.class.getName() + ".responseStatus";
 
     /**
+     * The {@link com.rocket.summer.framework.http.MediaType} selected during content negotiation,
+     * which may be more specific than the one the View is configured with. For example:
+     * "application/vnd.example-v1+xml" vs "application/*+xml".
+     * @since 3.2
+     */
+    String SELECTED_CONTENT_TYPE = View.class.getName() + ".selectedContentType";
+
+    /**
      * Name of the {@link HttpServletRequest} attribute that contains a Map with path variables.
      * The map consists of String-based URI template variable names as keys and their corresponding
      * Object-based values -- extracted from segments of the URL and type converted.

@@ -121,6 +121,11 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
     String getScope();
 
     /**
+     * Return whether this bean is a primary autowire candidate.
+     */
+    boolean isPrimary();
+
+    /**
      * Override the target scope of this bean, specifying a new scope name.
      * @see #SCOPE_SINGLETON
      * @see #SCOPE_PROTOTYPE

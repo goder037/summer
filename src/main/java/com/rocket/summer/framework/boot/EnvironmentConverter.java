@@ -17,7 +17,7 @@ import java.util.Set;
  */
 final class EnvironmentConverter {
 
-    private static final String CONFIGURABLE_WEB_ENVIRONMENT_CLASS = "org.springframework.web.context.ConfigurableWebEnvironment";
+    private static final String CONFIGURABLE_WEB_ENVIRONMENT_CLASS = "com.rocket.summer.framework.web.context.ConfigurableWebEnvironment";
 
     private static final Set<String> SERVLET_ENVIRONMENT_SOURCE_NAMES;
 

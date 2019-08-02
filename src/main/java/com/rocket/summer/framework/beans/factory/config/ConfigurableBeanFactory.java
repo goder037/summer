@@ -29,6 +29,25 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     String SCOPE_PROTOTYPE = "prototype";
 
     /**
+     * Explicitly control the current in-creation status of the specified bean.
+     * For container-internal use only.
+     * @param beanName the name of the bean
+     * @param inCreation whether the bean is currently in creation
+     * @since 3.1
+     */
+    void setCurrentlyInCreation(String beanName, boolean inCreation);
+
+    /**
+     * Resolve all alias target names and aliases registered in this
+     * factory, applying the given StringValueResolver to them.
+     * <p>The value resolver may for example resolve placeholders
+     * in target bean names and even in alias names.
+     * @param valueResolver the StringValueResolver to apply
+     * @since 2.5
+     */
+    void resolveAliases(StringValueResolver valueResolver);
+
+    /**
      * Register the given scope, backed by the given Scope implementation.
      * @param scopeName the scope identifier
      * @param scope the backing Scope implementation

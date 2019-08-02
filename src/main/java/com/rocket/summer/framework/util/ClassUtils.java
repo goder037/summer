@@ -79,6 +79,18 @@ public abstract class ClassUtils {
     }
 
     /**
+     * Determine the name of the package of the given class,
+     * e.g. "java.lang" for the {@code java.lang.String} class.
+     * @param clazz the class
+     * @return the package name, or the empty String if the class
+     * is defined in the default package
+     */
+    public static String getPackageName(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        return getPackageName(clazz.getName());
+    }
+
+    /**
      * Determine whether the given class has a method with the given signature,
      * and return it if available (else return <code>null</code>).
      * <p>Essentially translates <code>NoSuchMethodException</code> to <code>null</code>.
@@ -95,6 +107,40 @@ public abstract class ClassUtils {
             return clazz.getMethod(methodName, paramTypes);
         }
         catch (NoSuchMethodException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Copy the given {@code Collection} into a {@code Class} array.
+     * <p>The {@code Collection} must contain {@code Class} elements only.
+     * @param collection the {@code Collection} to copy
+     * @return the {@code Class} array
+     * @since 3.1
+     * @see StringUtils#toStringArray
+     */
+    public static Class<?>[] toClassArray(Collection<Class<?>> collection) {
+        if (collection == null) {
+            return null;
+        }
+        return collection.toArray(new Class<?>[collection.size()]);
+    }
+
+    /**
+     * Override the thread context ClassLoader with the environment's bean ClassLoader
+     * if necessary, i.e. if the bean ClassLoader is not equivalent to the thread
+     * context ClassLoader already.
+     * @param classLoaderToUse the actual ClassLoader to use for the thread context
+     * @return the original thread context ClassLoader, or {@code null} if not overridden
+     */
+    public static ClassLoader overrideThreadContextClassLoader(ClassLoader classLoaderToUse) {
+        Thread currentThread = Thread.currentThread();
+        ClassLoader threadContextClassLoader = currentThread.getContextClassLoader();
+        if (classLoaderToUse != null && !classLoaderToUse.equals(threadContextClassLoader)) {
+            currentThread.setContextClassLoader(classLoaderToUse);
+            return threadContextClassLoader;
+        }
+        else {
             return null;
         }
     }

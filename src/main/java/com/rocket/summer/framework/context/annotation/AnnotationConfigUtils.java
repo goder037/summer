@@ -5,11 +5,17 @@ import com.rocket.summer.framework.beans.factory.annotation.AutowiredAnnotationB
 import com.rocket.summer.framework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
+import com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.RootBeanDefinition;
+import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
+import com.rocket.summer.framework.core.type.AnnotatedTypeMetadata;
+import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.util.ClassUtils;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,7 +50,7 @@ public class AnnotationConfigUtils {
      * @since 3.1.1
      */
     public static final String CONFIGURATION_BEAN_NAME_GENERATOR =
-            "org.springframework.context.annotation.internalConfigurationBeanNameGenerator";
+            "com.rocket.summer.framework.context.annotation.internalConfigurationBeanNameGenerator";
 
     /**
      * The bean name of the internally managed Autowired annotation processor.
@@ -89,6 +95,72 @@ public class AnnotationConfigUtils {
      */
     public static void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
         registerAnnotationConfigProcessors(registry, null);
+    }
+
+    static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+        if (metadata.isAnnotated(Lazy.class.getName())) {
+            abd.setLazyInit(attributesFor(metadata, Lazy.class).getBoolean("value"));
+        }
+        else if (abd.getMetadata() != metadata && abd.getMetadata().isAnnotated(Lazy.class.getName())) {
+            abd.setLazyInit(attributesFor(abd.getMetadata(), Lazy.class).getBoolean("value"));
+        }
+
+        if (metadata.isAnnotated(Primary.class.getName())) {
+            abd.setPrimary(true);
+        }
+        if (metadata.isAnnotated(DependsOn.class.getName())) {
+            abd.setDependsOn(attributesFor(metadata, DependsOn.class).getStringArray("value"));
+        }
+
+        if (abd instanceof AbstractBeanDefinition) {
+            AbstractBeanDefinition absBd = (AbstractBeanDefinition) abd;
+            if (metadata.isAnnotated(Role.class.getName())) {
+                absBd.setRole(attributesFor(metadata, Role.class).getNumber("value").intValue());
+            }
+            if (metadata.isAnnotated(Description.class.getName())) {
+                absBd.setDescription(attributesFor(metadata, Description.class).getString("value"));
+            }
+        }
+    }
+
+    static AnnotationAttributes attributesFor(AnnotatedTypeMetadata metadata, Class<?> annotationClass) {
+        return attributesFor(metadata, annotationClass.getName());
+    }
+
+    static AnnotationAttributes attributesFor(AnnotatedTypeMetadata metadata, String annotationClassName) {
+        return AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(annotationClassName, false));
+    }
+
+    static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata,
+                                                             Class<?> containerClass, Class<?> annotationClass) {
+
+        return attributesForRepeatable(metadata, containerClass.getName(), annotationClass.getName());
+    }
+
+    static Set<AnnotationAttributes> attributesForRepeatable(
+            AnnotationMetadata metadata, String containerClassName, String annotationClassName) {
+
+        Set<AnnotationAttributes> result = new LinkedHashSet<AnnotationAttributes>();
+
+        // Direct annotation present?
+        addAttributesIfNotNull(result, metadata.getAnnotationAttributes(annotationClassName, false));
+
+        // Container annotation present?
+        Map<String, Object> container = metadata.getAnnotationAttributes(containerClassName, false);
+        if (container != null && container.containsKey("value")) {
+            for (Map<String, Object> containedAttributes : (Map<String, Object>[]) container.get("value")) {
+                addAttributesIfNotNull(result, containedAttributes);
+            }
+        }
+
+        // Return merged result
+        return Collections.unmodifiableSet(result);
+    }
+
+    private static void addAttributesIfNotNull(Set<AnnotationAttributes> result, Map<String, Object> attributes) {
+        if (attributes != null) {
+            result.add(AnnotationAttributes.fromMap(attributes));
+        }
     }
 
     /**

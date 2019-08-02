@@ -21,7 +21,7 @@ import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.SpringFactoriesLoader;
 import com.rocket.summer.framework.util.*;
-import com.rocket.summer.framework.web.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 import com.rocket.summer.framework.web.context.WebApplicationContext;
 import com.rocket.summer.framework.web.context.support.StandardServletEnvironment;
 import org.apache.commons.logging.Log;
@@ -107,18 +107,18 @@ public class SpringApplication {
      * The class name of application context that will be used by default for non-web
      * environments.
      */
-    public static final String DEFAULT_CONTEXT_CLASS = "org.springframework.context."
+    public static final String DEFAULT_CONTEXT_CLASS = "com.rocket.summer.framework.context."
             + "annotation.AnnotationConfigApplicationContext";
 
     /**
      * The class name of application context that will be used by default for web
      * environments.
      */
-    public static final String DEFAULT_WEB_CONTEXT_CLASS = "org.springframework."
+    public static final String DEFAULT_WEB_CONTEXT_CLASS = "com.rocket.summer.framework."
             + "boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext";
 
     private static final String[] WEB_ENVIRONMENT_CLASSES = { "javax.servlet.Servlet",
-            "org.springframework.web.context.ConfigurableWebApplicationContext" };
+            "com.rocket.summer.framework.web.context.ConfigurableWebApplicationContext" };
 
     /**
      * Default banner location.
@@ -437,7 +437,7 @@ public class SpringApplication {
      * @param environment this application's environment
      * @param args arguments passed to the {@code run} method
      * @see #configureEnvironment(ConfigurableEnvironment, String[])
-     * @see org.springframework.boot.context.config.ConfigFileApplicationListener
+     * @see com.rocket.summer.framework.boot.context.config.ConfigFileApplicationListener
      */
     protected void configureProfiles(ConfigurableEnvironment environment, String[] args) {
         environment.getActiveProfiles(); // ensure they are initialized

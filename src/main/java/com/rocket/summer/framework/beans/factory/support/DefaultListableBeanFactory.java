@@ -7,6 +7,7 @@ import com.rocket.summer.framework.beans.factory.config.*;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.CollectionFactory;
 import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.CompositeIterator;
 import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.StringUtils;
 
@@ -20,6 +21,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
     /** Whether to allow eager class loading even for lazy-init beans */
     private boolean allowEagerClassLoading = true;
+
+    /** Optional OrderComparator for dependency Lists and arrays */
+    private Comparator<Object> dependencyComparator;
 
     /** Whether bean definition metadata may be cached for all beans */
     private boolean configurationFrozen = false;
@@ -36,6 +40,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     /** Resolver to use for checking if a bean definition is an autowire candidate */
     private AutowireCandidateResolver autowireCandidateResolver = AutowireUtils.createAutowireCandidateResolver();
 
+    /** List of names of manually registered singletons, in registration order */
+    private volatile Set<String> manualSingletonNames = new LinkedHashSet<String>(16);
+
     /** Map from dependency type to corresponding autowired value */
     private final Map resolvableDependencies = new HashMap();
 
@@ -45,6 +52,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
      */
     public DefaultListableBeanFactory() {
         super();
+    }
+
+    /**
+     * Return the dependency comparator for this BeanFactory (may be {@code null}.
+     * @since 4.0
+     */
+    public Comparator<Object> getDependencyComparator() {
+        return this.dependencyComparator;
+    }
+
+    /**
+     * Return whether it should be allowed to override bean definitions by registering
+     * a different definition with the same name, automatically replacing the former.
+     * @since 4.1.2
+     */
+    public boolean isAllowBeanDefinitionOverriding() {
+        return this.allowBeanDefinitionOverriding;
     }
 
     /**
@@ -89,6 +113,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                 return StringUtils.toStringArray(this.beanDefinitionNames);
             }
         }
+    }
+
+    /**
+     * Return whether the factory is allowed to eagerly load bean classes
+     * even for bean definitions that are marked as "lazy-init".
+     * @since 4.1.2
+     */
+    public boolean isAllowEagerClassLoading() {
+        return this.allowEagerClassLoading;
+    }
+
+    @Override
+    public Iterator<String> getBeanNamesIterator() {
+        CompositeIterator<String> iterator = new CompositeIterator<String>();
+        iterator.add(this.beanDefinitionNames.iterator());
+        iterator.add(this.manualSingletonNames.iterator());
+        return iterator;
     }
 
     public String[] getBeanNamesForType(Class type) {
@@ -682,4 +723,5 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public void setAllowEagerClassLoading(boolean allowEagerClassLoading) {
         this.allowEagerClassLoading = allowEagerClassLoading;
     }
+
 }

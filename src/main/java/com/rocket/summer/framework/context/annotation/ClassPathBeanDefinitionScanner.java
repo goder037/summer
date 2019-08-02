@@ -5,6 +5,7 @@ import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinit
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
 import com.rocket.summer.framework.beans.factory.support.*;
+import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.PatternMatchUtils;
@@ -54,6 +55,42 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
      */
     public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
         this(registry, true);
+    }
+
+    /**
+     * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory and
+     * using the given {@link Environment} when evaluating bean definition profile metadata.
+     * @param registry the {@code BeanFactory} to load bean definitions into, in the form
+     * of a {@code BeanDefinitionRegistry}
+     * @param useDefaultFilters whether to include the default filters for the
+     * {@link com.rocket.summer.framework.stereotype.Component @Component},
+     * {@link com.rocket.summer.framework.stereotype.Repository @Repository},
+     * {@link com.rocket.summer.framework.stereotype.Service @Service}, and
+     * {@link com.rocket.summer.framework.stereotype.Controller @Controller} stereotype annotations
+     * @param environment the Spring {@link Environment} to use when evaluating bean
+     * definition profile metadata
+     * @param resourceLoader the {@link ResourceLoader} to use
+     * @since 4.3.6
+     */
+    public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters,
+                                          Environment environment, ResourceLoader resourceLoader) {
+
+        Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
+        this.registry = registry;
+
+        if (useDefaultFilters) {
+            registerDefaultFilters();
+        }
+        setEnvironment(environment);
+        setResourceLoader(resourceLoader);
+    }
+
+    /**
+     * Return the defaults to use for detected beans (never {@code null}).
+     * @since 4.1
+     */
+    public BeanDefinitionDefaults getBeanDefinitionDefaults() {
+        return this.beanDefinitionDefaults;
     }
 
     /**

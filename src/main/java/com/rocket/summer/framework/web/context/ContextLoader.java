@@ -5,6 +5,7 @@ import com.rocket.summer.framework.beans.factory.access.BeanFactoryLocator;
 import com.rocket.summer.framework.beans.factory.access.BeanFactoryReference;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextException;
+import com.rocket.summer.framework.context.ApplicationContextInitializer;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
@@ -109,6 +110,10 @@ public class ContextLoader {
      * Supplying the "parentContextKey" parameter is sufficient in this case.
      */
     public static final String LOCATOR_FACTORY_SELECTOR_PARAM = "locatorFactorySelector";
+
+    /** Actual ApplicationContextInitializer instances to apply to the context */
+    private final List<ApplicationContextInitializer<ConfigurableApplicationContext>> contextInitializers =
+            new ArrayList<ApplicationContextInitializer<ConfigurableApplicationContext>>();
 
     /**
      * Optional servlet context parameter (i.e., "{@code parentContextKey}")
@@ -437,41 +442,31 @@ public class ContextLoader {
      * <p>Any {@code ApplicationContextInitializers} implementing
      * {@link com.rocket.summer.framework.core.Ordered Ordered} or marked with @{@link
      * com.rocket.summer.framework.core.annotation.Order Order} will be sorted appropriately.
-     * @param servletContext the current servlet context
-     * @param applicationContext the newly created application context
-     * @see #createWebApplicationContext(ServletContext, ApplicationContext)
+     * @param sc the current servlet context
+     * @param wac the newly created application context
      * @see #CONTEXT_INITIALIZER_CLASSES_PARAM
      * @see ApplicationContextInitializer#initialize(ConfigurableApplicationContext)
      */
-    protected void customizeContext(ServletContext servletContext, ConfigurableWebApplicationContext applicationContext) {
+    protected void customizeContext(ServletContext sc, ConfigurableWebApplicationContext wac) {
         List<Class<ApplicationContextInitializer<ConfigurableApplicationContext>>> initializerClasses =
-                determineContextInitializerClasses(servletContext);
-
-        if (initializerClasses.size() == 0) {
-            // no ApplicationContextInitializers have been declared -> nothing to do
-            return;
-        }
-
-        Class<?> contextClass = applicationContext.getClass();
-        ArrayList<ApplicationContextInitializer<ConfigurableApplicationContext>> initializerInstances =
-                new ArrayList<ApplicationContextInitializer<ConfigurableApplicationContext>>();
+                determineContextInitializerClasses(sc);
 
         for (Class<ApplicationContextInitializer<ConfigurableApplicationContext>> initializerClass : initializerClasses) {
             Class<?> initializerContextClass =
                     GenericTypeResolver.resolveTypeArgument(initializerClass, ApplicationContextInitializer.class);
-            Assert.isAssignable(initializerContextClass, contextClass, String.format(
-                    "Could not add context initializer [%s] as its generic parameter [%s] " +
-                            "is not assignable from the type of application context used by this " +
-                            "context loader [%s]: ", initializerClass.getName(), initializerContextClass.getName(),
-                    contextClass.getName()));
-            initializerInstances.add(BeanUtils.instantiateClass(initializerClass));
+            if (initializerContextClass != null && !initializerContextClass.isInstance(wac)) {
+                throw new ApplicationContextException(String.format(
+                        "Could not apply context initializer [%s] since its generic parameter [%s] " +
+                                "is not assignable from the type of application context used by this " +
+                                "context loader: [%s]", initializerClass.getName(), initializerContextClass.getName(),
+                        wac.getClass().getName()));
+            }
+            this.contextInitializers.add(BeanUtils.instantiateClass(initializerClass));
         }
 
-        applicationContext.getEnvironment().initPropertySources(servletContext, null);
-
-        Collections.sort(initializerInstances, new AnnotationAwareOrderComparator());
-        for (ApplicationContextInitializer<ConfigurableApplicationContext> initializer : initializerInstances) {
-            initializer.initialize(applicationContext);
+        AnnotationAwareOrderComparator.sort(this.contextInitializers);
+        for (ApplicationContextInitializer<ConfigurableApplicationContext> initializer : this.contextInitializers) {
+            initializer.initialize(wac);
         }
     }
 

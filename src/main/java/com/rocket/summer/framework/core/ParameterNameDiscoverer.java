@@ -35,6 +35,6 @@ public interface ParameterNameDiscoverer {
      * @return an array of parameter names if the names can be resolved,
      * or <code>null</code> if they cannot
      */
-    String[] getParameterNames(Constructor ctor);
+    String[] getParameterNames(Constructor<?> ctor);
 
 }

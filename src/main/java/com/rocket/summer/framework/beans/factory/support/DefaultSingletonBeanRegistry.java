@@ -106,6 +106,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
         }
     }
 
+    public void setCurrentlyInCreation(String beanName, boolean inCreation) {
+        Assert.notNull(beanName, "Bean name must not be null");
+        if (!inCreation) {
+            this.inCreationCheckExclusions.add(beanName);
+        }
+        else {
+            this.inCreationCheckExclusions.remove(beanName);
+        }
+    }
+
     /**
      * Add the given singleton object to the singleton cache of this factory.
      * <p>To be called for eager registration of singletons.
@@ -541,13 +551,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
     }
 
     /**
-     * Expose the singleton mutex to subclasses.
+     * Exposes the singleton mutex to subclasses and external collaborators.
      * <p>Subclasses should synchronize on the given Object if they perform
      * any sort of extended singleton creation phase. In particular, subclasses
      * should <i>not</i> have their own mutexes involved in singleton creation,
      * to avoid the potential for deadlocks in lazy-init situations.
      */
-    protected final Object getSingletonMutex() {
+    public final Object getSingletonMutex() {
         return this.singletonObjects;
     }
 
