@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.util.comparator;
 
+import com.rocket.summer.framework.util.Assert;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -25,6 +27,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
      * @param comparator the comparator to decorate
      */
     public InvertibleComparator(Comparator<T> comparator) {
+        Assert.notNull(comparator, "Comparator must not be null");
         this.comparator = comparator;
     }
 
@@ -35,6 +38,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
      * @param ascending the sort order: ascending (true) or descending (false)
      */
     public InvertibleComparator(Comparator<T> comparator, boolean ascending) {
+        Assert.notNull(comparator, "Comparator must not be null");
         this.comparator = comparator;
         setAscending(ascending);
     }
@@ -63,6 +67,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
     }
 
 
+    @Override
     public int compare(T o1, T o2) {
         int result = this.comparator.compare(o1, o2);
         if (result != 0) {
@@ -81,6 +86,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -88,7 +94,7 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
         if (!(obj instanceof InvertibleComparator)) {
             return false;
         }
-        InvertibleComparator other = (InvertibleComparator) obj;
+        InvertibleComparator<T> other = (InvertibleComparator<T>) obj;
         return (this.comparator.equals(other.comparator) && this.ascending == other.ascending);
     }
 
@@ -103,4 +109,3 @@ public class InvertibleComparator<T> implements Comparator<T>, Serializable {
     }
 
 }
-

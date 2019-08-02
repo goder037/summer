@@ -410,6 +410,36 @@ public enum HttpStatus {
         throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
     }
 
+    /**
+     * Whether this status code is in the HTTP series
+     * {@link com.rocket.summer.framework.http.HttpStatus.Series#CLIENT_ERROR}.
+     * This is a shortcut for checking the value of {@link #series()}.
+     * @see #series()
+     */
+    public boolean is4xxClientError() {
+        return (series() == Series.CLIENT_ERROR);
+    }
+
+    /**
+     * Whether this status code is in the HTTP series
+     * {@link com.rocket.summer.framework.http.HttpStatus.Series#SERVER_ERROR}.
+     * This is a shortcut for checking the value of {@link #series()}.
+     * @see #series()
+     */
+    public boolean is5xxServerError() {
+        return (series() == Series.SERVER_ERROR);
+    }
+
+    /**
+     * Whether this status code is in the HTTP series
+     * {@link com.rocket.summer.framework.http.HttpStatus.Series#INFORMATIONAL}.
+     * This is a shortcut for checking the value of {@link #series()}.
+     * @see #series()
+     */
+    public boolean is1xxInformational() {
+        return (series() == Series.INFORMATIONAL);
+    }
+
 
     /**
      * Java 5 enumeration of HTTP status series.

@@ -509,6 +509,12 @@ final class HierarchicalUriComponents extends UriComponents {
             public boolean isAllowed(int c) {
                 return isPchar(c) || '/' == c || '?' == c;
             }
+        },
+        URI {
+            @Override
+            public boolean isAllowed(int c) {
+                return isUnreserved(c);
+            }
         };
 
         /**

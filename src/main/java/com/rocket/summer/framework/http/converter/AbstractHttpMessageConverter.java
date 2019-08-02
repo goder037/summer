@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,8 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
     protected final Log logger = LogFactory.getLog(getClass());
 
     private List<MediaType> supportedMediaTypes = Collections.emptyList();
+
+    private Charset defaultCharset;
 
 
     /**
@@ -56,6 +59,56 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
         setSupportedMediaTypes(Arrays.asList(supportedMediaTypes));
     }
 
+    /**
+     * Set the default character set, if any.
+     * @since 4.3
+     */
+    public void setDefaultCharset(Charset defaultCharset) {
+        this.defaultCharset = defaultCharset;
+    }
+
+    /**
+     * Add default headers to the output message.
+     * <p>This implementation delegates to {@link #getDefaultContentType(Object)} if a
+     * content type was not provided, set if necessary the default character set, calls
+     * {@link #getContentLength}, and sets the corresponding headers.
+     * @since 4.2
+     */
+    protected void addDefaultHeaders(HttpHeaders headers, T t, MediaType contentType) throws IOException {
+        if (headers.getContentType() == null) {
+            MediaType contentTypeToUse = contentType;
+            if (contentType == null || contentType.isWildcardType() || contentType.isWildcardSubtype()) {
+                contentTypeToUse = getDefaultContentType(t);
+            }
+            else if (MediaType.APPLICATION_OCTET_STREAM.equals(contentType)) {
+                MediaType mediaType = getDefaultContentType(t);
+                contentTypeToUse = (mediaType != null ? mediaType : contentTypeToUse);
+            }
+            if (contentTypeToUse != null) {
+                if (contentTypeToUse.getCharset() == null) {
+                    Charset defaultCharset = getDefaultCharset();
+                    if (defaultCharset != null) {
+                        contentTypeToUse = new MediaType(contentTypeToUse, defaultCharset);
+                    }
+                }
+                headers.setContentType(contentTypeToUse);
+            }
+        }
+        if (headers.getContentLength() < 0 && !headers.containsKey(HttpHeaders.TRANSFER_ENCODING)) {
+            Long contentLength = getContentLength(t, headers.getContentType());
+            if (contentLength != null) {
+                headers.setContentLength(contentLength);
+            }
+        }
+    }
+
+    /**
+     * Return the default character set, if any.
+     * @since 4.3
+     */
+    public Charset getDefaultCharset() {
+        return this.defaultCharset;
+    }
 
     /**
      * Set the list of {@link MediaType} objects supported by this converter.
