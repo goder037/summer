@@ -1,7 +1,5 @@
 package com.rocket.summer.framework.core.type;
 
-import java.util.Map;
-
 /**
  * Interface that defines abstract access to the annotations of a specific
  * class, in a form that does not require that class to be loaded yet.

@@ -11,7 +11,6 @@ import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
 import com.rocket.summer.framework.beans.factory.support.SimpleInstantiationStrategy;
 import com.rocket.summer.framework.cglib.core.SpringNamingPolicy;
 import com.rocket.summer.framework.core.annotation.AnnotatedElementUtils;
-import com.rocket.summer.framework.core.annotation.AnnotationUtils;
 import com.rocket.summer.framework.objenesis.SpringObjenesis;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;

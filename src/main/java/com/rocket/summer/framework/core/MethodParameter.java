@@ -107,6 +107,40 @@ public class MethodParameter {
     }
 
     /**
+     * Return the wrapped annotated element.
+     * <p>Note: This method exposes the annotations declared on the method/constructor
+     * itself (i.e. at the method/constructor level, not at the parameter level).
+     * @return the Method or Constructor as AnnotatedElement
+     */
+    public AnnotatedElement getAnnotatedElement() {
+        // NOTE: no ternary expression to retain JDK <8 compatibility even when using
+        // the JDK 8 compiler (potentially selecting java.lang.reflect.Executable
+        // as common type, with that new base class not available on older JDKs)
+        if (this.method != null) {
+            return this.method;
+        }
+        else {
+            return this.constructor;
+        }
+    }
+
+    /**
+     * Return the wrapped member.
+     * @return the Method or Constructor as Member
+     */
+    public Member getMember() {
+        // NOTE: no ternary expression to retain JDK <8 compatibility even when using
+        // the JDK 8 compiler (potentially selecting java.lang.reflect.Executable
+        // as common type, with that new base class not available on older JDKs)
+        if (this.method != null) {
+            return this.method;
+        }
+        else {
+            return this.constructor;
+        }
+    }
+
+    /**
      * Copy constructor, resulting in an independent MethodParameter object
      * based on the same metadata and cache state that the original object was in.
      * @param original the original MethodParameter object to copy from
@@ -147,22 +181,6 @@ public class MethodParameter {
      */
     public Constructor getConstructor() {
         return this.constructor;
-    }
-
-    /**
-     * Returns the wrapped member.
-     * @return the member
-     */
-    private Member getMember() {
-        return this.method != null ? this.method : this.constructor;
-    }
-
-    /**
-     * Returns the wrapped annotated element.
-     * @return the annotated element
-     */
-    private AnnotatedElement getAnnotatedElement() {
-        return this.method != null ? this.method : this.constructor;
     }
 
     /**

@@ -3,7 +3,6 @@ package com.rocket.summer.framework.web.servlet.config.annotation;
 import com.rocket.summer.framework.cache.Cache;
 import com.rocket.summer.framework.cache.concurrent.ConcurrentMapCache;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.web.servlet.resource.*;
 
 import java.util.ArrayList;

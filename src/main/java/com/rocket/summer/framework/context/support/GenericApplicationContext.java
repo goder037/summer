@@ -8,7 +8,6 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.core.ResolvableType;
-import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;

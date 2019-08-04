@@ -1,16 +1,8 @@
 package com.rocket.summer.framework.context.support;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.rocket.summer.framework.beans.BeanUtils;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
@@ -128,7 +120,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     private long startupDate;
 
     /** Flag that indicates whether this context is currently active */
-    private boolean active = false;
+    private final AtomicBoolean active = new AtomicBoolean();
+
+    /** LifecycleProcessor for managing the lifecycle of beans within this context */
+    private LifecycleProcessor lifecycleProcessor;
 
     /** Synchronization monitor for the "active" flag */
     private final Object activeMonitor = new Object();
@@ -154,6 +149,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     /** Environment used by this context; initialized by {@link #createEnvironment()} */
     private ConfigurableEnvironment environment;
 
+    /** Flag that indicates whether this context has been closed already */
+    private final AtomicBoolean closed = new AtomicBoolean();
+
+    /** ApplicationEvents published early */
+    private Set<ApplicationEvent> earlyApplicationEvents;
 
     /**
      * Create a new AbstractApplicationContext with no parent.
@@ -421,15 +421,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * active flag.
      */
     protected void prepareRefresh() {
+        // Switch to active.
         this.startupDate = System.currentTimeMillis();
-
-        synchronized (this.activeMonitor) {
-            this.active = true;
-        }
+        this.closed.set(false);
+        this.active.set(true);
 
         if (logger.isInfoEnabled()) {
             logger.info("Refreshing " + this);
         }
+
+        // Initialize any placeholder property sources in the context environment.
+        initPropertySources();
+
+        // Validate that all properties marked as required are resolvable:
+        // see ConfigurablePropertyResolver#setRequiredProperties
+        getEnvironment().validateRequiredProperties();
+
+        // Allow for the collection of early ApplicationEvents,
+        // to be published once the multicaster is available...
+        this.earlyApplicationEvents = new LinkedHashSet<ApplicationEvent>();
     }
 
     /**
@@ -720,9 +730,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * @param ex the exception that led to the cancellation
      */
     protected void cancelRefresh(BeansException ex) {
-        synchronized (this.activeMonitor) {
-            this.active = false;
-        }
+        this.active.set(false);
     }
 
 
@@ -754,7 +762,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * <p>The <code>close</code> method is the native way to
      * shut down an ApplicationContext.
      * @see #close()
-     * @see com.rocket.summer.framework.beans.factory.access.SingletonBeanFactoryLocator
      */
     public void destroy() {
         close();
@@ -788,31 +795,43 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
      * @see #registerShutdownHook()
      */
     protected void doClose() {
-        if (isActive()) {
+        // Check whether an actual close attempt is necessary...
+        if (this.active.get() && this.closed.compareAndSet(false, true)) {
             if (logger.isInfoEnabled()) {
                 logger.info("Closing " + this);
             }
+
+            LiveBeansView.unregisterApplicationContext(this);
+
             try {
                 // Publish shutdown event.
                 publishEvent(new ContextClosedEvent(this));
             }
             catch (Throwable ex) {
-                logger.error("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
+                logger.warn("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
             }
+
             // Stop all Lifecycle beans, to avoid delays during individual destruction.
-            Map lifecycleBeans = getLifecycleBeans();
-            for (Object o : new LinkedHashSet(lifecycleBeans.keySet())) {
-                String beanName = (String) o;
-                doStop(lifecycleBeans, beanName);
+            if (this.lifecycleProcessor != null) {
+                try {
+                    this.lifecycleProcessor.onClose();
+                }
+                catch (Throwable ex) {
+                    logger.warn("Exception thrown from LifecycleProcessor on context close", ex);
+                }
             }
+
             // Destroy all cached singletons in the context's BeanFactory.
             destroyBeans();
+
             // Close the state of this context itself.
             closeBeanFactory();
+
+            // Let subclasses do some final clean-up if they wish...
             onClose();
-            synchronized (this.activeMonitor) {
-                this.active = false;
-            }
+
+            // Switch to inactive.
+            this.active.set(false);
         }
     }
 
@@ -843,10 +862,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
         // For subclasses: do nothing by default.
     }
 
+    @Override
     public boolean isActive() {
-        synchronized (this.activeMonitor) {
-            return this.active;
-        }
+        return this.active.get();
     }
 
 

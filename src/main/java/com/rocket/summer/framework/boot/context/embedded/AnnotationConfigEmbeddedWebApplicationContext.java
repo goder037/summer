@@ -2,13 +2,11 @@ package com.rocket.summer.framework.boot.context.embedded;
 
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
-import com.rocket.summer.framework.context.annotation.AnnotatedBeanDefinitionReader;
-import com.rocket.summer.framework.context.annotation.AnnotationConfigUtils;
-import com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner;
-import com.rocket.summer.framework.context.annotation.ScopeMetadataResolver;
+import com.rocket.summer.framework.context.annotation.*;
 import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.stereotype.Component;
 import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.web.context.support.AnnotationConfigWebApplicationContext;
 
 /**
  * {@link EmbeddedWebApplicationContext} that accepts annotated classes as input - in

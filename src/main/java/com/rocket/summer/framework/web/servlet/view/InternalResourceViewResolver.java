@@ -1,7 +1,5 @@
 package com.rocket.summer.framework.web.servlet.view;
 
-import com.rocket.summer.framework.util.ClassUtils;
-
 /**
  * Convenient subclass of {@link UrlBasedViewResolver} that supports
  * {@link InternalResourceView} .
@@ -25,7 +23,6 @@ import com.rocket.summer.framework.util.ClassUtils;
  * @see #setSuffix
  * @see #setRequestContextAttribute
  * @see InternalResourceView
- * @see JstlView
  */
 public class InternalResourceViewResolver extends UrlBasedViewResolver {
 

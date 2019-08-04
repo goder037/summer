@@ -80,7 +80,7 @@ public class ServletServerHttpRequest implements ServerHttpRequest {
                 MediaType contentType = MediaType.parseMediaType(this.servletRequest.getContentType());
                 this.headers.setContentType(contentType);
             }
-            if (this.headers.getContentType() != null && this.headers.getContentType().getCharSet() == null &&
+            if (this.headers.getContentType() != null && this.headers.getContentType().getCharset() == null &&
                     this.servletRequest.getCharacterEncoding() != null) {
                 MediaType oldContentType = this.headers.getContentType();
                 Charset charSet = Charset.forName(this.servletRequest.getCharacterEncoding());

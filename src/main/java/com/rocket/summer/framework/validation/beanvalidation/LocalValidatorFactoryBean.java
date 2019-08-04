@@ -17,7 +17,6 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import javax.validation.*;
 import javax.validation.bootstrap.GenericBootstrap;
 import javax.validation.bootstrap.ProviderSpecificBootstrap;
-import javax.validation.executable.ExecutableValidator;
 import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.Arrays;

@@ -10,7 +10,6 @@ import com.rocket.summer.framework.context.annotation.Configuration;
 import com.rocket.summer.framework.context.annotation.ScopeMetadataResolver;
 import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.web.context.ConfigurableWebEnvironment;
 
 /**
  * {@link com.rocket.summer.framework.web.context.WebApplicationContext} implementation

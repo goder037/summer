@@ -87,7 +87,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(16));
 
     /** Map between dependent bean names: bean name --> Set of dependent bean names */
-    /** Map between dependent bean names: bean name --> Set of dependent bean names */
     private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
 
     /** Map between depending bean names: bean name --> Set of bean names for the bean's dependencies */

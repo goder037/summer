@@ -3,7 +3,6 @@ package com.rocket.summer.framework.boot.context.embedded;
 import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
 import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.ClassUtils;
 
 import java.io.File;
 import java.net.InetAddress;

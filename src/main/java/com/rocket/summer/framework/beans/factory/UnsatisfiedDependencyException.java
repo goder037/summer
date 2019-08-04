@@ -14,6 +14,8 @@ import com.rocket.summer.framework.util.ClassUtils;
  */
 public class UnsatisfiedDependencyException extends BeanCreationException {
 
+    private InjectionPoint injectionPoint;
+
     /**
      * Create a new UnsatisfiedDependencyException.
      * @param resourceDescription description of the resource that the bean definition came from
@@ -73,6 +75,14 @@ public class UnsatisfiedDependencyException extends BeanCreationException {
 
         this(resourceDescription, beanName, ctorArgIndex, ctorArgType, (ex != null ? ": " + ex.getMessage() : ""));
         initCause(ex);
+    }
+
+    /**
+     * Return the injection point (field or method/constructor parameter), if known.
+     * @since 4.3
+     */
+    public InjectionPoint getInjectionPoint() {
+        return this.injectionPoint;
     }
 
 }

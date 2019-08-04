@@ -2,7 +2,6 @@ package com.rocket.summer.framework.context.event;
 
 import com.rocket.summer.framework.aop.support.AopUtils;
 import com.rocket.summer.framework.context.ApplicationListener;
-import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.util.Assert;

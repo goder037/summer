@@ -5,7 +5,6 @@ import com.rocket.summer.framework.core.env.PropertyResolver;
 import com.rocket.summer.framework.core.env.StandardEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.SystemPropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
