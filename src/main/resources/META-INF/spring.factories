@@ -6,14 +6,23 @@ com.rocket.summer.framework.boot.context.ContextIdApplicationContextInitializer,
 com.rocket.summer.framework.boot.context.config.DelegatingApplicationContextInitializer,\
 com.rocket.summer.framework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
 
+# PropertySource Loaders
+com.rocket.summer.framework.boot.env.PropertySourceLoader=\
+com.rocket.summer.framework.boot.env.PropertiesPropertySourceLoader,\
+
 # Application Listeners
 com.rocket.summer.framework.context.ApplicationListener=\
 com.rocket.summer.framework.boot.ClearCachesApplicationListener,\
+com.rocket.summer.framework.boot.context.config.ConfigFileApplicationListener,\
 com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer
 
 # Auto Configuration Import Listeners
+com.rocket.summer.framework.boot.autoconfigure.AutoConfigurationImportListener=\
+com.rocket.summer.framework.boot.autoconfigure.condition.ConditionEvaluationReportAutoConfigurationImportListener
 
 # Auto Configuration Import Filters
+com.rocket.summer.framework.boot.autoconfigure.AutoConfigurationImportFilter=\
+com.rocket.summer.framework.boot.autoconfigure.condition.OnClassCondition
 
 
 # Auto Configure

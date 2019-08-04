@@ -38,11 +38,11 @@ public abstract class LoggingSystem {
     static {
         Map<String, String> systems = new LinkedHashMap<String, String>();
         systems.put("ch.qos.logback.core.Appender",
-                "org.springframework.boot.logging.logback.LogbackLoggingSystem");
+                "com.rocket.summer.framework.boot.logging.logback.LogbackLoggingSystem");
         systems.put("org.apache.logging.log4j.core.impl.Log4jContextFactory",
-                "org.springframework.boot.logging.log4j2.Log4J2LoggingSystem");
+                "com.rocket.summer.framework.boot.logging.log4j2.Log4J2LoggingSystem");
         systems.put("java.util.logging.LogManager",
-                "org.springframework.boot.logging.java.JavaLoggingSystem");
+                "com.rocket.summer.framework.boot.logging.java.JavaLoggingSystem");
         SYSTEMS = Collections.unmodifiableMap(systems);
     }
 
