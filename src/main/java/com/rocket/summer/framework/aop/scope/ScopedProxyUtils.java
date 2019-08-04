@@ -71,4 +71,13 @@ public abstract class ScopedProxyUtils {
     public static String getTargetBeanName(String originalBeanName) {
         return TARGET_NAME_PREFIX + originalBeanName;
     }
+
+    /**
+     * Specify if the {@code beanName} is the name of a bean that references the target
+     * bean within a scoped proxy.
+     * @since 4.1.4
+     */
+    public static boolean isScopedTarget(String beanName) {
+        return (beanName != null && beanName.startsWith(TARGET_NAME_PREFIX));
+    }
 }

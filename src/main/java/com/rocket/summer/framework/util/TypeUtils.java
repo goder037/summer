@@ -28,15 +28,15 @@ public abstract class TypeUtils {
         Assert.notNull(rhsType, "Right-hand side type must not be null");
 
         // all types are assignable to themselves and to class Object
-        if (lhsType.equals(rhsType) || lhsType.equals(Object.class)) {
+        if (lhsType.equals(rhsType) || Object.class == lhsType) {
             return true;
         }
 
-        if (lhsType instanceof Class<?>) {
+        if (lhsType instanceof Class) {
             Class<?> lhsClass = (Class<?>) lhsType;
 
             // just comparing two classes
-            if (rhsType instanceof Class<?>) {
+            if (rhsType instanceof Class) {
                 return ClassUtils.isAssignable(lhsClass, (Class<?>) rhsType);
             }
 
@@ -44,7 +44,7 @@ public abstract class TypeUtils {
                 Type rhsRaw = ((ParameterizedType) rhsType).getRawType();
 
                 // a parameterized type is always assignable to its raw class type
-                if (rhsRaw instanceof Class<?>) {
+                if (rhsRaw instanceof Class) {
                     return ClassUtils.isAssignable(lhsClass, (Class<?>) rhsRaw);
                 }
             }
@@ -57,10 +57,10 @@ public abstract class TypeUtils {
 
         // parameterized types are only assignable to other parameterized types and class types
         if (lhsType instanceof ParameterizedType) {
-            if (rhsType instanceof Class<?>) {
+            if (rhsType instanceof Class) {
                 Type lhsRaw = ((ParameterizedType) lhsType).getRawType();
 
-                if (lhsRaw instanceof Class<?>) {
+                if (lhsRaw instanceof Class) {
                     return ClassUtils.isAssignable((Class<?>) lhsRaw, (Class<?>) rhsType);
                 }
             }
@@ -72,7 +72,7 @@ public abstract class TypeUtils {
         if (lhsType instanceof GenericArrayType) {
             Type lhsComponent = ((GenericArrayType) lhsType).getGenericComponentType();
 
-            if (rhsType instanceof Class<?>) {
+            if (rhsType instanceof Class) {
                 Class<?> rhsClass = (Class<?>) rhsType;
 
                 if (rhsClass.isArray()) {
@@ -199,7 +199,6 @@ public abstract class TypeUtils {
         if (rhsType == null) {
             return true;
         }
-
         if (lhsType == null) {
             return false;
         }

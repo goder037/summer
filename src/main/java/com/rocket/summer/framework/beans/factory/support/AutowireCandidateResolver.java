@@ -22,4 +22,23 @@ public interface AutowireCandidateResolver {
      */
     boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor);
 
+    /**
+     * Determine whether a default value is suggested for the given dependency.
+     * @param descriptor the descriptor for the target method parameter or field
+     * @return the value suggested (typically an expression String),
+     * or {@code null} if none found
+     * @since 3.0
+     */
+    Object getSuggestedValue(DependencyDescriptor descriptor);
+
+    /**
+     * Build a proxy for lazy resolution of the actual dependency target,
+     * if demanded by the injection point.
+     * @param descriptor the descriptor for the target method parameter or field
+     * @param beanName the name of the bean that contains the injection point
+     * @return the lazy resolution proxy for the actual dependency target,
+     * or {@code null} if straight resolution is to be performed
+     * @since 4.0
+     */
+    Object getLazyResolutionProxyIfNecessary(DependencyDescriptor descriptor, String beanName);
 }

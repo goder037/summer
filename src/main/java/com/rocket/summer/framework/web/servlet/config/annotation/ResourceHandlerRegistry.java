@@ -9,10 +9,7 @@ import com.rocket.summer.framework.web.servlet.handler.SimpleUrlHandlerMapping;
 import com.rocket.summer.framework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.ServletContext;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Stores registrations of resource handlers for serving static resources such as images, css files and others
@@ -65,6 +62,18 @@ public class ResourceHandlerRegistry {
     public ResourceHandlerRegistry setOrder(int order) {
         this.order = order;
         return this;
+    }
+
+    /**
+     * Whether a resource handler has already been registered for the given path pattern.
+     */
+    public boolean hasMappingForPattern(String pathPattern) {
+        for (ResourceHandlerRegistration registration : this.registrations) {
+            if (Arrays.asList(registration.getPathPatterns()).contains(pathPattern)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

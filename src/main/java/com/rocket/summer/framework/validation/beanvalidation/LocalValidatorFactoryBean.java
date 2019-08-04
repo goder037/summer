@@ -375,6 +375,12 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
     }
 
     @Override
+    public ParameterNameProvider getParameterNameProvider() {
+        Assert.notNull(this.validatorFactory, "No target ValidatorFactory set");
+        return this.validatorFactory.getParameterNameProvider();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T unwrap(Class<T> type) {
         if (type == null || !ValidatorFactory.class.isAssignableFrom(type)) {
@@ -396,7 +402,6 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
             throw ex;
         }
     }
-
 
     public void close() {
         if (closeMethod != null && this.validatorFactory != null) {

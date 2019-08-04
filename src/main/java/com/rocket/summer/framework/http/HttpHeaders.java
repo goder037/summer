@@ -60,6 +60,12 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public static final String COOKIE = "Cookie";
 
+    /**
+     * The HTTP {@code Vary} header field name.
+     * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.4">Section 7.1.4 of RFC 7231</a>
+     */
+    public static final String VARY = "Vary";
+
     private static final String ETAG = "ETag";
 
     private static final String EXPIRES = "Expires";
@@ -125,6 +131,66 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public void setAccept(List<MediaType> acceptableMediaTypes) {
         set(ACCEPT, MediaType.toString(acceptableMediaTypes));
+    }
+
+    /**
+     * Set the request header names (e.g. "Accept-Language") for which the
+     * response is subject to content negotiation and variances based on the
+     * value of those request headers.
+     * @param requestHeaders the request header names
+     * @since 4.3
+     */
+    public void setVary(List<String> requestHeaders) {
+        set(VARY, toCommaDelimitedString(requestHeaders));
+    }
+
+    /**
+     * Turn the given list of header values into a comma-delimited result.
+     * @param headerValues the list of header values
+     * @return a combined result with comma delimitation
+     */
+    protected String toCommaDelimitedString(List<String> headerValues) {
+        StringBuilder builder = new StringBuilder();
+        for (Iterator<String> it = headerValues.iterator(); it.hasNext(); ) {
+            String val = it.next();
+            builder.append(val);
+            if (it.hasNext()) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Return the request header names subject to content negotiation.
+     * @since 4.3
+     */
+    public List<String> getVary() {
+        return getValuesAsList(VARY);
+    }
+
+    /**
+     * Return all values of a given header name,
+     * even if this header is set multiple times.
+     * @param headerName the header name
+     * @return all associated values
+     * @since 4.3
+     */
+    public List<String> getValuesAsList(String headerName) {
+        List<String> values = get(headerName);
+        if (values != null) {
+            List<String> result = new ArrayList<String>();
+            for (String value : values) {
+                if (value != null) {
+                    String[] tokens = StringUtils.tokenizeToStringArray(value, ",");
+                    for (String token : tokens) {
+                        result.add(token);
+                    }
+                }
+            }
+            return result;
+        }
+        return Collections.emptyList();
     }
 
     /**

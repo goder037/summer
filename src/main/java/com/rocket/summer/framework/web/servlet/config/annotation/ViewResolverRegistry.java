@@ -11,7 +11,6 @@ import com.rocket.summer.framework.web.servlet.View;
 import com.rocket.summer.framework.web.servlet.ViewResolver;
 import com.rocket.summer.framework.web.servlet.view.BeanNameViewResolver;
 import com.rocket.summer.framework.web.servlet.view.ContentNegotiatingViewResolver;
-import com.rocket.summer.framework.web.servlet.view.InternalResourceViewResolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;

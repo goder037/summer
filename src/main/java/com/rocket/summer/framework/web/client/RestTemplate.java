@@ -1,13 +1,20 @@
 package com.rocket.summer.framework.web.client;
 
+import com.rocket.summer.framework.core.ParameterizedTypeReference;
 import com.rocket.summer.framework.http.*;
+import com.rocket.summer.framework.http.client.ClientHttpRequest;
+import com.rocket.summer.framework.http.client.ClientHttpRequestFactory;
+import com.rocket.summer.framework.http.client.ClientHttpResponse;
+import com.rocket.summer.framework.http.client.support.InterceptingHttpAccessor;
 import com.rocket.summer.framework.http.converter.*;
 import com.rocket.summer.framework.http.converter.json.MappingJackson2HttpMessageConverter;
 import com.rocket.summer.framework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter;
+import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.web.util.AbstractUriTemplateHandler;
 import com.rocket.summer.framework.web.util.DefaultUriTemplateHandler;
 import com.rocket.summer.framework.web.util.UriTemplateHandler;
 
@@ -57,7 +64,7 @@ import java.util.*;
  * {@code https://example.com/hotel%2520list}). To avoid that use a {@code URI} method
  * variant to provide (or re-use) a previously encoded URI. To prepare such an URI
  * with full control over encoding, consider using
- * {@link org.springframework.web.util.UriComponentsBuilder}.
+ * {@link com.rocket.summer.framework.web.util.UriComponentsBuilder}.
  *
  * <p>Internally the template uses {@link HttpMessageConverter} instances to
  * convert HTTP messages to and from POJOs. Converters for the main mime types
@@ -65,7 +72,7 @@ import java.util.*;
  * via {@link #setMessageConverters}.
  *
  * <p>This template uses a
- * {@link org.springframework.http.client.SimpleClientHttpRequestFactory} and a
+ * {@link com.rocket.summer.framework.http.client.SimpleClientHttpRequestFactory} and a
  * {@link DefaultResponseErrorHandler} as default strategies for creating HTTP
  * connections or handling HTTP errors, respectively. These defaults can be overridden
  * through {@link #setRequestFactory} and {@link #setErrorHandler} respectively.
@@ -106,7 +113,6 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 
     private final ResponseExtractor<HttpHeaders> headersExtractor = new HeadersExtractor();
 
-
     /**
      * Create a new instance of the {@link RestTemplate} using default settings.
      * Default {@link HttpMessageConverter}s are initialized.
@@ -117,11 +123,6 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
         this.messageConverters.add(new ResourceHttpMessageConverter());
         this.messageConverters.add(new SourceHttpMessageConverter<Source>());
         this.messageConverters.add(new AllEncompassingFormHttpMessageConverter());
-
-        if (romePresent) {
-            this.messageConverters.add(new AtomFeedHttpMessageConverter());
-            this.messageConverters.add(new RssChannelHttpMessageConverter());
-        }
 
         if (jackson2XmlPresent) {
             this.messageConverters.add(new MappingJackson2XmlHttpMessageConverter());
@@ -138,8 +139,7 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
     /**
      * Create a new instance of the {@link RestTemplate} based on the given {@link ClientHttpRequestFactory}.
      * @param requestFactory HTTP request factory to use
-     * @see org.springframework.http.client.SimpleClientHttpRequestFactory
-     * @see org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+     * @see com.rocket.summer.framework.http.client.SimpleClientHttpRequestFactory
      */
     public RestTemplate(ClientHttpRequestFactory requestFactory) {
         this();

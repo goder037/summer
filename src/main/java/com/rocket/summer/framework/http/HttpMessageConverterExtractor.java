@@ -1,12 +1,10 @@
 package com.rocket.summer.framework.http;
 
+import com.rocket.summer.framework.http.client.ClientHttpResponse;
 import com.rocket.summer.framework.http.converter.GenericHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.HttpMessageConverter;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
-import com.rocket.summer.framework.web.client.MessageBodyClientHttpResponseWrapper;
-import com.rocket.summer.framework.web.client.ResponseExtractor;
-import com.rocket.summer.framework.web.client.RestClientException;
+import com.rocket.summer.framework.web.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,8 +47,7 @@ public class HttpMessageConverterExtractor<T> implements ResponseExtractor<T> {
         this(responseType, messageConverters, LogFactory.getLog(HttpMessageConverterExtractor.class));
     }
 
-    @SuppressWarnings("unchecked")
-    HttpMessageConverterExtractor(Type responseType, List<HttpMessageConverter<?>> messageConverters, Log logger) {
+    public HttpMessageConverterExtractor(Type responseType, List<HttpMessageConverter<?>> messageConverters, Log logger) {
         Assert.notNull(responseType, "'responseType' must not be null");
         Assert.notEmpty(messageConverters, "'messageConverters' must not be empty");
         this.responseType = responseType;
@@ -59,9 +56,7 @@ public class HttpMessageConverterExtractor<T> implements ResponseExtractor<T> {
         this.logger = logger;
     }
 
-
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes", "resource"})
     public T extractData(ClientHttpResponse response) throws IOException {
         MessageBodyClientHttpResponseWrapper responseWrapper = new MessageBodyClientHttpResponseWrapper(response);
         if (!responseWrapper.hasMessageBody() || responseWrapper.hasEmptyMessageBody()) {

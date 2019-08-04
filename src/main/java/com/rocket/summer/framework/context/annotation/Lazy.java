@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  * @see Configuration
  * @see com.rocket.summer.framework.stereotype.Component
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

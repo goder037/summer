@@ -3,8 +3,6 @@ package com.rocket.summer.framework.http.client;
 import com.rocket.summer.framework.core.task.AsyncListenableTaskExecutor;
 import com.rocket.summer.framework.http.HttpMethod;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.web.client.ClientHttpRequest;
-import com.rocket.summer.framework.web.client.ClientHttpRequestFactory;
 
 import java.io.IOException;
 import java.net.*;

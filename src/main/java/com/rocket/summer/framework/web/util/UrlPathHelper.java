@@ -72,6 +72,14 @@ public class UrlPathHelper {
     }
 
     /**
+     * Whether to decode the request URI when determining the lookup path.
+     * @since 4.3.13
+     */
+    public boolean isUrlDecode() {
+        return this.urlDecode;
+    }
+
+    /**
      * Return the servlet path for the given request, detecting an include request
      * URL if called within a RequestDispatcher include.
      * @param request current HTTP request

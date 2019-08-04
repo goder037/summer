@@ -18,7 +18,7 @@ public interface ClassFilter {
      * @param clazz the candidate target class
      * @return whether the advice should apply to the given target class
      */
-    boolean matches(Class clazz);
+    boolean matches(Class<?> clazz);
 
 
     /**

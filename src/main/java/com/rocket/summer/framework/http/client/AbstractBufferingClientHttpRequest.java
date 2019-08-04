@@ -1,7 +1,6 @@
 package com.rocket.summer.framework.http.client;
 
 import com.rocket.summer.framework.http.HttpHeaders;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

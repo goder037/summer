@@ -1,13 +1,12 @@
 package com.rocket.summer.framework.context.event;
 
-import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.aop.framework.AopProxyUtils;
 import com.rocket.summer.framework.beans.factory.BeanClassLoaderAware;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.BeanFactoryAware;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationListener;
-import com.rocket.summer.framework.core.CollectionFactory;
 import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
 import com.rocket.summer.framework.util.ClassUtils;
@@ -31,17 +30,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * Alternative implementations could be more sophisticated in those respects.
  *
  * @author Juergen Hoeller
+ * @author Stephane Nicoll
  * @since 1.2.3
- * @see #setCollectionClass
- * @see #getApplicationListeners()
+ * @see #getApplicationListeners(ApplicationEvent, ResolvableType)
  * @see SimpleApplicationEventMulticaster
  */
-public abstract class AbstractApplicationEventMulticaster implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
+public abstract class AbstractApplicationEventMulticaster
+        implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
 
     private final ListenerRetriever defaultRetriever = new ListenerRetriever(false);
-
-    /** Collection of ApplicationListeners */
-    private Collection applicationListeners = new LinkedHashSet();
 
     final Map<ListenerCacheKey, ListenerRetriever> retrieverCache =
             new ConcurrentHashMap<ListenerCacheKey, ListenerRetriever>(64);
@@ -79,64 +76,63 @@ public abstract class AbstractApplicationEventMulticaster implements Application
     }
 
 
-    /**
-     * Set whether this multicaster should expect concurrent updates at runtime
-     * (i.e. after context startup finished). In case of concurrent updates,
-     * a copy-on-write strategy is applied, keeping iteration (for multicasting)
-     * without synchronization while still making listener updates thread-safe.
-     */
-    public void setConcurrentUpdates(boolean concurrent) {
-        Collection newColl = (concurrent ? CollectionFactory.createCopyOnWriteSet() : new LinkedHashSet());
-        // Add all previously registered listeners (usually none).
-        newColl.addAll(this.applicationListeners);
-        this.applicationListeners = newColl;
-    }
-
-    /**
-     * Specify the collection class to use. Can be populated with a fully
-     * qualified class name when defined in a Spring application context.
-     * <p>Default is a linked HashSet, keeping the registration order.
-     * Note that a Set class specified will not permit multiple instances
-     * of the same listener, while a List class will allow for registering
-     * the same listener multiple times.
-     */
-    public void setCollectionClass(Class collectionClass) {
-        if (collectionClass == null) {
-            throw new IllegalArgumentException("'collectionClass' must not be null");
+    @Override
+    public void addApplicationListener(ApplicationListener<?> listener) {
+        synchronized (this.retrievalMutex) {
+            // Explicitly remove target for a proxy, if registered already,
+            // in order to avoid double invocations of the same listener.
+            Object singletonTarget = AopProxyUtils.getSingletonTarget(listener);
+            if (singletonTarget instanceof ApplicationListener) {
+                this.defaultRetriever.applicationListeners.remove(singletonTarget);
+            }
+            this.defaultRetriever.applicationListeners.add(listener);
+            this.retrieverCache.clear();
         }
-        if (!Collection.class.isAssignableFrom(collectionClass)) {
-            throw new IllegalArgumentException("'collectionClass' must implement [java.util.Collection]");
+    }
+
+    @Override
+    public void addApplicationListenerBean(String listenerBeanName) {
+        synchronized (this.retrievalMutex) {
+            this.defaultRetriever.applicationListenerBeans.add(listenerBeanName);
+            this.retrieverCache.clear();
         }
-        // Create desired collection instance.
-        Collection newColl = (Collection) BeanUtils.instantiateClass(collectionClass);
-        // Add all previously registered listeners (usually none).
-        newColl.addAll(this.applicationListeners);
-        this.applicationListeners = newColl;
     }
 
-
-    public void addApplicationListener(ApplicationListener listener) {
-        this.applicationListeners.add(listener);
+    @Override
+    public void removeApplicationListener(ApplicationListener<?> listener) {
+        synchronized (this.retrievalMutex) {
+            this.defaultRetriever.applicationListeners.remove(listener);
+            this.retrieverCache.clear();
+        }
     }
 
-    public void removeApplicationListener(ApplicationListener listener) {
-        this.applicationListeners.remove(listener);
+    @Override
+    public void removeApplicationListenerBean(String listenerBeanName) {
+        synchronized (this.retrievalMutex) {
+            this.defaultRetriever.applicationListenerBeans.remove(listenerBeanName);
+            this.retrieverCache.clear();
+        }
     }
 
+    @Override
     public void removeAllListeners() {
-        this.applicationListeners.clear();
+        synchronized (this.retrievalMutex) {
+            this.defaultRetriever.applicationListeners.clear();
+            this.defaultRetriever.applicationListenerBeans.clear();
+            this.retrieverCache.clear();
+        }
     }
 
+
     /**
-     * Return the current Collection of ApplicationListeners.
-     * <p>Note that this is the raw Collection of ApplicationListeners,
-     * potentially modified when new listeners get registered or
-     * existing ones get removed. This Collection is not a snapshot copy.
+     * Return a Collection containing all ApplicationListeners.
      * @return a Collection of ApplicationListeners
      * @see com.rocket.summer.framework.context.ApplicationListener
      */
-    protected Collection getApplicationListeners() {
-        return this.applicationListeners;
+    protected Collection<ApplicationListener<?>> getApplicationListeners() {
+        synchronized (this.retrievalMutex) {
+            return this.defaultRetriever.getApplicationListeners();
+        }
     }
 
     /**
@@ -272,6 +268,7 @@ public abstract class AbstractApplicationEventMulticaster implements Application
         return (smartListener.supportsEventType(eventType) && smartListener.supportsSourceType(sourceType));
     }
 
+
     /**
      * Cache key for ListenerRetrievers, based on event type and source type.
      */
@@ -319,6 +316,7 @@ public abstract class AbstractApplicationEventMulticaster implements Application
         }
     }
 
+
     /**
      * Helper class that encapsulates a specific set of target listeners,
      * allowing for efficient retrieval of pre-filtered listeners.
@@ -361,4 +359,3 @@ public abstract class AbstractApplicationEventMulticaster implements Application
     }
 
 }
-

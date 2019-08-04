@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
  * @author Juergen Hoeller
  * @since 2.0.3
  * @see SimpleAsyncTaskExecutor
- * @see org.springframework.scheduling.SchedulingTaskExecutor
+ * @see com.rocket.summer.framework.scheduling.SchedulingTaskExecutor
  * @see java.util.concurrent.Callable
  * @see java.util.concurrent.Executors
  */

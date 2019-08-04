@@ -7,17 +7,20 @@ import com.rocket.summer.framework.beans.factory.ObjectProvider;
 import com.rocket.summer.framework.beans.factory.annotation.Autowired;
 import com.rocket.summer.framework.boot.autoconfigure.AutoConfigureAfter;
 import com.rocket.summer.framework.boot.autoconfigure.AutoConfigureOrder;
-import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnBean;
-import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnClass;
-import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import com.rocket.summer.framework.boot.autoconfigure.EnableAutoConfiguration;
+import com.rocket.summer.framework.boot.autoconfigure.condition.*;
+import com.rocket.summer.framework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import com.rocket.summer.framework.boot.context.properties.EnableConfigurationProperties;
+import com.rocket.summer.framework.boot.web.filter.OrderedHiddenHttpMethodFilter;
+import com.rocket.summer.framework.boot.web.filter.OrderedRequestContextFilter;
 import com.rocket.summer.framework.context.annotation.*;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.convert.converter.Converter;
 import com.rocket.summer.framework.core.convert.converter.GenericConverter;
 import com.rocket.summer.framework.core.io.Resource;
+import com.rocket.summer.framework.format.Formatter;
 import com.rocket.summer.framework.format.FormatterRegistry;
+import com.rocket.summer.framework.format.datetime.DateFormatter;
 import com.rocket.summer.framework.http.HttpHeaders;
 import com.rocket.summer.framework.http.MediaType;
 import com.rocket.summer.framework.http.converter.HttpMessageConverter;
@@ -27,27 +30,37 @@ import com.rocket.summer.framework.validation.DefaultMessageCodesResolver;
 import com.rocket.summer.framework.validation.MessageCodesResolver;
 import com.rocket.summer.framework.validation.Validator;
 import com.rocket.summer.framework.web.HttpMediaTypeNotAcceptableException;
+import com.rocket.summer.framework.web.accept.ContentNegotiationManager;
+import com.rocket.summer.framework.web.accept.ContentNegotiationStrategy;
+import com.rocket.summer.framework.web.accept.PathExtensionContentNegotiationStrategy;
 import com.rocket.summer.framework.web.bind.support.ConfigurableWebBindingInitializer;
 import com.rocket.summer.framework.web.context.request.NativeWebRequest;
 import com.rocket.summer.framework.web.context.request.RequestAttributes;
 import com.rocket.summer.framework.web.context.request.RequestContextListener;
+import com.rocket.summer.framework.web.filter.HiddenHttpMethodFilter;
+import com.rocket.summer.framework.web.filter.HttpPutFormContentFilter;
+import com.rocket.summer.framework.web.filter.OrderedHttpPutFormContentFilter;
+import com.rocket.summer.framework.web.filter.RequestContextFilter;
 import com.rocket.summer.framework.web.servlet.*;
 import com.rocket.summer.framework.web.servlet.config.annotation.*;
 import com.rocket.summer.framework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import com.rocket.summer.framework.web.servlet.handler.AbstractUrlHandlerMapping;
 import com.rocket.summer.framework.web.servlet.handler.SimpleUrlHandlerMapping;
+import com.rocket.summer.framework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import com.rocket.summer.framework.web.servlet.i18n.FixedLocaleResolver;
 import com.rocket.summer.framework.web.servlet.mvc.ParameterizableViewController;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import com.rocket.summer.framework.web.servlet.resource.ResourceHttpRequestHandler;
-import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolver;
+import com.rocket.summer.framework.web.servlet.resource.*;
+import com.rocket.summer.framework.web.servlet.view.BeanNameViewResolver;
+import com.rocket.summer.framework.web.servlet.view.ContentNegotiatingViewResolver;
+import com.rocket.summer.framework.web.servlet.view.InternalResourceViewResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.DateFormatter;
 import java.util.*;
 
 /**
@@ -449,7 +462,7 @@ public class WebMvcAutoConfiguration {
 
         private void configureResourceChain(ResourceProperties.Chain properties,
                                             ResourceChainRegistration chain) {
-            Strategy strategy = properties.getStrategy();
+            ResourceProperties.Strategy strategy = properties.getStrategy();
             if (strategy.getFixed().isEnabled() || strategy.getContent().isEnabled()) {
                 chain.addResolver(getVersionResourceResolver(strategy));
             }

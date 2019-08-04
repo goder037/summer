@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.boot.context.embedded;
 
+import com.rocket.summer.framework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
 import org.apache.catalina.core.ApplicationContext;
 

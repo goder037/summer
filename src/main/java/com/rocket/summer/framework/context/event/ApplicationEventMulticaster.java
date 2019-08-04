@@ -4,13 +4,16 @@ import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.core.ResolvableType;
 
 /**
- * Interface to be implemented by objects that can manage a number
- * of ApplicationListeners, and publish events to them. An example
- * of such an object is an ApplicationEventPublisher, typically
- * the ApplicationContext, which can use an ApplicationEventMulticaster
- * as a helper to publish events to listeners.
+ * Interface to be implemented by objects that can manage a number of
+ * {@link ApplicationListener} objects, and publish events to them.
+ *
+ * <p>An {@link com.rocket.summer.framework.context.ApplicationEventPublisher}, typically
+ * a Spring {@link com.rocket.summer.framework.context.ApplicationContext}, can use an
+ * ApplicationEventMulticaster as a delegate for actually publishing events.
  *
  * @author Rod Johnson
+ * @author Juergen Hoeller
+ * @author Stephane Nicoll
  */
 public interface ApplicationEventMulticaster {
 
@@ -18,27 +21,40 @@ public interface ApplicationEventMulticaster {
      * Add a listener to be notified of all events.
      * @param listener the listener to add
      */
-    void addApplicationListener(ApplicationListener listener);
+    void addApplicationListener(ApplicationListener<?> listener);
+
+    /**
+     * Add a listener bean to be notified of all events.
+     * @param listenerBeanName the name of the listener bean to add
+     */
+    void addApplicationListenerBean(String listenerBeanName);
 
     /**
      * Remove a listener from the notification list.
      * @param listener the listener to remove
      */
-    void removeApplicationListener(ApplicationListener listener);
+    void removeApplicationListener(ApplicationListener<?> listener);
+
+    /**
+     * Remove a listener bean from the notification list.
+     * @param listenerBeanName the name of the listener bean to add
+     */
+    void removeApplicationListenerBean(String listenerBeanName);
 
     /**
      * Remove all listeners registered with this multicaster.
-     * It will perform no action on event notification until more
-     * listeners are registered.
+     * <p>After a remove call, the multicaster will perform no action
+     * on event notification until new listeners are being registered.
      */
     void removeAllListeners();
 
     /**
      * Multicast the given application event to appropriate listeners.
+     * <p>Consider using {@link #multicastEvent(ApplicationEvent, ResolvableType)}
+     * if possible as it provides a better support for generics-based events.
      * @param event the event to multicast
      */
     void multicastEvent(ApplicationEvent event);
-
 
     /**
      * Multicast the given application event to appropriate listeners.

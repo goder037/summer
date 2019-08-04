@@ -390,7 +390,7 @@ public class ConfigurationPropertiesBindingPostProcessor implements BeanPostProc
                 return true;
             }
             if (type.getPackage() != null && type.getPackage().getName()
-                    .startsWith("org.springframework.boot")) {
+                    .startsWith("com.rocket.summer.framework.boot")) {
                 return false;
             }
             if (getConstraintsForClass(type).isBeanConstrained()) {

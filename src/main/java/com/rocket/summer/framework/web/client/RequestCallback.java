@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.web.client;
 
+import com.rocket.summer.framework.http.client.ClientHttpRequest;
+
 import java.io.IOException;
 
 /**

@@ -1,7 +1,6 @@
 package com.rocket.summer.framework.beans;
 
 import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.JdkVersion;
 import com.rocket.summer.framework.core.SpringProperties;
 import com.rocket.summer.framework.core.convert.TypeDescriptor;
 import com.rocket.summer.framework.core.io.support.SpringFactoriesLoader;
@@ -14,8 +13,6 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

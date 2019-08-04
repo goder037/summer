@@ -163,15 +163,14 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         return this.advisorChainFactory;
     }
 
-
     /**
      * Set the interfaces to be proxied.
      */
-    public void setInterfaces(Class[] interfaces) {
+    public void setInterfaces(Class<?>... interfaces) {
         Assert.notNull(interfaces, "Interfaces must not be null");
         this.interfaces.clear();
-        for (Class anInterface : interfaces) {
-            addInterface(anInterface);
+        for (Class<?> ifc : interfaces) {
+            addInterface(ifc);
         }
     }
 

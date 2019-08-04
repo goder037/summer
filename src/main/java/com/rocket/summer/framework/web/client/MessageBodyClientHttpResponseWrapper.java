@@ -2,6 +2,7 @@ package com.rocket.summer.framework.web.client;
 
 import com.rocket.summer.framework.http.HttpHeaders;
 import com.rocket.summer.framework.http.HttpStatus;
+import com.rocket.summer.framework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +17,7 @@ import java.io.PushbackInputStream;
  * @since 4.1.5
  * @see <a href="https://tools.ietf.org/html/rfc7230#section-3.3.3">RFC 7230 Section 3.3.3</a>
  */
-class MessageBodyClientHttpResponseWrapper implements ClientHttpResponse {
+public class MessageBodyClientHttpResponseWrapper implements ClientHttpResponse {
 
     private final ClientHttpResponse response;
 

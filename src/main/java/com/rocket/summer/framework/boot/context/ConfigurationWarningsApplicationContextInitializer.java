@@ -112,7 +112,7 @@ public class ConfigurationWarningsApplicationContextInitializer
 
         static {
             Set<String> packages = new HashSet<String>();
-            packages.add("org.springframework");
+            packages.add("com.rocket.summer.framework");
             packages.add("org");
             PROBLEM_PACKAGES = Collections.unmodifiableSet(packages);
         }

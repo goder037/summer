@@ -1,14 +1,13 @@
 package com.rocket.summer.framework.http.client;
 
 import com.rocket.summer.framework.http.HttpRequest;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
 
 import java.io.IOException;
 
 /**
  * Intercepts client-side HTTP requests. Implementations of this interface can be
- * {@linkplain org.springframework.web.client.RestTemplate#setInterceptors registered}
- * with the {@link org.springframework.web.client.RestTemplate RestTemplate},
+ * {@linkplain com.rocket.summer.framework.web.client.RestTemplate#setInterceptors registered}
+ * with the {@link com.rocket.summer.framework.web.client.RestTemplate RestTemplate},
  * as to modify the outgoing {@link ClientHttpRequest} and/or the incoming
  * {@link ClientHttpResponse}.
  *
@@ -27,13 +26,13 @@ public interface ClientHttpRequestInterceptor {
      * <p>A typical implementation of this method would follow the following pattern:
      * <ol>
      * <li>Examine the {@linkplain HttpRequest request} and body</li>
-     * <li>Optionally {@linkplain org.springframework.http.client.support.HttpRequestWrapper
+     * <li>Optionally {@linkplain com.rocket.summer.framework.http.client.support.HttpRequestWrapper
      * wrap} the request to filter HTTP attributes.</li>
      * <li>Optionally modify the body of the request.</li>
      * <li><strong>Either</strong>
      * <ul>
      * <li>execute the request using
-     * {@link ClientHttpRequestExecution#execute(org.springframework.http.HttpRequest, byte[])},</li>
+     * {@link ClientHttpRequestExecution#execute(com.rocket.summer.framework.http.HttpRequest, byte[])},</li>
      * <strong>or</strong>
      * <li>do not execute the request to block the execution altogether.</li>
      * </ul>

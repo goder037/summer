@@ -27,6 +27,13 @@ public class ServletContextAwareProcessor implements BeanPostProcessor {
 
     private ServletConfig servletConfig;
 
+    /**
+     * Create a new ServletContextAwareProcessor without an initial context or config.
+     * When this constructor is used the {@link #getServletContext()} and/or
+     * {@link #getServletConfig()} methods should be overridden.
+     */
+    protected ServletContextAwareProcessor() {
+    }
 
     /**
      * Create a new ServletContextAwareProcessor for the given context.
@@ -51,6 +58,27 @@ public class ServletContextAwareProcessor implements BeanPostProcessor {
         if (servletContext == null && servletConfig != null) {
             this.servletContext = servletConfig.getServletContext();
         }
+    }
+
+    /**
+     * Returns the {@link ServletContext} to be injected or {@code null}. This method
+     * can be overridden by subclasses when a context is obtained after the post-processor
+     * has been registered.
+     */
+    protected ServletContext getServletContext() {
+        if (this.servletContext == null && getServletConfig() != null) {
+            return getServletConfig().getServletContext();
+        }
+        return this.servletContext;
+    }
+
+    /**
+     * Returns the {@link ServletContext} to be injected or {@code null}. This method
+     * can be overridden by subclasses when a context is obtained after the post-processor
+     * has been registered.
+     */
+    protected ServletConfig getServletConfig() {
+        return this.servletConfig;
     }
 
 

@@ -39,6 +39,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
      * @throws BeanDefinitionStoreException if the BeanDefinition is invalid
      * or if there is already a BeanDefinition for the specified bean name
      * (and we are not allowed to override it)
+     * @see GenericBeanDefinition
      * @see RootBeanDefinition
      * @see ChildBeanDefinition
      */
@@ -55,7 +56,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
     /**
      * Return the BeanDefinition for the given bean name.
      * @param beanName name of the bean to find a definition for
-     * @return the BeanDefinition for the given name (never <code>null</code>)
+     * @return the BeanDefinition for the given name (never {@code null})
      * @throws NoSuchBeanDefinitionException if there is no such bean definition
      */
     BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
@@ -89,4 +90,3 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
     boolean isBeanNameInUse(String beanName);
 
 }
-

@@ -2,19 +2,21 @@ package com.rocket.summer.framework.context.support;
 
 import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
+import com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory;
 import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.ResolvableType;
-import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
 import com.rocket.summer.framework.util.Assert;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Generic ApplicationContext implementation that holds a single internal
@@ -38,7 +40,7 @@ import java.io.IOException;
  *
  * <p>Usage example:
  *
- * <pre>
+ * <pre class="code">
  * GenericApplicationContext ctx = new GenericApplicationContext();
  * XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
  * xmlReader.loadBeanDefinitions(new ClassPathResource("applicationContext.xml"));
@@ -61,9 +63,11 @@ import java.io.IOException;
  * from the {@link AbstractRefreshableApplicationContext} base class.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 1.1.2
  * @see #registerBeanDefinition
  * @see #refresh()
+ * @see com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader
  * @see com.rocket.summer.framework.beans.factory.support.PropertiesBeanDefinitionReader
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
@@ -72,7 +76,9 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
     private ResourceLoader resourceLoader;
 
-    private boolean refreshed = false;
+    private boolean customClassLoader = false;
+
+    private final AtomicBoolean refreshed = new AtomicBoolean();
 
 
     /**
@@ -118,27 +124,52 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
         setParent(parent);
     }
 
+
     /**
      * Set the parent of this application context, also setting
      * the parent of the internal BeanFactory accordingly.
      * @see com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
      */
+    @Override
     public void setParent(ApplicationContext parent) {
         super.setParent(parent);
         this.beanFactory.setParentBeanFactory(getInternalParentBeanFactory());
     }
 
     /**
+     * Set whether it should be allowed to override bean definitions by registering
+     * a different definition with the same name, automatically replacing the former.
+     * If not, an exception will be thrown. Default is "true".
+     * @since 3.0
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
+     */
+    public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
+        this.beanFactory.setAllowBeanDefinitionOverriding(allowBeanDefinitionOverriding);
+    }
+
+    /**
+     * Set whether to allow circular references between beans - and automatically
+     * try to resolve them.
+     * <p>Default is "true". Turn this off to throw an exception when encountering
+     * a circular reference, disallowing them completely.
+     * @since 3.0
+     * @see com.rocket.summer.framework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
+     */
+    public void setAllowCircularReferences(boolean allowCircularReferences) {
+        this.beanFactory.setAllowCircularReferences(allowCircularReferences);
+    }
+
+    /**
      * Set a ResourceLoader to use for this context. If set, the context will
-     * delegate all <code>getResource</code> calls to the given ResourceLoader.
+     * delegate all {@code getResource} calls to the given ResourceLoader.
      * If not set, default resource loading will apply.
      * <p>The main reason to specify a custom ResourceLoader is to resolve
-     * resource paths (withour URL prefix) in a specific fashion.
+     * resource paths (without URL prefix) in a specific fashion.
      * The default behavior is to resolve such paths as class path locations.
      * To resolve resource paths as file system locations, specify a
      * FileSystemResourceLoader here.
      * <p>You can also pass in a full ResourcePatternResolver, which will
-     * be autodetected by the context and used for <code>getResources</code>
+     * be autodetected by the context and used for {@code getResources}
      * calls as well. Else, default resource pattern matching will apply.
      * @see #getResource
      * @see com.rocket.summer.framework.core.io.DefaultResourceLoader
@@ -151,11 +182,16 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
     }
 
 
+    //---------------------------------------------------------------------
+    // ResourceLoader / ResourcePatternResolver override if necessary
+    //---------------------------------------------------------------------
+
     /**
      * This implementation delegates to this context's ResourceLoader if set,
      * falling back to the default superclass behavior else.
      * @see #setResourceLoader
      */
+    @Override
     public Resource getResource(String location) {
         if (this.resourceLoader != null) {
             return this.resourceLoader.getResource(location);
@@ -169,11 +205,26 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
      * default superclass behavior else.
      * @see #setResourceLoader
      */
+    @Override
     public Resource[] getResources(String locationPattern) throws IOException {
         if (this.resourceLoader instanceof ResourcePatternResolver) {
             return ((ResourcePatternResolver) this.resourceLoader).getResources(locationPattern);
         }
         return super.getResources(locationPattern);
+    }
+
+    @Override
+    public void setClassLoader(ClassLoader classLoader) {
+        super.setClassLoader(classLoader);
+        this.customClassLoader = true;
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        if (this.resourceLoader != null && !this.customClassLoader) {
+            return this.resourceLoader.getClassLoader();
+        }
+        return super.getClassLoader();
     }
 
 
@@ -186,25 +237,35 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
      * to register beans through our public methods (or the BeanFactory's).
      * @see #registerBeanDefinition
      */
+    @Override
     protected final void refreshBeanFactory() throws IllegalStateException {
-        if (this.refreshed) {
+        if (!this.refreshed.compareAndSet(false, true)) {
             throw new IllegalStateException(
                     "GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
         }
-        this.refreshed = true;
+        this.beanFactory.setSerializationId(getId());
+    }
+
+    @Override
+    protected void cancelRefresh(BeansException ex) {
+        this.beanFactory.setSerializationId(null);
+        super.cancelRefresh(ex);
     }
 
     /**
-     * Do nothing: We hold a single internal BeanFactory that will never
+     * Not much to do: We hold a single internal BeanFactory that will never
      * get released.
      */
+    @Override
     protected final void closeBeanFactory() {
+        this.beanFactory.setSerializationId(null);
     }
 
     /**
      * Return the single internal BeanFactory held by this context
      * (as ConfigurableListableBeanFactory).
      */
+    @Override
     public final ConfigurableListableBeanFactory getBeanFactory() {
         return this.beanFactory;
     }
@@ -221,44 +282,52 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
         return this.beanFactory;
     }
 
+    @Override
+    public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException {
+        assertBeanFactoryActive();
+        return this.beanFactory;
+    }
+
 
     //---------------------------------------------------------------------
     // Implementation of BeanDefinitionRegistry
     //---------------------------------------------------------------------
 
+    @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
             throws BeanDefinitionStoreException {
 
         this.beanFactory.registerBeanDefinition(beanName, beanDefinition);
     }
 
+    @Override
     public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
         this.beanFactory.removeBeanDefinition(beanName);
     }
 
+    @Override
     public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
         return this.beanFactory.getBeanDefinition(beanName);
     }
 
+    @Override
     public boolean isBeanNameInUse(String beanName) {
         return this.beanFactory.isBeanNameInUse(beanName);
     }
 
+    @Override
     public void registerAlias(String beanName, String alias) {
         this.beanFactory.registerAlias(beanName, alias);
     }
 
+    @Override
     public void removeAlias(String alias) {
         this.beanFactory.removeAlias(alias);
     }
 
+    @Override
     public boolean isAlias(String beanName) {
         return this.beanFactory.isAlias(beanName);
     }
 
-    @Override
-    public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
-        return false;
-    }
 }
-

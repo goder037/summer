@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator implements H
 
     private List<Resource> locations;
 
+    private final List<ResourceResolver> resourceResolvers = new ArrayList<ResourceResolver>(4);
 
     public ResourceHttpRequestHandler() {
         super(METHOD_GET, METHOD_HEAD);
@@ -69,6 +71,25 @@ public class ResourceHttpRequestHandler extends WebContentGenerator implements H
     public void setLocations(List<Resource> locations) {
         Assert.notEmpty(locations, "Locations list must not be empty");
         this.locations = locations;
+    }
+
+    /**
+     * Return the configured {@code List} of {@code Resource} locations.
+     * <p>Note that if {@link #setLocationValues(List) locationValues} are provided,
+     * instead of loaded Resource-based locations, this method will return
+     * empty until after initialization via {@link #afterPropertiesSet()}.
+     * @see #setLocationValues
+     * @see #setLocations
+     */
+    public List<Resource> getLocations() {
+        return this.locations;
+    }
+
+    /**
+     * Return the list of configured resource resolvers.
+     */
+    public List<ResourceResolver> getResourceResolvers() {
+        return this.resourceResolvers;
     }
 
 

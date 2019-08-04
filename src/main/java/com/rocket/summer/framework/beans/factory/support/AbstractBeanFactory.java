@@ -4,7 +4,6 @@ import com.rocket.summer.framework.beans.*;
 import com.rocket.summer.framework.beans.factory.*;
 import com.rocket.summer.framework.beans.factory.config.*;
 import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.CollectionFactory;
 import com.rocket.summer.framework.core.DecoratingClassLoader;
 import com.rocket.summer.framework.core.NamedThreadLocal;
 import com.rocket.summer.framework.core.ResolvableType;

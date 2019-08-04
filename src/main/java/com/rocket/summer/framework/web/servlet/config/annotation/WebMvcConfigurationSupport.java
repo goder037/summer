@@ -12,6 +12,7 @@ import com.rocket.summer.framework.format.Formatter;
 import com.rocket.summer.framework.format.FormatterRegistry;
 import com.rocket.summer.framework.format.support.DefaultFormattingConversionService;
 import com.rocket.summer.framework.format.support.FormattingConversionService;
+import com.rocket.summer.framework.http.MediaType;
 import com.rocket.summer.framework.http.converter.ByteArrayHttpMessageConverter;
 import com.rocket.summer.framework.http.converter.HttpMessageConverter;
 import com.rocket.summer.framework.http.converter.ResourceHttpMessageConverter;
@@ -22,8 +23,11 @@ import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter
 import com.rocket.summer.framework.http.converter.xml.XmlAwareFormHttpMessageConverter;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.validation.Errors;
+import com.rocket.summer.framework.validation.MessageCodesResolver;
 import com.rocket.summer.framework.validation.Validator;
 import com.rocket.summer.framework.web.HttpRequestHandler;
+import com.rocket.summer.framework.web.accept.ContentNegotiationManager;
+import com.rocket.summer.framework.web.bind.WebDataBinder;
 import com.rocket.summer.framework.web.bind.annotation.ExceptionHandler;
 import com.rocket.summer.framework.web.bind.annotation.ResponseStatus;
 import com.rocket.summer.framework.web.bind.support.ConfigurableWebBindingInitializer;
@@ -50,7 +54,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.Source;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the main class providing the configuration behind the MVC Java config.
@@ -116,11 +122,27 @@ import java.util.List;
  */
 public class WebMvcConfigurationSupport implements ApplicationContextAware, ServletContextAware {
 
+    private static final boolean jaxb2Present =
+            ClassUtils.isPresent("javax.xml.bind.Binder",
+                    WebMvcConfigurationSupport.class.getClassLoader());
+
+    private static final boolean jackson2Present =
+            ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper",
+                    WebMvcConfigurationSupport.class.getClassLoader()) &&
+                    ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator",
+                            WebMvcConfigurationSupport.class.getClassLoader());
+
+    private static final boolean jackson2XmlPresent =
+            ClassUtils.isPresent("com.fasterxml.jackson.dataformat.xml.XmlMapper",
+                    WebMvcConfigurationSupport.class.getClassLoader());
+
     private ServletContext servletContext;
 
     private ApplicationContext applicationContext;
 
     private List<Object> interceptors;
+
+    private ContentNegotiationManager contentNegotiationManager;
 
     private List<HttpMessageConverter<?>> messageConverters;
 
@@ -142,6 +164,93 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
         handlerMapping.setOrder(0);
         handlerMapping.setInterceptors(getInterceptors());
         return handlerMapping;
+    }
+
+    /**
+     * Protected method for plugging in a custom subclass of
+     * {@link RequestMappingHandlerAdapter}.
+     * @since 4.3
+     */
+    protected RequestMappingHandlerAdapter createRequestMappingHandlerAdapter() {
+        return new RequestMappingHandlerAdapter();
+    }
+
+    /**
+     * Return a {@link ContentNegotiationManager} instance to use to determine
+     * requested {@linkplain MediaType media types} in a given request.
+     */
+    @Bean
+    public ContentNegotiationManager mvcContentNegotiationManager() {
+        if (this.contentNegotiationManager == null) {
+            ContentNegotiationConfigurer configurer = new ContentNegotiationConfigurer(this.servletContext);
+            configurer.mediaTypes(getDefaultMediaTypes());
+            configureContentNegotiation(configurer);
+            this.contentNegotiationManager = configurer.buildContentNegotiationManager();
+        }
+        return this.contentNegotiationManager;
+    }
+
+    protected Map<String, MediaType> getDefaultMediaTypes() {
+        Map<String, MediaType> map = new HashMap<String, MediaType>(4);
+        if (jaxb2Present || jackson2XmlPresent) {
+            map.put("xml", MediaType.APPLICATION_XML);
+        }
+        if (jackson2Present) {
+            map.put("json", MediaType.APPLICATION_JSON);
+        }
+        return map;
+    }
+
+    /**
+     * Return the associated Spring {@link ApplicationContext}.
+     * @since 4.2
+     */
+    public ApplicationContext getApplicationContext() {
+        return this.applicationContext;
+    }
+
+    /**
+     * Override this method to configure content negotiation.
+     * @see DefaultServletHandlerConfigurer
+     */
+    protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    }
+
+    /**
+     * Return the {@link ConfigurableWebBindingInitializer} to use for
+     * initializing all {@link WebDataBinder} instances.
+     */
+    protected ConfigurableWebBindingInitializer getConfigurableWebBindingInitializer() {
+        ConfigurableWebBindingInitializer initializer = new ConfigurableWebBindingInitializer();
+        initializer.setConversionService(mvcConversionService());
+        initializer.setValidator(mvcValidator());
+        initializer.setMessageCodesResolver(getMessageCodesResolver());
+        return initializer;
+    }
+
+    /**
+     * Protected method for plugging in a custom subclass of
+     * {@link ExceptionHandlerExceptionResolver}.
+     * @since 4.3
+     */
+    protected ExceptionHandlerExceptionResolver createExceptionHandlerExceptionResolver() {
+        return new ExceptionHandlerExceptionResolver();
+    }
+
+    /**
+     * Override this method to provide a custom {@link MessageCodesResolver}.
+     */
+    protected MessageCodesResolver getMessageCodesResolver() {
+        return null;
+    }
+
+    /**
+     * Protected method for plugging in a custom subclass of
+     * {@link RequestMappingHandlerMapping}.
+     * @since 4.0
+     */
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+        return new RequestMappingHandlerMapping();
     }
 
     /**

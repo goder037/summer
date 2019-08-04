@@ -7,28 +7,18 @@ import com.rocket.summer.framework.beans.factory.annotation.Autowire;
 import com.rocket.summer.framework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
-import com.rocket.summer.framework.beans.factory.parsing.Location;
-import com.rocket.summer.framework.beans.factory.parsing.Problem;
-import com.rocket.summer.framework.beans.factory.parsing.ProblemReporter;
 import com.rocket.summer.framework.beans.factory.parsing.SourceExtractor;
 import com.rocket.summer.framework.beans.factory.support.*;
-import com.rocket.summer.framework.core.Conventions;
 import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
-import com.rocket.summer.framework.core.annotation.AnnotationUtils;
 import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.MethodMetadata;
-import com.rocket.summer.framework.core.type.StandardAnnotationMetadata;
-import com.rocket.summer.framework.core.type.classreading.MetadataReader;
-import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
-import com.rocket.summer.framework.stereotype.Component;
 import com.rocket.summer.framework.util.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
 

@@ -3,13 +3,10 @@ package com.rocket.summer.framework.context.event;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.core.ResolvableType;
-import com.rocket.summer.framework.core.task.SyncTaskExecutor;
-import com.rocket.summer.framework.core.task.TaskExecutor;
 import com.rocket.summer.framework.util.ErrorHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 /**

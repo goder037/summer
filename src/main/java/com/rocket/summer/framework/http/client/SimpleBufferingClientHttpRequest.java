@@ -4,7 +4,6 @@ import com.rocket.summer.framework.http.HttpHeaders;
 import com.rocket.summer.framework.http.HttpMethod;
 import com.rocket.summer.framework.util.FileCopyUtils;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
