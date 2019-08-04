@@ -39,7 +39,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 
     static {
         List<Class<?>> nonReplacingConverters = new ArrayList<Class<?>>();
-        addClassIfExists(nonReplacingConverters, "org.springframework.hateoas.mvc."
+        addClassIfExists(nonReplacingConverters, "com.rocket.summer.framework.hateoas.mvc."
                 + "TypeConstrainedMappingJackson2HttpMessageConverter");
         NON_REPLACING_CONVERTERS = Collections.unmodifiableList(nonReplacingConverters);
     }
@@ -171,7 +171,7 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
 
     private List<HttpMessageConverter<?>> getDefaultConverters() {
         List<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
-        if (ClassUtils.isPresent("org.springframework.web.servlet.config.annotation."
+        if (ClassUtils.isPresent("com.rocket.summer.framework.web.servlet.config.annotation."
                 + "WebMvcConfigurationSupport", null)) {
             converters.addAll(new WebMvcConfigurationSupport() {
                 public List<HttpMessageConverter<?>> defaultMessageConverters() {

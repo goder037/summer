@@ -3,7 +3,6 @@ package com.rocket.summer.framework.http.client;
 import com.rocket.summer.framework.http.HttpOutputMessage;
 import com.rocket.summer.framework.http.HttpRequest;
 import com.rocket.summer.framework.util.concurrent.ListenableFuture;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
 
 import java.io.IOException;
 

@@ -17,6 +17,7 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import javax.validation.*;
 import javax.validation.bootstrap.GenericBootstrap;
 import javax.validation.bootstrap.ProviderSpecificBootstrap;
+import javax.validation.executable.ExecutableValidator;
 import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -375,6 +376,12 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
     }
 
     @Override
+    public ParameterNameProvider getParameterNameProvider() {
+        Assert.notNull(this.validatorFactory, "No target ValidatorFactory set");
+        return this.validatorFactory.getParameterNameProvider();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T unwrap(Class<T> type) {
         if (type == null || !ValidatorFactory.class.isAssignableFrom(type)) {
@@ -396,7 +403,6 @@ public class LocalValidatorFactoryBean extends SpringValidatorAdapter
             throw ex;
         }
     }
-
 
     public void close() {
         if (closeMethod != null && this.validatorFactory != null) {

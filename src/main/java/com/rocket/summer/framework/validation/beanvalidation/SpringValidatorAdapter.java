@@ -7,9 +7,9 @@ import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.validation.*;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
+import javax.validation.*;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import java.io.Serializable;
@@ -76,6 +76,12 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
         if (this.targetValidator != null) {
             processConstraintViolations(this.targetValidator.validate(target), errors);
         }
+    }
+
+    @Override
+    public ExecutableValidator forExecutables() {
+        Assert.state(this.targetValidator != null, "No target Validator set");
+        return this.targetValidator.forExecutables();
     }
 
     @Override
@@ -299,7 +305,6 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
      * Wrapper for a String attribute which can be resolved via a {@code MessageSource},
      * falling back to the original attribute as a default value otherwise.
      */
-    @SuppressWarnings("serial")
     private static class ResolvableAttribute implements MessageSourceResolvable, Serializable {
 
         private final String resolvableString;
@@ -325,4 +330,3 @@ public class SpringValidatorAdapter implements SmartValidator, javax.validation.
     }
 
 }
-

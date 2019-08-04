@@ -5,6 +5,7 @@ import com.rocket.summer.framework.util.StringUtils;
 import com.rocket.summer.framework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,8 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 
     private volatile HttpSession session;
 
+    private HttpServletResponse response;
+
     private final Map<String, Object> sessionAttributesToUpdate = new HashMap<String, Object>();
 
 
@@ -46,6 +49,16 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
     public ServletRequestAttributes(HttpServletRequest request) {
         Assert.notNull(request, "Request must not be null");
         this.request = request;
+    }
+
+    /**
+     * Create a new ServletRequestAttributes instance for the given request.
+     * @param request current HTTP request
+     * @param response current HTTP response (for optional exposure)
+     */
+    public ServletRequestAttributes(HttpServletRequest request, HttpServletResponse response) {
+        this(request);
+        this.response = response;
     }
 
 

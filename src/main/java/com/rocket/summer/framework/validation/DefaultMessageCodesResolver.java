@@ -66,8 +66,12 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
      */
     public static final String CODE_SEPARATOR = ".";
 
+    private static final MessageCodeFormatter DEFAULT_FORMATTER = Format.PREFIX_ERROR_CODE;
+
 
     private String prefix = "";
+
+    private MessageCodeFormatter formatter = DEFAULT_FORMATTER;
 
     /**
      * Specify a prefix to be applied to any code built by this resolver.
@@ -82,6 +86,16 @@ public class DefaultMessageCodesResolver implements MessageCodesResolver, Serial
         return new String[] {
                 postProcessMessageCode(errorCode + CODE_SEPARATOR + objectName),
                 postProcessMessageCode(errorCode)};
+    }
+
+    /**
+     * Specify the format for message codes built by this resolver.
+     * <p>The default is {@link Format#PREFIX_ERROR_CODE}.
+     * @since 3.2
+     * @see Format
+     */
+    public void setMessageCodeFormatter(MessageCodeFormatter formatter) {
+        this.formatter = (formatter != null ? formatter : DEFAULT_FORMATTER);
     }
 
     /**

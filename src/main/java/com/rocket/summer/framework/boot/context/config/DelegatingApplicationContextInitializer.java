@@ -26,7 +26,7 @@ import java.util.List;
 public class DelegatingApplicationContextInitializer implements
         ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
-    // NOTE: Similar to org.springframework.web.context.ContextLoader
+    // NOTE: Similar to com.rocket.summer.framework.web.context.ContextLoader
 
     private static final String PROPERTY_NAME = "context.initializer.classes";
 

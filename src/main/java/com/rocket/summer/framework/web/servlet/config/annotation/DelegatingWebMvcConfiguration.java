@@ -4,6 +4,7 @@ import com.rocket.summer.framework.beans.factory.annotation.Autowired;
 import com.rocket.summer.framework.context.annotation.Configuration;
 import com.rocket.summer.framework.format.FormatterRegistry;
 import com.rocket.summer.framework.http.converter.HttpMessageConverter;
+import com.rocket.summer.framework.validation.MessageCodesResolver;
 import com.rocket.summer.framework.validation.Validator;
 import com.rocket.summer.framework.web.method.support.HandlerMethodArgumentResolver;
 import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandler;
@@ -82,6 +83,11 @@ public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport {
     @Override
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         configurers.configureHandlerExceptionResolvers(exceptionResolvers);
+    }
+
+    @Override
+    protected MessageCodesResolver getMessageCodesResolver() {
+        return this.configurers.getMessageCodesResolver();
     }
 
 }

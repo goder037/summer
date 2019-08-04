@@ -3,6 +3,7 @@ package com.rocket.summer.framework.web.client;
 import com.rocket.summer.framework.http.HttpHeaders;
 import com.rocket.summer.framework.http.HttpStatus;
 import com.rocket.summer.framework.http.MediaType;
+import com.rocket.summer.framework.http.client.ClientHttpResponse;
 import com.rocket.summer.framework.util.FileCopyUtils;
 
 import java.io.IOException;

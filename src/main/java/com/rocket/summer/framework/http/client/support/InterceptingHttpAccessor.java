@@ -1,17 +1,18 @@
 package com.rocket.summer.framework.http.client.support;
 
+import com.rocket.summer.framework.http.client.ClientHttpRequestFactory;
 import com.rocket.summer.framework.http.client.ClientHttpRequestInterceptor;
+import com.rocket.summer.framework.http.client.InterceptingClientHttpRequestFactory;
 import com.rocket.summer.framework.util.CollectionUtils;
-import com.rocket.summer.framework.web.client.ClientHttpRequestFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for {@link org.springframework.web.client.RestTemplate} and other HTTP accessing gateway helpers, adding
+ * Base class for {@link com.rocket.summer.framework.web.client.RestTemplate} and other HTTP accessing gateway helpers, adding
  * interceptor-related properties to {@link HttpAccessor}'s common properties.
  *
- * <p>Not intended to be used directly. See {@link org.springframework.web.client.RestTemplate}.
+ * <p>Not intended to be used directly. See {@link com.rocket.summer.framework.web.client.RestTemplate}.
  *
  * @author Arjen Poutsma
  */

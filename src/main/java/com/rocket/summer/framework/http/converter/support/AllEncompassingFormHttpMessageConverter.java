@@ -10,7 +10,7 @@ import com.rocket.summer.framework.util.ClassUtils;
 import javax.xml.transform.Source;
 
 /**
- * Extension of {@link org.springframework.http.converter.FormHttpMessageConverter},
+ * Extension of {@link com.rocket.summer.framework.http.converter.FormHttpMessageConverter},
  * adding support for XML and JSON-based parts.
  *
  * @author Rossen Stoyanchev

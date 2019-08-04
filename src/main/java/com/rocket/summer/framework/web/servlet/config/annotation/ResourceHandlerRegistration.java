@@ -4,6 +4,7 @@ import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.CollectionUtils;
+import com.rocket.summer.framework.web.servlet.resource.PathResourceResolver;
 import com.rocket.summer.framework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ public class ResourceHandlerRegistration {
     private final List<Resource> locations = new ArrayList<Resource>();
 
     private Integer cachePeriod;
+
+    private ResourceChainRegistration resourceChainRegistration;
 
     /**
      * Create a {@link ResourceHandlerRegistration} instance.
@@ -52,6 +55,23 @@ public class ResourceHandlerRegistration {
             this.locations.add(resourceLoader.getResource(location));
         }
         return this;
+    }
+
+    /**
+     * Configure a chain of resource resolvers and transformers to use. This
+     * can be useful, for example, to apply a version strategy to resource URLs.
+     * <p>If this method is not invoked, by default only a simple
+     * {@link PathResourceResolver} is used in order to match URL paths to
+     * resources under the configured locations.
+     * @param cacheResources whether to cache the result of resource resolution;
+     * setting this to "true" is recommended for production (and "false" for
+     * development, especially when applying a version strategy)
+     * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
+     * @since 4.1
+     */
+    public ResourceChainRegistration resourceChain(boolean cacheResources) {
+        this.resourceChainRegistration = new ResourceChainRegistration(cacheResources);
+        return this.resourceChainRegistration;
     }
 
     /**

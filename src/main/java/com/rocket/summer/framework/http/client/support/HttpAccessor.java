@@ -1,10 +1,10 @@
 package com.rocket.summer.framework.http.client.support;
 
 import com.rocket.summer.framework.http.HttpMethod;
+import com.rocket.summer.framework.http.client.ClientHttpRequest;
+import com.rocket.summer.framework.http.client.ClientHttpRequestFactory;
 import com.rocket.summer.framework.http.client.SimpleClientHttpRequestFactory;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.web.client.ClientHttpRequest;
-import com.rocket.summer.framework.web.client.ClientHttpRequestFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,8 +39,6 @@ public abstract class HttpAccessor {
      * <p><b>Note that the standard JDK HTTP library does not support the HTTP PATCH method.
      * Configure the Apache HttpComponents or OkHttp request factory to enable PATCH.</b>
      * @see #createRequest(URI, HttpMethod)
-     * @see com.rocket.summer.framework.http.client.HttpComponentsAsyncClientHttpRequestFactory
-     * @see com.rocket.summer.framework.http.client.OkHttp3ClientHttpRequestFactory
      */
     public void setRequestFactory(ClientHttpRequestFactory requestFactory) {
         Assert.notNull(requestFactory, "ClientHttpRequestFactory must not be null");
@@ -71,6 +69,7 @@ public abstract class HttpAccessor {
         }
         return request;
     }
+
 
 }
 

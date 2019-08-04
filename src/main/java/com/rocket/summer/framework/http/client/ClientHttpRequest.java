@@ -1,5 +1,6 @@
-package com.rocket.summer.framework.web.client;
+package com.rocket.summer.framework.http.client;
 
+import com.rocket.summer.framework.http.HttpMethod;
 import com.rocket.summer.framework.http.HttpOutputMessage;
 import com.rocket.summer.framework.http.HttpRequest;
 
@@ -26,4 +27,3 @@ public interface ClientHttpRequest extends HttpRequest, HttpOutputMessage {
     ClientHttpResponse execute() throws IOException;
 
 }
-

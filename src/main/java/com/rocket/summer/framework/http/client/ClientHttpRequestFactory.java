@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.web.client;
+package com.rocket.summer.framework.http.client;
 
 import com.rocket.summer.framework.http.HttpMethod;
 

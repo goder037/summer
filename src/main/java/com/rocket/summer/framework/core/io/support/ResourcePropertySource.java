@@ -11,19 +11,19 @@ import java.util.Properties;
 
 /**
  * Subclass of {@link PropertiesPropertySource} that loads a {@link Properties} object
- * from a given {@link org.springframework.core.io.Resource} or resource location such as
+ * from a given {@link com.rocket.summer.framework.core.io.Resource} or resource location such as
  * {@code "classpath:/com/myco/foo.properties"} or {@code "file:/path/to/file.xml"}.
  *
  * <p>Both traditional and XML-based properties file formats are supported; however, in
  * order for XML processing to take effect, the underlying {@code Resource}'s
- * {@link org.springframework.core.io.Resource#getFilename() getFilename()} method must
+ * {@link com.rocket.summer.framework.core.io.Resource#getFilename() getFilename()} method must
  * return a non-{@code null} value that ends in {@code ".xml"}.
  *
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
- * @see org.springframework.core.io.Resource
- * @see org.springframework.core.io.support.EncodedResource
+ * @see com.rocket.summer.framework.core.io.Resource
+ * @see com.rocket.summer.framework.core.io.support.EncodedResource
  */
 public class ResourcePropertySource extends PropertiesPropertySource {
 
@@ -155,7 +155,7 @@ public class ResourcePropertySource extends PropertiesPropertySource {
     /**
      * Return the description for the given Resource; if the description is
      * empty, return the class name of the resource plus its identity hash code.
-     * @see org.springframework.core.io.Resource#getDescription()
+     * @see com.rocket.summer.framework.core.io.Resource#getDescription()
      */
     private static String getNameForResource(Resource resource) {
         String name = resource.getDescription();

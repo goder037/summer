@@ -2,8 +2,6 @@ package com.rocket.summer.framework.http.client;
 
 import com.rocket.summer.framework.http.HttpHeaders;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.web.client.ClientHttpRequest;
-import com.rocket.summer.framework.web.client.ClientHttpResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;

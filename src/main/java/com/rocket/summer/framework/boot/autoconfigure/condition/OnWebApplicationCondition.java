@@ -21,7 +21,7 @@ import com.rocket.summer.framework.web.context.support.StandardServletEnvironmen
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 class OnWebApplicationCondition extends SpringBootCondition {
 
-    private static final String WEB_CONTEXT_CLASS = "org.springframework.web.context."
+    private static final String WEB_CONTEXT_CLASS = "com.rocket.summer.framework.web.context."
             + "support.GenericWebApplicationContext";
 
     @Override

@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Convenient base class for {@link org.springframework.web.servlet.ViewResolver}
- * implementations. Caches {@link org.springframework.web.servlet.View} objects
+ * Convenient base class for {@link com.rocket.summer.framework.web.servlet.ViewResolver}
+ * implementations. Caches {@link com.rocket.summer.framework.web.servlet.View} objects
  * once resolved: This means that view resolution won't be a performance problem,
  * no matter how costly initial view retrieval is.
  *
