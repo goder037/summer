@@ -22,4 +22,9 @@ com.rocket.summer.framework.boot.autoconfigure.web.WebMvcAutoConfiguration
 # Failure Analyzers
 com.rocket.summer.framework.boot.diagnostics.FailureAnalyzer=\
 com.rocket.summer.framework.boot.diagnostics.analyzer.BeanCurrentlyInCreationFailureAnalyzer
-com.rocket.summer.framework.boot.diagnostics.analyzer.ConnectorStartFailureAnalyzer,\
+com.rocket.summer.framework.boot.diagnostics.analyzer.ConnectorStartFailureAnalyzer
+
+
+# FailureAnalysisReporters
+org.springframework.boot.diagnostics.FailureAnalysisReporter=\
+org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter

@@ -93,7 +93,7 @@ public interface ListableBeanFactory extends BeanFactory {
      * @see FactoryBean#getObjectType
      * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class)
      */
-    String[] getBeanNamesForType(Class type);
+    String[] getBeanNamesForType(Class<?> type);
 
     /**
      * Return the names of beans matching the given type (including subclasses),
@@ -126,7 +126,7 @@ public interface ListableBeanFactory extends BeanFactory {
      * @see FactoryBean#getObjectType
      * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, Class, boolean, boolean)
      */
-    String[] getBeanNamesForType(Class type, boolean includeNonSingletons, boolean allowEagerInit);
+    String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit);
 
     /**
      * Return the bean instances that match the given object type (including

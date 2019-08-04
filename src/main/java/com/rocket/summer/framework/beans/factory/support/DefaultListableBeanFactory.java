@@ -6,12 +6,11 @@ import com.rocket.summer.framework.beans.factory.*;
 import com.rocket.summer.framework.beans.factory.config.*;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.CollectionFactory;
-import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.CompositeIterator;
-import com.rocket.summer.framework.util.ObjectUtils;
-import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.core.ResolvableType;
+import com.rocket.summer.framework.util.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
         implements ConfigurableListableBeanFactory, BeanDefinitionRegistry {
@@ -32,7 +31,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     private final Map beanDefinitionMap = CollectionFactory.createConcurrentMapIfPossible(16);
 
     /** List of bean definition names, in registration order */
-    private final List beanDefinitionNames = new ArrayList();
+    private volatile List<String> beanDefinitionNames = new ArrayList<String>(256);
 
     /** Cached array of bean definition names in case of frozen configuration */
     private String[] frozenBeanDefinitionNames;
@@ -42,6 +41,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
     /** List of names of manually registered singletons, in registration order */
     private volatile Set<String> manualSingletonNames = new LinkedHashSet<String>(16);
+
+    /** Map of singleton and non-singleton bean names, keyed by dependency type */
+    private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
+
+    /** Map of singleton-only bean names, keyed by dependency type */
+    private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
     /** Map from dependency type to corresponding autowired value */
     private final Map resolvableDependencies = new HashMap();
@@ -132,31 +137,47 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         return iterator;
     }
 
-    public String[] getBeanNamesForType(Class type) {
-        return getBeanNamesForType(type, true, true);
+    @Override
+    public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+        if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
+            return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
+        }
+        Map<Class<?>, String[]> cache =
+                (includeNonSingletons ? this.allBeanNamesByType : this.singletonBeanNamesByType);
+        String[] resolvedBeanNames = cache.get(type);
+        if (resolvedBeanNames != null) {
+            return resolvedBeanNames;
+        }
+        resolvedBeanNames = doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, true);
+        if (ClassUtils.isCacheSafe(type, getBeanClassLoader())) {
+            cache.put(type, resolvedBeanNames);
+        }
+        return resolvedBeanNames;
     }
 
-    public String[] getBeanNamesForType(Class type, boolean includeNonSingletons, boolean allowEagerInit) {
-        List result = new ArrayList();
+    private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
+        List<String> result = new ArrayList<String>();
 
         // Check all bean definitions.
-        String[] beanDefinitionNames = getBeanDefinitionNames();
-        for (String beanDefinitionName : beanDefinitionNames) {
-            String beanName = beanDefinitionName;
+        for (String beanName : this.beanDefinitionNames) {
             // Only consider bean as eligible if the bean name
             // is not defined as alias for some other bean.
             if (!isAlias(beanName)) {
                 try {
                     RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
                     // Only check bean definition if it is complete.
-                    if (!mbd.isAbstract() &&
-                            (allowEagerInit || ((mbd.hasBeanClass() || !mbd.isLazyInit() || this.allowEagerClassLoading)) &&
+                    if (!mbd.isAbstract() && (allowEagerInit ||
+                            (mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
                                     !requiresEagerInitForType(mbd.getFactoryBeanName()))) {
                         // In case of FactoryBean, match object created by FactoryBean.
                         boolean isFactoryBean = isFactoryBean(beanName, mbd);
+                        BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
                         boolean matchFound =
-                                (allowEagerInit || !isFactoryBean || containsSingleton(beanName)) &&
-                                        (includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type);
+                                (allowEagerInit || !isFactoryBean ||
+                                        (dbd != null && !mbd.isLazyInit()) || containsSingleton(beanName)) &&
+                                        (includeNonSingletons ||
+                                                (dbd != null ? mbd.isSingleton() : isSingleton(beanName))) &&
+                                        isTypeMatch(beanName, type);
                         if (!matchFound && isFactoryBean) {
                             // In case of FactoryBean, try to match FactoryBean instance itself next.
                             beanName = FACTORY_BEAN_PREFIX + beanName;
@@ -170,30 +191,27 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                     if (allowEagerInit) {
                         throw ex;
                     }
-                    // Probably contains a placeholder: let's ignore it for type matching purposes.
-                    if (this.logger.isDebugEnabled()) {
-                        this.logger.debug("Ignoring bean class loading failure for bean '" + beanName + "'", ex);
+                    // Probably a class name with a placeholder: let's ignore it for type matching purposes.
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Ignoring bean class loading failure for bean '" + beanName + "'", ex);
                     }
                     onSuppressedException(ex);
                 } catch (BeanDefinitionStoreException ex) {
                     if (allowEagerInit) {
                         throw ex;
                     }
-                    // Probably contains a placeholder: let's ignore it for type matching purposes.
-                    if (this.logger.isDebugEnabled()) {
-                        this.logger.debug("Ignoring unresolvable metadata in bean definition '" + beanName + "'", ex);
+                    // Probably some metadata with a placeholder: let's ignore it for type matching purposes.
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Ignoring unresolvable metadata in bean definition '" + beanName + "'", ex);
                     }
                     onSuppressedException(ex);
                 }
             }
         }
 
-        // Check singletons too, to catch manually registered singletons.
-        String[] singletonNames = getSingletonNames();
-        for (String singletonName : singletonNames) {
-            String beanName = singletonName;
-            // Only check if manually registered.
-            if (!containsBeanDefinition(beanName)) {
+        // Check manually registered singletons too.
+        for (String beanName : this.manualSingletonNames) {
+            try {
                 // In case of FactoryBean, match object created by FactoryBean.
                 if (isFactoryBean(beanName)) {
                     if ((includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type)) {
@@ -208,10 +226,20 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
                 if (isTypeMatch(beanName, type)) {
                     result.add(beanName);
                 }
+            } catch (NoSuchBeanDefinitionException ex) {
+                // Shouldn't happen - probably a result of circular reference resolution...
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Failed to check manually registered singleton with name '" + beanName + "'", ex);
+                }
             }
         }
 
         return StringUtils.toStringArray(result);
+    }
+
+    @Override
+    public String[] getBeanNamesForType(Class<?> type) {
+        return getBeanNamesForType(type, true, true);
     }
 
     public <T> T getBean(Class<T> requiredType) throws BeansException {
