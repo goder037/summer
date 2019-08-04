@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans.factory;
 
 import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.StringUtils;
 
@@ -66,6 +67,55 @@ public abstract class BeanFactoryUtils {
      */
     public static boolean isGeneratedBeanName(String name) {
         return (name != null && name.indexOf(GENERATED_BEAN_NAME_SEPARATOR) != -1);
+    }
+
+    /**
+     * Get all bean names for the given type, including those defined in ancestor
+     * factories. Will return unique names in case of overridden bean definitions.
+     * <p>Does consider objects created by FactoryBeans, which means that FactoryBeans
+     * will get initialized. If the object created by the FactoryBean doesn't match,
+     * the raw FactoryBean itself will be matched against the type.
+     * <p>This version of {@code beanNamesForTypeIncludingAncestors} automatically
+     * includes prototypes and FactoryBeans.
+     * @param lbf the bean factory
+     * @param type the type that beans must match (as a {@code ResolvableType})
+     * @return the array of matching bean names, or an empty array if none
+     * @since 4.2
+     */
+    public static String[] beanNamesForTypeIncludingAncestors(ListableBeanFactory lbf, ResolvableType type) {
+        Assert.notNull(lbf, "ListableBeanFactory must not be null");
+        String[] result = lbf.getBeanNamesForType(type);
+        if (lbf instanceof HierarchicalBeanFactory) {
+            HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
+            if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
+                String[] parentResult = beanNamesForTypeIncludingAncestors(
+                        (ListableBeanFactory) hbf.getParentBeanFactory(), type);
+                result = mergeNamesWithParent(result, parentResult, hbf);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Merge the given bean names result with the given parent result.
+     * @param result the local bean name result
+     * @param parentResult the parent bean name result (possibly empty)
+     * @param hbf the local bean factory
+     * @return the merged result (possibly the local result as-is)
+     * @since 4.3.15
+     */
+    private static String[] mergeNamesWithParent(String[] result, String[] parentResult, HierarchicalBeanFactory hbf) {
+        if (parentResult.length == 0) {
+            return result;
+        }
+        List<String> merged = new ArrayList<String>(result.length + parentResult.length);
+        merged.addAll(Arrays.asList(result));
+        for (String beanName : parentResult) {
+            if (!merged.contains(beanName) && !hbf.containsLocalBean(beanName)) {
+                merged.add(beanName);
+            }
+        }
+        return StringUtils.toStringArray(merged);
     }
 
     /**

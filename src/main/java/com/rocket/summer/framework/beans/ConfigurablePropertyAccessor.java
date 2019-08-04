@@ -10,6 +10,7 @@ import com.rocket.summer.framework.core.convert.ConversionService;
  * <p>Serves as base interface for {@link BeanWrapper}.
  *
  * @author Juergen Hoeller
+ * @author Stephane Nicoll
  * @since 2.0
  * @see BeanWrapper
  */
@@ -38,5 +39,21 @@ public interface ConfigurablePropertyAccessor extends PropertyAccessor, Property
      */
     boolean isExtractOldValueForEditor();
 
+    /**
+     * Set whether this instance should attempt to "auto-grow" a
+     * nested path that contains a {@code null} value.
+     * <p>If {@code true}, a {@code null} path location will be populated
+     * with a default object value and traversed instead of resulting in a
+     * {@link NullValueInNestedPathException}.
+     * <p>Default is {@code false} on a plain PropertyAccessor instance.
+     */
+    void setAutoGrowNestedPaths(boolean autoGrowNestedPaths);
+
+    /**
+     * Return whether "auto-growing" of nested paths has been activated.
+     */
+    boolean isAutoGrowNestedPaths();
+
 }
+
 

@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.beans.factory.config;
 
 import com.rocket.summer.framework.beans.BeanMetadataElement;
+import com.rocket.summer.framework.beans.factory.BeanFactoryUtils;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.StringUtils;
@@ -41,7 +42,7 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
      * Create a new BeanDefinitionHolder.
      * @param beanDefinition the BeanDefinition to wrap
      * @param beanName the name of the bean, as specified for the bean definition
-     * @param aliases alias names for the bean, or <code>null</code> if none
+     * @param aliases alias names for the bean, or {@code null} if none
      */
     public BeanDefinitionHolder(BeanDefinition beanDefinition, String beanName, String[] aliases) {
         Assert.notNull(beanDefinition, "BeanDefinition must not be null");
@@ -55,7 +56,7 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
      * Copy constructor: Create a new BeanDefinitionHolder with the
      * same contents as the given BeanDefinitionHolder instance.
      * <p>Note: The wrapped BeanDefinition reference is taken as-is;
-     * it is <code>not</code> deeply copied.
+     * it is {@code not} deeply copied.
      * @param beanDefinitionHolder the BeanDefinitionHolder to copy
      */
     public BeanDefinitionHolder(BeanDefinitionHolder beanDefinitionHolder) {
@@ -65,35 +66,6 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
         this.aliases = beanDefinitionHolder.getAliases();
     }
 
-    /**
-     * Expose the bean definition's source object.
-     * @see BeanDefinition#getSource()
-     */
-    public Object getSource() {
-        return this.beanDefinition.getSource();
-    }
-
-    /**
-     * This implementation returns the long description. Can be overridden
-     * to return the short description or any kind of custom description instead.
-     * @see #getLongDescription()
-     * @see #getShortDescription()
-     */
-    public String toString() {
-        return getLongDescription();
-    }
-
-    /**
-     * Return a long description for the bean, including name and aliases
-     * as well as a description of the contained {@link BeanDefinition}.
-     * @see #getShortDescription()
-     * @see #getBeanDefinition()
-     */
-    public String getLongDescription() {
-        StringBuffer sb = new StringBuffer(getShortDescription());
-        sb.append(": ").append(this.beanDefinition);
-        return sb.toString();
-    }
 
     /**
      * Return the wrapped BeanDefinition.
@@ -103,12 +75,47 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
     }
 
     /**
+     * Return the primary name of the bean, as specified for the bean definition.
+     */
+    public String getBeanName() {
+        return this.beanName;
+    }
+
+    /**
+     * Return the alias names for the bean, as specified directly for the bean definition.
+     * @return the array of alias names, or {@code null} if none
+     */
+    public String[] getAliases() {
+        return this.aliases;
+    }
+
+    /**
+     * Expose the bean definition's source object.
+     * @see BeanDefinition#getSource()
+     */
+    @Override
+    public Object getSource() {
+        return this.beanDefinition.getSource();
+    }
+
+    /**
+     * Determine whether the given candidate name matches the bean name
+     * or the aliases stored in this bean definition.
+     */
+    public boolean matchesName(String candidateName) {
+        return (candidateName != null && (candidateName.equals(this.beanName) ||
+                candidateName.equals(BeanFactoryUtils.transformedBeanName(this.beanName)) ||
+                ObjectUtils.containsElement(this.aliases, candidateName)));
+    }
+
+
+    /**
      * Return a friendly, short description for the bean, stating name and aliases.
      * @see #getBeanName()
      * @see #getAliases()
      */
     public String getShortDescription() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("Bean definition with name '").append(this.beanName).append("'");
         if (this.aliases != null) {
             sb.append(" and aliases [").append(StringUtils.arrayToCommaDelimitedString(this.aliases)).append("]");
@@ -116,6 +123,31 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
         return sb.toString();
     }
 
+    /**
+     * Return a long description for the bean, including name and aliases
+     * as well as a description of the contained {@link BeanDefinition}.
+     * @see #getShortDescription()
+     * @see #getBeanDefinition()
+     */
+    public String getLongDescription() {
+        StringBuilder sb = new StringBuilder(getShortDescription());
+        sb.append(": ").append(this.beanDefinition);
+        return sb.toString();
+    }
+
+    /**
+     * This implementation returns the long description. Can be overridden
+     * to return the short description or any kind of custom description instead.
+     * @see #getLongDescription()
+     * @see #getShortDescription()
+     */
+    @Override
+    public String toString() {
+        return getLongDescription();
+    }
+
+
+    @Override
     public boolean equals(Object other) {
         if (this == other) {
             return true;
@@ -129,6 +161,7 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
                 ObjectUtils.nullSafeEquals(this.aliases, otherHolder.aliases);
     }
 
+    @Override
     public int hashCode() {
         int hashCode = this.beanDefinition.hashCode();
         hashCode = 29 * hashCode + this.beanName.hashCode();
@@ -136,18 +169,4 @@ public class BeanDefinitionHolder implements BeanMetadataElement {
         return hashCode;
     }
 
-    /**
-     * Return the primary name of the bean, as specified for the bean definition.
-     */
-    public String getBeanName() {
-        return this.beanName;
-    }
-
-    /**
-     * Return the alias names for the bean, as specified directly for the bean definition.
-     * @return the array of alias names, or <code>null</code> if none
-     */
-    public String[] getAliases() {
-        return this.aliases;
-    }
 }

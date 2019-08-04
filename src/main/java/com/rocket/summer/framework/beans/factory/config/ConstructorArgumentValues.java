@@ -20,9 +20,9 @@ import java.util.*;
  */
 public class ConstructorArgumentValues {
 
-    private final Map indexedArgumentValues = new HashMap();
+    private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<Integer, ValueHolder>(0);
 
-    private final List genericArgumentValues = new LinkedList();
+    private final List<ValueHolder> genericArgumentValues = new LinkedList<ValueHolder>();
 
 
     /**
@@ -39,6 +39,7 @@ public class ConstructorArgumentValues {
         addArgumentValues(original);
     }
 
+
     /**
      * Copy all given argument values into this object, using separate holder
      * instances to keep the values independent from the original object.
@@ -48,15 +49,12 @@ public class ConstructorArgumentValues {
      */
     public void addArgumentValues(ConstructorArgumentValues other) {
         if (other != null) {
-            for (Iterator it = other.indexedArgumentValues.entrySet().iterator(); it.hasNext();) {
-                Map.Entry entry = (Map.Entry) it.next();
-                ValueHolder valueHolder = (ValueHolder) entry.getValue();
-                addOrMergeIndexedArgumentValue(entry.getKey(), valueHolder.copy());
+            for (Map.Entry<Integer, ValueHolder> entry : other.indexedArgumentValues.entrySet()) {
+                addOrMergeIndexedArgumentValue(entry.getKey(), entry.getValue().copy());
             }
-            for (Iterator it = other.genericArgumentValues.iterator(); it.hasNext();) {
-                ValueHolder valueHolder = (ValueHolder) it.next();
+            for (ValueHolder valueHolder : other.genericArgumentValues) {
                 if (!this.genericArgumentValues.contains(valueHolder)) {
-                    this.genericArgumentValues.add(valueHolder.copy());
+                    addOrMergeGenericArgumentValue(valueHolder.copy());
                 }
             }
         }
@@ -64,7 +62,7 @@ public class ConstructorArgumentValues {
 
 
     /**
-     * Add argument value for the given index in the constructor argument list.
+     * Add an argument value for the given index in the constructor argument list.
      * @param index the index in the constructor argument list
      * @param value the argument value
      */
@@ -73,7 +71,7 @@ public class ConstructorArgumentValues {
     }
 
     /**
-     * Add argument value for the given index in the constructor argument list.
+     * Add an argument value for the given index in the constructor argument list.
      * @param index the index in the constructor argument list
      * @param value the argument value
      * @param type the type of the constructor argument
@@ -83,25 +81,25 @@ public class ConstructorArgumentValues {
     }
 
     /**
-     * Add argument value for the given index in the constructor argument list.
+     * Add an argument value for the given index in the constructor argument list.
      * @param index the index in the constructor argument list
      * @param newValue the argument value in the form of a ValueHolder
      */
     public void addIndexedArgumentValue(int index, ValueHolder newValue) {
         Assert.isTrue(index >= 0, "Index must not be negative");
         Assert.notNull(newValue, "ValueHolder must not be null");
-        addOrMergeIndexedArgumentValue(new Integer(index), newValue);
+        addOrMergeIndexedArgumentValue(index, newValue);
     }
 
     /**
-     * Add argument value for the given index in the constructor argument list,
+     * Add an argument value for the given index in the constructor argument list,
      * merging the new value (typically a collection) with the current value
      * if demanded: see {@link com.rocket.summer.framework.beans.Mergeable}.
      * @param key the index in the constructor argument list
      * @param newValue the argument value in the form of a ValueHolder
      */
-    private void addOrMergeIndexedArgumentValue(Object key, ValueHolder newValue) {
-        ValueHolder currentValue = (ValueHolder) this.indexedArgumentValues.get(key);
+    private void addOrMergeIndexedArgumentValue(Integer key, ValueHolder newValue) {
+        ValueHolder currentValue = this.indexedArgumentValues.get(key);
         if (currentValue != null && newValue.getValue() instanceof Mergeable) {
             Mergeable mergeable = (Mergeable) newValue.getValue();
             if (mergeable.isMergeEnabled()) {
@@ -112,20 +110,42 @@ public class ConstructorArgumentValues {
     }
 
     /**
+     * Check whether an argument value has been registered for the given index.
+     * @param index the index in the constructor argument list
+     */
+    public boolean hasIndexedArgumentValue(int index) {
+        return this.indexedArgumentValues.containsKey(index);
+    }
+
+    /**
      * Get argument value for the given index in the constructor argument list.
      * @param index the index in the constructor argument list
-     * @param requiredType the type to match (can be <code>null</code> to match
+     * @param requiredType the type to match (can be {@code null} to match
      * untyped values only)
-     * @return the ValueHolder for the argument, or <code>null</code> if none set
+     * @return the ValueHolder for the argument, or {@code null} if none set
      */
-    public ValueHolder getIndexedArgumentValue(int index, Class requiredType) {
+    public ValueHolder getIndexedArgumentValue(int index, Class<?> requiredType) {
+        return getIndexedArgumentValue(index, requiredType, null);
+    }
+
+    /**
+     * Get argument value for the given index in the constructor argument list.
+     * @param index the index in the constructor argument list
+     * @param requiredType the type to match (can be {@code null} to match
+     * untyped values only)
+     * @param requiredName the type to match (can be {@code null} to match
+     * unnamed values only, or empty String to match any name)
+     * @return the ValueHolder for the argument, or {@code null} if none set
+     */
+    public ValueHolder getIndexedArgumentValue(int index, Class<?> requiredType, String requiredName) {
         Assert.isTrue(index >= 0, "Index must not be negative");
-        ValueHolder valueHolder = (ValueHolder) this.indexedArgumentValues.get(new Integer(index));
-        if (valueHolder != null) {
-            if (valueHolder.getType() == null ||
-                    (requiredType != null && requiredType.getName().equals(valueHolder.getType()))) {
-                return valueHolder;
-            }
+        ValueHolder valueHolder = this.indexedArgumentValues.get(index);
+        if (valueHolder != null &&
+                (valueHolder.getType() == null ||
+                        (requiredType != null && ClassUtils.matchesTypeName(requiredType, valueHolder.getType()))) &&
+                (valueHolder.getName() == null || "".equals(requiredName) ||
+                        (requiredName != null && requiredName.equals(valueHolder.getName())))) {
+            return valueHolder;
         }
         return null;
     }
@@ -135,15 +155,15 @@ public class ConstructorArgumentValues {
      * @return unmodifiable Map with Integer index as key and ValueHolder as value
      * @see ValueHolder
      */
-    public Map getIndexedArgumentValues() {
+    public Map<Integer, ValueHolder> getIndexedArgumentValues() {
         return Collections.unmodifiableMap(this.indexedArgumentValues);
     }
 
 
     /**
-     * Add generic argument value to be matched by type.
+     * Add a generic argument value to be matched by type.
      * <p>Note: A single generic argument value will just be used once,
-     * rather than matched multiple times (as of Spring 1.1).
+     * rather than matched multiple times.
      * @param value the argument value
      */
     public void addGenericArgumentValue(Object value) {
@@ -151,9 +171,9 @@ public class ConstructorArgumentValues {
     }
 
     /**
-     * Add generic argument value to be matched by type.
+     * Add a generic argument value to be matched by type.
      * <p>Note: A single generic argument value will just be used once,
-     * rather than matched multiple times (as of Spring 1.1).
+     * rather than matched multiple times.
      * @param value the argument value
      * @param type the type of the constructor argument
      */
@@ -162,9 +182,9 @@ public class ConstructorArgumentValues {
     }
 
     /**
-     * Add generic argument value to be matched by type.
+     * Add a generic argument value to be matched by type or name (if available).
      * <p>Note: A single generic argument value will just be used once,
-     * rather than matched multiple times (as of Spring 1.1).
+     * rather than matched multiple times.
      * @param newValue the argument value in the form of a ValueHolder
      * <p>Note: Identical ValueHolder instances will only be registered once,
      * to allow for merging and re-merging of argument value definitions. Distinct
@@ -173,52 +193,82 @@ public class ConstructorArgumentValues {
     public void addGenericArgumentValue(ValueHolder newValue) {
         Assert.notNull(newValue, "ValueHolder must not be null");
         if (!this.genericArgumentValues.contains(newValue)) {
-            this.genericArgumentValues.add(newValue);
+            addOrMergeGenericArgumentValue(newValue);
         }
     }
 
     /**
-     * Look for a generic argument value that matches the given type.
-     * @param requiredType the type to match (can be <code>null</code> to find
-     * an arbitrary next generic argument value)
-     * @return the ValueHolder for the argument, or <code>null</code> if none set
+     * Add a generic argument value, merging the new value (typically a collection)
+     * with the current value if demanded: see {@link com.rocket.summer.framework.beans.Mergeable}.
+     * @param newValue the argument value in the form of a ValueHolder
      */
-    public ValueHolder getGenericArgumentValue(Class requiredType) {
-        return getGenericArgumentValue(requiredType, null);
+    private void addOrMergeGenericArgumentValue(ValueHolder newValue) {
+        if (newValue.getName() != null) {
+            for (Iterator<ValueHolder> it = this.genericArgumentValues.iterator(); it.hasNext();) {
+                ValueHolder currentValue = it.next();
+                if (newValue.getName().equals(currentValue.getName())) {
+                    if (newValue.getValue() instanceof Mergeable) {
+                        Mergeable mergeable = (Mergeable) newValue.getValue();
+                        if (mergeable.isMergeEnabled()) {
+                            newValue.setValue(mergeable.merge(currentValue.getValue()));
+                        }
+                    }
+                    it.remove();
+                }
+            }
+        }
+        this.genericArgumentValues.add(newValue);
+    }
+
+    /**
+     * Look for a generic argument value that matches the given type.
+     * @param requiredType the type to match
+     * @return the ValueHolder for the argument, or {@code null} if none set
+     */
+    public ValueHolder getGenericArgumentValue(Class<?> requiredType) {
+        return getGenericArgumentValue(requiredType, null, null);
+    }
+
+    /**
+     * Look for a generic argument value that matches the given type.
+     * @param requiredType the type to match
+     * @param requiredName the name to match
+     * @return the ValueHolder for the argument, or {@code null} if none set
+     */
+    public ValueHolder getGenericArgumentValue(Class<?> requiredType, String requiredName) {
+        return getGenericArgumentValue(requiredType, requiredName, null);
     }
 
     /**
      * Look for the next generic argument value that matches the given type,
      * ignoring argument values that have already been used in the current
      * resolution process.
-     * @param requiredType the type to match (can be <code>null</code> to find
+     * @param requiredType the type to match (can be {@code null} to find
      * an arbitrary next generic argument value)
+     * @param requiredName the name to match (can be {@code null} to not
+     * match argument values by name, or empty String to match any name)
      * @param usedValueHolders a Set of ValueHolder objects that have already been used
      * in the current resolution process and should therefore not be returned again
-     * @return the ValueHolder for the argument, or <code>null</code> if none found
+     * @return the ValueHolder for the argument, or {@code null} if none found
      */
-    public ValueHolder getGenericArgumentValue(Class requiredType, Set usedValueHolders) {
-        for (Iterator it = this.genericArgumentValues.iterator(); it.hasNext();) {
-            ValueHolder valueHolder = (ValueHolder) it.next();
-            if (usedValueHolders == null || !usedValueHolders.contains(valueHolder)) {
-                if (requiredType != null) {
-                    // Check matching type.
-                    if (valueHolder.getType() != null) {
-                        if (valueHolder.getType().equals(requiredType.getName())) {
-                            return valueHolder;
-                        }
-                    }
-                    else if (ClassUtils.isAssignableValue(requiredType, valueHolder.getValue())) {
-                        return valueHolder;
-                    }
-                }
-                else {
-                    // No required type specified -> consider untyped values only.
-                    if (valueHolder.getType() == null) {
-                        return valueHolder;
-                    }
-                }
+    public ValueHolder getGenericArgumentValue(Class<?> requiredType, String requiredName, Set<ValueHolder> usedValueHolders) {
+        for (ValueHolder valueHolder : this.genericArgumentValues) {
+            if (usedValueHolders != null && usedValueHolders.contains(valueHolder)) {
+                continue;
             }
+            if (valueHolder.getName() != null && !"".equals(requiredName) &&
+                    (requiredName == null || !valueHolder.getName().equals(requiredName))) {
+                continue;
+            }
+            if (valueHolder.getType() != null &&
+                    (requiredType == null || !ClassUtils.matchesTypeName(requiredType, valueHolder.getType()))) {
+                continue;
+            }
+            if (requiredType != null && valueHolder.getType() == null && valueHolder.getName() == null &&
+                    !ClassUtils.isAssignableValue(requiredType, valueHolder.getValue())) {
+                continue;
+            }
+            return valueHolder;
         }
         return null;
     }
@@ -228,7 +278,7 @@ public class ConstructorArgumentValues {
      * @return unmodifiable List of ValueHolders
      * @see ValueHolder
      */
-    public List getGenericArgumentValues() {
+    public List<ValueHolder> getGenericArgumentValues() {
         return Collections.unmodifiableList(this.genericArgumentValues);
     }
 
@@ -237,30 +287,44 @@ public class ConstructorArgumentValues {
      * Look for an argument value that either corresponds to the given index
      * in the constructor argument list or generically matches by type.
      * @param index the index in the constructor argument list
-     * @param requiredType the type to match
-     * @return the ValueHolder for the argument, or <code>null</code> if none set
+     * @param requiredType the parameter type to match
+     * @return the ValueHolder for the argument, or {@code null} if none set
      */
-    public ValueHolder getArgumentValue(int index, Class requiredType) {
-        return getArgumentValue(index, requiredType, null);
+    public ValueHolder getArgumentValue(int index, Class<?> requiredType) {
+        return getArgumentValue(index, requiredType, null, null);
     }
 
     /**
      * Look for an argument value that either corresponds to the given index
      * in the constructor argument list or generically matches by type.
      * @param index the index in the constructor argument list
-     * @param requiredType the type to match (can be <code>null</code> to find
-     * an untyped argument value)
+     * @param requiredType the parameter type to match
+     * @param requiredName the parameter name to match
+     * @return the ValueHolder for the argument, or {@code null} if none set
+     */
+    public ValueHolder getArgumentValue(int index, Class<?> requiredType, String requiredName) {
+        return getArgumentValue(index, requiredType, requiredName, null);
+    }
+
+    /**
+     * Look for an argument value that either corresponds to the given index
+     * in the constructor argument list or generically matches by type.
+     * @param index the index in the constructor argument list
+     * @param requiredType the parameter type to match (can be {@code null}
+     * to find an untyped argument value)
+     * @param requiredName the parameter name to match (can be {@code null}
+     * to find an unnamed argument value, or empty String to match any name)
      * @param usedValueHolders a Set of ValueHolder objects that have already
      * been used in the current resolution process and should therefore not
      * be returned again (allowing to return the next generic argument match
      * in case of multiple generic argument values of the same type)
-     * @return the ValueHolder for the argument, or <code>null</code> if none set
+     * @return the ValueHolder for the argument, or {@code null} if none set
      */
-    public ValueHolder getArgumentValue(int index, Class requiredType, Set usedValueHolders) {
+    public ValueHolder getArgumentValue(int index, Class<?> requiredType, String requiredName, Set<ValueHolder> usedValueHolders) {
         Assert.isTrue(index >= 0, "Index must not be negative");
-        ValueHolder valueHolder = getIndexedArgumentValue(index, requiredType);
+        ValueHolder valueHolder = getIndexedArgumentValue(index, requiredType, requiredName);
         if (valueHolder == null) {
-            valueHolder = getGenericArgumentValue(requiredType, usedValueHolders);
+            valueHolder = getGenericArgumentValue(requiredType, requiredName, usedValueHolders);
         }
         return valueHolder;
     }
@@ -290,6 +354,7 @@ public class ConstructorArgumentValues {
     }
 
 
+    @Override
     public boolean equals(Object other) {
         if (this == other) {
             return true;
@@ -302,19 +367,18 @@ public class ConstructorArgumentValues {
                 this.indexedArgumentValues.size() != that.indexedArgumentValues.size()) {
             return false;
         }
-        Iterator it1 = this.genericArgumentValues.iterator();
-        Iterator it2 = that.genericArgumentValues.iterator();
+        Iterator<ValueHolder> it1 = this.genericArgumentValues.iterator();
+        Iterator<ValueHolder> it2 = that.genericArgumentValues.iterator();
         while (it1.hasNext() && it2.hasNext()) {
-            ValueHolder vh1 = (ValueHolder) it1.next();
-            ValueHolder vh2 = (ValueHolder) it2.next();
+            ValueHolder vh1 = it1.next();
+            ValueHolder vh2 = it2.next();
             if (!vh1.contentEquals(vh2)) {
                 return false;
             }
         }
-        for (Iterator it = this.indexedArgumentValues.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            ValueHolder vh1 = (ValueHolder) entry.getValue();
-            ValueHolder vh2 = (ValueHolder) that.indexedArgumentValues.get(entry.getKey());
+        for (Map.Entry<Integer, ValueHolder> entry : this.indexedArgumentValues.entrySet()) {
+            ValueHolder vh1 = entry.getValue();
+            ValueHolder vh2 = that.indexedArgumentValues.get(entry.getKey());
             if (!vh1.contentEquals(vh2)) {
                 return false;
             }
@@ -322,18 +386,15 @@ public class ConstructorArgumentValues {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = 7;
-        for (Iterator it = this.genericArgumentValues.iterator(); it.hasNext();) {
-            ValueHolder valueHolder = (ValueHolder) it.next();
+        for (ValueHolder valueHolder : this.genericArgumentValues) {
             hashCode = 31 * hashCode + valueHolder.contentHashCode();
         }
         hashCode = 29 * hashCode;
-        for (Iterator it = this.indexedArgumentValues.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Integer key = (Integer) entry.getKey();
-            ValueHolder value = (ValueHolder) entry.getValue();
-            hashCode = 31 * hashCode + (value.contentHashCode() ^ key.hashCode());
+        for (Map.Entry<Integer, ValueHolder> entry : this.indexedArgumentValues.entrySet()) {
+            hashCode = 31 * hashCode + (entry.getValue().contentHashCode() ^ entry.getKey().hashCode());
         }
         return hashCode;
     }
@@ -348,6 +409,8 @@ public class ConstructorArgumentValues {
         private Object value;
 
         private String type;
+
+        private String name;
 
         private Object source;
 
@@ -374,9 +437,19 @@ public class ConstructorArgumentValues {
         }
 
         /**
+         * Create a new ValueHolder for the given value, type and name.
+         * @param value the argument value
+         * @param type the type of the constructor argument
+         * @param name the name of the constructor argument
+         */
+        public ValueHolder(Object value, String type, String name) {
+            this.value = value;
+            this.type = type;
+            this.name = name;
+        }
+
+        /**
          * Set the value for the constructor argument.
-         * Only necessary for manipulating a registered value,
-         * for example in BeanFactoryPostProcessors.
          * @see PropertyPlaceholderConfigurer
          */
         public void setValue(Object value) {
@@ -392,9 +465,6 @@ public class ConstructorArgumentValues {
 
         /**
          * Set the type of the constructor argument.
-         * Only necessary for manipulating a registered value,
-         * for example in BeanFactoryPostProcessors.
-         * @see PropertyPlaceholderConfigurer
          */
         public void setType(String type) {
             this.type = type;
@@ -408,20 +478,35 @@ public class ConstructorArgumentValues {
         }
 
         /**
-         * Set the configuration source <code>Object</code> for this metadata element.
+         * Set the name of the constructor argument.
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Return the name of the constructor argument.
+         */
+        public String getName() {
+            return this.name;
+        }
+
+        /**
+         * Set the configuration source {@code Object} for this metadata element.
          * <p>The exact type of the object will depend on the configuration mechanism used.
          */
         public void setSource(Object source) {
             this.source = source;
         }
 
+        @Override
         public Object getSource() {
             return this.source;
         }
 
         /**
-         * Return whether this holder contains a converted value already (<code>true</code>),
-         * or whether the value still needs to be converted (<code>false</code>).
+         * Return whether this holder contains a converted value already ({@code true}),
+         * or whether the value still needs to be converted ({@code false}).
          */
         public synchronized boolean isConverted() {
             return this.converted;
@@ -447,7 +532,7 @@ public class ConstructorArgumentValues {
         /**
          * Determine whether the content of this ValueHolder is equal
          * to the content of the given other ValueHolder.
-         * <p>Note that ValueHolder does not implement <code>equals</code>
+         * <p>Note that ValueHolder does not implement {@code equals}
          * directly, to allow for multiple ValueHolder instances with the
          * same content to reside in the same Set.
          */
@@ -458,7 +543,7 @@ public class ConstructorArgumentValues {
 
         /**
          * Determine whether the hash code of the content of this ValueHolder.
-         * <p>Note that ValueHolder does not implement <code>hashCode</code>
+         * <p>Note that ValueHolder does not implement {@code hashCode}
          * directly, to allow for multiple ValueHolder instances with the
          * same content to reside in the same Set.
          */
@@ -471,7 +556,7 @@ public class ConstructorArgumentValues {
          * ValueHolder instance with the same contents.
          */
         public ValueHolder copy() {
-            ValueHolder copy = new ValueHolder(this.value, this.type);
+            ValueHolder copy = new ValueHolder(this.value, this.type, this.name);
             copy.setSource(this.source);
             return copy;
         }

@@ -60,6 +60,35 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
     /**
      * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory and
      * using the given {@link Environment} when evaluating bean definition profile metadata.
+     * <p>If the passed-in bean factory does not only implement the {@code
+     * BeanDefinitionRegistry} interface but also the {@link ResourceLoader} interface, it
+     * will be used as default {@code ResourceLoader} as well. This will usually be the
+     * case for {@link com.rocket.summer.framework.context.ApplicationContext} implementations.
+     * <p>If given a plain {@code BeanDefinitionRegistry}, the default {@code ResourceLoader}
+     * will be a {@link com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver}.
+     * @param registry the {@code BeanFactory} to load bean definitions into, in the form
+     * of a {@code BeanDefinitionRegistry}
+     * @param useDefaultFilters whether to include the default filters for the
+     * {@link com.rocket.summer.framework.stereotype.Component @Component},
+     * {@link com.rocket.summer.framework.stereotype.Repository @Repository},
+     * {@link com.rocket.summer.framework.stereotype.Service @Service}, and
+     * {@link com.rocket.summer.framework.stereotype.Controller @Controller} stereotype annotations
+     * @param environment the Spring {@link Environment} to use when evaluating bean
+     * definition profile metadata
+     * @since 3.1
+     * @see #setResourceLoader
+     */
+    public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters,
+                                          Environment environment) {
+
+        this(registry, useDefaultFilters, environment,
+                (registry instanceof ResourceLoader ? (ResourceLoader) registry : null));
+    }
+
+
+    /**
+     * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory and
+     * using the given {@link Environment} when evaluating bean definition profile metadata.
      * @param registry the {@code BeanFactory} to load bean definitions into, in the form
      * of a {@code BeanDefinitionRegistry}
      * @param useDefaultFilters whether to include the default filters for the

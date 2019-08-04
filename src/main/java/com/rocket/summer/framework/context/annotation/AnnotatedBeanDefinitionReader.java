@@ -8,6 +8,7 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
 import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.env.StandardEnvironment;
+import com.rocket.summer.framework.util.Assert;
 
 import java.lang.annotation.Annotation;
 
@@ -39,6 +40,24 @@ public class AnnotatedBeanDefinitionReader {
         this.registry = registry;
         AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
     }
+
+    /**
+     * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry and using
+     * the given {@link Environment}.
+     * @param registry the {@code BeanFactory} to load bean definitions into,
+     * in the form of a {@code BeanDefinitionRegistry}
+     * @param environment the {@code Environment} to use when evaluating bean definition
+     * profiles.
+     * @since 3.1
+     */
+    public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry, Environment environment) {
+        Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
+        Assert.notNull(environment, "Environment must not be null");
+        this.registry = registry;
+        this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+        AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
+    }
+
 
     /**
      * Set the Environment to use when evaluating whether

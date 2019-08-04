@@ -7,6 +7,9 @@ com.rocket.summer.framework.boot.context.config.DelegatingApplicationContextInit
 com.rocket.summer.framework.boot.context.embedded.ServerPortInfoApplicationContextInitializer
 
 # Application Listeners
+com.rocket.summer.framework.context.ApplicationListener=\
+com.rocket.summer.framework.boot.ClearCachesApplicationListener,\
+com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer
 
 # Auto Configuration Import Listeners
 
@@ -26,5 +29,5 @@ com.rocket.summer.framework.boot.diagnostics.analyzer.ConnectorStartFailureAnaly
 
 
 # FailureAnalysisReporters
-org.springframework.boot.diagnostics.FailureAnalysisReporter=\
-org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter
+com.rocket.summer.framework.boot.diagnostics.FailureAnalysisReporter=\
+com.rocket.summer.framework.boot.diagnostics.LoggingFailureAnalysisReporter

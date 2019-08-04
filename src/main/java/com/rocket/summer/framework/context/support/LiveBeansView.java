@@ -31,7 +31,7 @@ import java.util.Set;
  * @author Stephane Nicoll
  * @since 3.2
  * @see #getSnapshotAsJson()
- * @see org.springframework.web.context.support.LiveBeansViewServlet
+ * @see com.rocket.summer.framework.web.context.support.LiveBeansViewServlet
  */
 public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAware {
 

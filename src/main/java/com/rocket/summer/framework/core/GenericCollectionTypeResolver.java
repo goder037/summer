@@ -275,7 +275,7 @@ public abstract class GenericCollectionTypeResolver {
      * @return the generic type, or <code>null</code> if none
      */
     private static Class<?> getGenericParameterType(MethodParameter methodParam, Class<?> source, int typeIndex) {
-        return extractType(GenericTypeResolver.getTargetType(methodParam), source, typeIndex,
+        return extractType(methodParam.getGenericParameterType(), source, typeIndex,
                 methodParam.typeVariableMap, methodParam.typeIndexesPerLevel, methodParam.getNestingLevel(), 1);
     }
 

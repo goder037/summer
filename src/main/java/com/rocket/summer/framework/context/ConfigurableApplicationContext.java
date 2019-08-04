@@ -3,6 +3,7 @@ package com.rocket.summer.framework.context;
 import com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
+import com.rocket.summer.framework.core.io.ProtocolResolver;
 
 import java.io.Closeable;
 
@@ -17,6 +18,7 @@ import java.io.Closeable;
  * methods should only be used by startup and shutdown code.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 03.11.2003
  */
 public interface ConfigurableApplicationContext extends ApplicationContext, Lifecycle, Closeable {
@@ -42,25 +44,35 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * Name of the LoadTimeWeaver bean in the factory. If such a bean is supplied,
      * the context will use a temporary ClassLoader for type matching, in order
      * to allow the LoadTimeWeaver to process all actual bean classes.
+     * @since 2.5
      * @see com.rocket.summer.framework.instrument.classloading.LoadTimeWeaver
      */
     String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
 
     /**
-     * Set the {@code Environment} for this application context.
-     * @param environment the new environment
+     * Name of the {@link Environment} bean in the factory.
      * @since 3.1
      */
-    void setEnvironment(ConfigurableEnvironment environment);
+    String ENVIRONMENT_BEAN_NAME = "environment";
+
+    /**
+     * Name of the System properties bean in the factory.
+     * @see java.lang.System#getProperties()
+     */
+    String SYSTEM_PROPERTIES_BEAN_NAME = "systemProperties";
+
+    /**
+     * Name of the System environment bean in the factory.
+     * @see java.lang.System#getenv()
+     */
+    String SYSTEM_ENVIRONMENT_BEAN_NAME = "systemEnvironment";
 
 
     /**
-     * Return the {@code Environment} for this application context in configurable
-     * form, allowing for further customization.
-     * @since 3.1
+     * Set the unique id of this application context.
+     * @since 3.0
      */
-    @Override
-    ConfigurableEnvironment getEnvironment();
+    void setId(String id);
 
     /**
      * Set the parent of this application context.
@@ -73,12 +85,27 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     void setParent(ApplicationContext parent);
 
     /**
+     * Set the {@code Environment} for this application context.
+     * @param environment the new environment
+     * @since 3.1
+     */
+    void setEnvironment(ConfigurableEnvironment environment);
+
+    /**
+     * Return the {@code Environment} for this application context in configurable
+     * form, allowing for further customization.
+     * @since 3.1
+     */
+    @Override
+    ConfigurableEnvironment getEnvironment();
+
+    /**
      * Add a new BeanFactoryPostProcessor that will get applied to the internal
      * bean factory of this application context on refresh, before any of the
      * bean definitions get evaluated. To be invoked during context configuration.
-     * @param beanFactoryPostProcessor the factory processor to register
+     * @param postProcessor the factory processor to register
      */
-    void addBeanFactoryPostProcessor(BeanFactoryPostProcessor beanFactoryPostProcessor);
+    void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor);
 
     /**
      * Add a new ApplicationListener that will be notified on context events
@@ -87,10 +114,19 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * on refresh if the context is not active yet, or on the fly with the
      * current event multicaster in case of a context that is already active.
      * @param listener the ApplicationListener to register
-     * @seecom.rocket.summer.framework.context.event.ContextRefreshedEvent
-     * @seecom.rocket.summer.framework.context.event.ContextClosedEvent
+     * @see com.rocket.summer.framework.context.event.ContextRefreshedEvent
+     * @see com.rocket.summer.framework.context.event.ContextClosedEvent
      */
     void addApplicationListener(ApplicationListener<?> listener);
+
+    /**
+     * Register the given protocol resolver with this application context,
+     * allowing for additional resource protocols to be handled.
+     * <p>Any such resolver will be invoked ahead of this context's standard
+     * resolution rules. It may therefore also override any default rules.
+     * @since 4.3
+     */
+    void addProtocolResolver(ProtocolResolver resolver);
 
     /**
      * Load or refresh the persistent representation of the configuration,
@@ -105,11 +141,6 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     void refresh() throws BeansException, IllegalStateException;
 
     /**
-     * Set the unique id of this application context.
-     */
-    void setId(String id);
-
-    /**
      * Register a shutdown hook with the JVM runtime, closing this context
      * on JVM shutdown unless it has already been closed at that time.
      * <p>This method can be called multiple times. Only one shutdown hook
@@ -122,11 +153,12 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
     /**
      * Close this application context, releasing all resources and locks that the
      * implementation might hold. This includes destroying all cached singleton beans.
-     * <p>Note: Does <i>not</i> invoke <code>close</code> on a parent context;
+     * <p>Note: Does <i>not</i> invoke {@code close} on a parent context;
      * parent contexts have their own, independent lifecycle.
      * <p>This method can be called multiple times without side effects: Subsequent
-     * <code>close</code> calls on an already closed context will be ignored.
+     * {@code close} calls on an already closed context will be ignored.
      */
+    @Override
     void close();
 
     /**
@@ -146,7 +178,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
      * will already have been instantiated before. Use a BeanFactoryPostProcessor
      * to intercept the BeanFactory setup process before beans get touched.
      * <p>Generally, this internal factory will only be accessible while the context
-     * is active, that is, inbetween {@link #refresh()} and {@link #close()}.
+     * is active, that is, in-between {@link #refresh()} and {@link #close()}.
      * The {@link #isActive()} flag can be used to check whether the context
      * is in an appropriate state.
      * @return the underlying bean factory

@@ -70,6 +70,8 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
     /** The wrapped object */
     private Object object;
 
+    Object wrappedObject;
+
     private String nestedPath = "";
 
     private Object rootObject;
@@ -193,6 +195,19 @@ public class BeanWrapperImpl extends AbstractPropertyAccessor implements BeanWra
         this.rootObject = (!"".equals(this.nestedPath) ? rootObject : object);
         this.nestedBeanWrappers = null;
         this.typeConverterDelegate = new TypeConverterDelegate(this, object);
+        setIntrospectionClass(object.getClass());
+    }
+
+    /**
+     * Set a bean instance to hold, without any unwrapping of {@link java.util.Optional}.
+     * @param object the actual target object
+     * @since 4.3
+     * @see #setWrappedInstance(Object)
+     */
+    public void setBeanInstance(Object object) {
+        this.wrappedObject = object;
+        this.rootObject = object;
+        this.typeConverterDelegate = new TypeConverterDelegate(this, this.wrappedObject);
         setIntrospectionClass(object.getClass());
     }
 

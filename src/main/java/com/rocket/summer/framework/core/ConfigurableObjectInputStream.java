@@ -7,7 +7,7 @@ import java.io.*;
 /**
  * Special ObjectInputStream subclass that resolves class names
  * against a specific ClassLoader. Serves as base class for
- * {@link org.springframework.remoting.rmi.CodebaseAwareObjectInputStream}.
+ * {@link com.rocket.summer.framework.remoting.rmi.CodebaseAwareObjectInputStream}.
  *
  * @author Juergen Hoeller
  * @since 2.5.5

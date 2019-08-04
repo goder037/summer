@@ -42,7 +42,7 @@ public interface PropertyAccessor {
 
     /**
      * Determine whether the specified property is readable.
-     * <p>Returns <code>false</code> if the property doesn't exist.
+     * <p>Returns {@code false} if the property doesn't exist.
      * @param propertyName the property to check
      * (may be a nested path and/or an indexed/mapped property)
      * @return whether the property is readable
@@ -51,7 +51,7 @@ public interface PropertyAccessor {
 
     /**
      * Determine whether the specified property is writable.
-     * <p>Returns <code>false</code> if the property doesn't exist.
+     * <p>Returns {@code false} if the property doesn't exist.
      * @param propertyName the property to check
      * (may be a nested path and/or an indexed/mapped property)
      * @return whether the property is writable
@@ -65,13 +65,11 @@ public interface PropertyAccessor {
      * @param propertyName the property to check
      * (may be a nested path and/or an indexed/mapped property)
      * @return the property type for the particular property,
-     * or <code>null</code> if not determinable
-     * @throws InvalidPropertyException if there is no such property or
-     * if the property isn't readable
+     * or {@code null} if not determinable
      * @throws PropertyAccessException if the property was valid but the
      * accessor method failed
      */
-    Class getPropertyType(String propertyName) throws BeansException;
+    Class<?> getPropertyType(String propertyName) throws BeansException;
 
     /**
      * Return a type descriptor for the specified property:
@@ -79,9 +77,9 @@ public interface PropertyAccessor {
      * @param propertyName the property to check
      * (may be a nested path and/or an indexed/mapped property)
      * @return the property type for the particular property,
-     * or <code>null</code> if not determinable
-     * @throws InvalidPropertyException if there is no such property or
-     * if the property isn't readable
+     * or {@code null} if not determinable
+     * @throws PropertyAccessException if the property was valid but the
+     * accessor method failed
      */
     TypeDescriptor getPropertyTypeDescriptor(String propertyName) throws BeansException;
 
@@ -105,7 +103,7 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyAccessException if the property was valid but the
-     * accessor method failed or a type mismatch occured
+     * accessor method failed or a type mismatch occurred
      */
     void setPropertyValue(String propertyName, Object value) throws BeansException;
 
@@ -115,7 +113,7 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyAccessException if the property was valid but the
-     * accessor method failed or a type mismatch occured
+     * accessor method failed or a type mismatch occurred
      */
     void setPropertyValue(PropertyValue pv) throws BeansException;
 
@@ -129,11 +127,11 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyBatchUpdateException if one or more PropertyAccessExceptions
-     * occured for specific properties during the batch update. This exception bundles
+     * occurred for specific properties during the batch update. This exception bundles
      * all individual PropertyAccessExceptions. All other properties will have been
      * successfully updated.
      */
-    void setPropertyValues(Map map) throws BeansException;
+    void setPropertyValues(Map<?, ?> map) throws BeansException;
 
     /**
      * The preferred way to perform a batch update.
@@ -149,7 +147,7 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyBatchUpdateException if one or more PropertyAccessExceptions
-     * occured for specific properties during the batch update. This exception bundles
+     * occurred for specific properties during the batch update. This exception bundles
      * all individual PropertyAccessExceptions. All other properties will have been
      * successfully updated.
      * @see #setPropertyValues(PropertyValues, boolean, boolean)
@@ -170,7 +168,7 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyBatchUpdateException if one or more PropertyAccessExceptions
-     * occured for specific properties during the batch update. This exception bundles
+     * occurred for specific properties during the batch update. This exception bundles
      * all individual PropertyAccessExceptions. All other properties will have been
      * successfully updated.
      * @see #setPropertyValues(PropertyValues, boolean, boolean)
@@ -193,7 +191,7 @@ public interface PropertyAccessor {
      * @throws InvalidPropertyException if there is no such property or
      * if the property isn't writable
      * @throws PropertyBatchUpdateException if one or more PropertyAccessExceptions
-     * occured for specific properties during the batch update. This exception bundles
+     * occurred for specific properties during the batch update. This exception bundles
      * all individual PropertyAccessExceptions. All other properties will have been
      * successfully updated.
      */
@@ -201,4 +199,3 @@ public interface PropertyAccessor {
             throws BeansException;
 
 }
-

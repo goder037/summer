@@ -26,7 +26,7 @@ public abstract class ResourceTransformerSupport implements ResourceTransformer 
      * <p>By default this property is not set. In that case if a
      * {@code ResourceUrlProvider} is needed an attempt is made to find the
      * {@code ResourceUrlProvider} exposed through the
-     * {@link org.springframework.web.servlet.resource.ResourceUrlProviderExposingInterceptor
+     * {@link com.rocket.summer.framework.web.servlet.resource.ResourceUrlProviderExposingInterceptor
      * ResourceUrlProviderExposingInterceptor} (configured by default in the MVC
      * Java config and XML namespace). Therefore explicitly configuring this
      * property should not be needed in most cases.
