@@ -8,6 +8,7 @@ import com.rocket.summer.framework.aop.target.SingletonTargetSource;
 import com.rocket.summer.framework.core.CollectionFactory;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.CollectionUtils;
 import com.rocket.summer.framework.util.ObjectUtils;
 import org.aopalliance.aop.Advice;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for AOP proxy configuration managers.
@@ -55,19 +57,19 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
     /** Cache with Method as key and advisor chain List as value */
-    private transient Map methodCache;
+    private transient Map<MethodCacheKey, List<Object>> methodCache;
 
     /**
      * Interfaces to be implemented by the proxy. Held in List to keep the order
      * of registration, to create JDK proxy with specified order of interfaces.
      */
-    private List interfaces = new ArrayList();
+    private List<Class<?>> interfaces = new ArrayList<Class<?>>();
 
     /**
      * List of Advisors. If an Advice is added, it will be wrapped
      * in an Advisor before being added to this List.
      */
-    private List advisors = new LinkedList();
+    private List<Advisor> advisors = new ArrayList<Advisor>();
 
     /**
      * Array updated on changes to the advisors list, which is easier
@@ -87,7 +89,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Create a AdvisedSupport instance with the given parameters.
      * @param interfaces the proxied interfaces
      */
-    public AdvisedSupport(Class[] interfaces) {
+    public AdvisedSupport(Class<?>... interfaces) {
         this();
         setInterfaces(interfaces);
     }
@@ -96,7 +98,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Initialize the method cache.
      */
     private void initMethodCache() {
-        this.methodCache = CollectionFactory.createConcurrentMapIfPossible(32);
+        this.methodCache = new ConcurrentHashMap<MethodCacheKey, List<Object>>(32);
     }
 
 
@@ -110,10 +112,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         setTargetSource(new SingletonTargetSource(target));
     }
 
+    @Override
     public void setTargetSource(TargetSource targetSource) {
         this.targetSource = (targetSource != null ? targetSource : EMPTY_TARGET_SOURCE);
     }
 
+    @Override
     public TargetSource getTargetSource() {
         return this.targetSource;
     }
@@ -131,18 +135,21 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * @see #setTargetSource
      * @see #setTarget
      */
-    public void setTargetClass(Class targetClass) {
+    public void setTargetClass(Class<?> targetClass) {
         this.targetSource = EmptyTargetSource.forClass(targetClass);
     }
 
-    public Class getTargetClass() {
+    @Override
+    public Class<?> getTargetClass() {
         return this.targetSource.getTargetClass();
     }
 
+    @Override
     public void setPreFiltered(boolean preFiltered) {
         this.preFiltered = preFiltered;
     }
 
+    @Override
     public boolean isPreFiltered() {
         return this.preFiltered;
     }
@@ -157,11 +164,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     }
 
     /**
-     * Return the advisor chain factory to use (never <code>null</code>).
+     * Return the advisor chain factory to use (never {@code null}).
      */
     public AdvisorChainFactory getAdvisorChainFactory() {
         return this.advisorChainFactory;
     }
+
 
     /**
      * Set the interfaces to be proxied.
@@ -178,7 +186,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Add a new proxied interface.
      * @param intf the additional interface to proxy
      */
-    public void addInterface(Class intf) {
+    public void addInterface(Class<?> intf) {
         Assert.notNull(intf, "Interface must not be null");
         if (!intf.isInterface()) {
             throw new IllegalArgumentException("[" + intf.getName() + "] is not an interface");
@@ -193,20 +201,21 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Remove a proxied interface.
      * <p>Does nothing if the given interface isn't proxied.
      * @param intf the interface to remove from the proxy
-     * @return <code>true</code> if the interface was removed; <code>false</code>
+     * @return {@code true} if the interface was removed; {@code false}
      * if the interface was not found and hence could not be removed
      */
-    public boolean removeInterface(Class intf) {
+    public boolean removeInterface(Class<?> intf) {
         return this.interfaces.remove(intf);
     }
 
-    public Class[] getProxiedInterfaces() {
-        return (Class[]) this.interfaces.toArray(new Class[this.interfaces.size()]);
+    @Override
+    public Class<?>[] getProxiedInterfaces() {
+        return ClassUtils.toClassArray(this.interfaces);
     }
 
-    public boolean isInterfaceProxied(Class intf) {
-        for (Object anInterface : this.interfaces) {
-            Class proxyIntf = (Class) anInterface;
+    @Override
+    public boolean isInterfaceProxied(Class<?> intf) {
+        for (Class<?> proxyIntf : this.interfaces) {
             if (intf.isAssignableFrom(proxyIntf)) {
                 return true;
             }
@@ -215,15 +224,18 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     }
 
 
+    @Override
     public final Advisor[] getAdvisors() {
         return this.advisorArray;
     }
 
+    @Override
     public void addAdvisor(Advisor advisor) {
         int pos = this.advisors.size();
         addAdvisor(pos, advisor);
     }
 
+    @Override
     public void addAdvisor(int pos, Advisor advisor) throws AopConfigException {
         if (advisor instanceof IntroductionAdvisor) {
             validateIntroductionAdvisor((IntroductionAdvisor) advisor);
@@ -231,6 +243,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         addAdvisorInternal(pos, advisor);
     }
 
+    @Override
     public boolean removeAdvisor(Advisor advisor) {
         int index = indexOf(advisor);
         if (index == -1) {
@@ -242,6 +255,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         }
     }
 
+    @Override
     public void removeAdvisor(int index) throws AopConfigException {
         if (isFrozen()) {
             throw new AopConfigException("Cannot remove Advisor: Configuration is frozen.");
@@ -251,7 +265,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
                     "This configuration only has " + this.advisors.size() + " advisors.");
         }
 
-        Advisor advisor = (Advisor) this.advisors.get(index);
+        Advisor advisor = this.advisors.get(index);
         if (advisor instanceof IntroductionAdvisor) {
             IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
             // We need to remove introduction interfaces.
@@ -265,11 +279,13 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         adviceChanged();
     }
 
+    @Override
     public int indexOf(Advisor advisor) {
         Assert.notNull(advisor, "Advisor must not be null");
         return this.advisors.indexOf(advisor);
     }
 
+    @Override
     public boolean replaceAdvisor(Advisor a, Advisor b) throws AopConfigException {
         Assert.notNull(a, "Advisor a must not be null");
         Assert.notNull(b, "Advisor b must not be null");
@@ -286,11 +302,19 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Add all of the given advisors to this proxy configuration.
      * @param advisors the advisors to register
      */
-    public void addAllAdvisors(Advisor[] advisors) {
+    public void addAdvisors(Advisor... advisors) {
+        addAdvisors(Arrays.asList(advisors));
+    }
+
+    /**
+     * Add all of the given advisors to this proxy configuration.
+     * @param advisors the advisors to register
+     */
+    public void addAdvisors(Collection<Advisor> advisors) {
         if (isFrozen()) {
             throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
         }
-        if (!ObjectUtils.isEmpty(advisors)) {
+        if (!CollectionUtils.isEmpty(advisors)) {
             for (Advisor advisor : advisors) {
                 if (advisor instanceof IntroductionAdvisor) {
                     validateIntroductionAdvisor((IntroductionAdvisor) advisor);
@@ -306,8 +330,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     private void validateIntroductionAdvisor(IntroductionAdvisor advisor) {
         advisor.validateInterfaces();
         // If the advisor passed validation, we can make the change.
-        Class[] ifcs = advisor.getInterfaces();
-        for (Class ifc : ifcs) {
+        Class<?>[] ifcs = advisor.getInterfaces();
+        for (Class<?> ifc : ifcs) {
             addInterface(ifc);
         }
     }
@@ -330,7 +354,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Bring the array up to date with the list.
      */
     protected final void updateAdvisorArray() {
-        this.advisorArray = (Advisor[]) this.advisors.toArray(new Advisor[this.advisors.size()]);
+        this.advisorArray = this.advisors.toArray(new Advisor[this.advisors.size()]);
     }
 
     /**
@@ -338,11 +362,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * <p>Use with care, and remember to {@link #updateAdvisorArray() refresh the advisor array}
      * and {@link #adviceChanged() fire advice changed events} when making any modifications.
      */
-    protected final List getAdvisorsInternal() {
+    protected final List<Advisor> getAdvisorsInternal() {
         return this.advisors;
     }
 
 
+    @Override
     public void addAdvice(Advice advice) throws AopConfigException {
         int pos = this.advisors.size();
         addAdvice(pos, advice);
@@ -351,6 +376,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     /**
      * Cannot add introductions this way unless the advice implements IntroductionInfo.
      */
+    @Override
     public void addAdvice(int pos, Advice advice) throws AopConfigException {
         Assert.notNull(advice, "Advice must not be null");
         if (advice instanceof IntroductionInfo) {
@@ -367,6 +393,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         }
     }
 
+    @Override
     public boolean removeAdvice(Advice advice) throws AopConfigException {
         int index = indexOf(advice);
         if (index == -1) {
@@ -378,10 +405,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
         }
     }
 
+    @Override
     public int indexOf(Advice advice) {
         Assert.notNull(advice, "Advice must not be null");
         for (int i = 0; i < this.advisors.size(); i++) {
-            Advisor advisor = (Advisor) this.advisors.get(i);
+            Advisor advisor = this.advisors.get(i);
             if (advisor.getAdvice() == advice) {
                 return i;
             }
@@ -395,11 +423,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * @return whether this advice instance is included
      */
     public boolean adviceIncluded(Advice advice) {
-        Assert.notNull(advice, "Advice must not be null");
-        for (Object o : this.advisors) {
-            Advisor advisor = (Advisor) o;
-            if (advisor.getAdvice() == advice) {
-                return true;
+        if (advice != null) {
+            for (Advisor advisor : this.advisors) {
+                if (advisor.getAdvice() == advice) {
+                    return true;
+                }
             }
         }
         return false;
@@ -410,14 +438,13 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * @param adviceClass the advice class to check
      * @return the count of the interceptors of this class or subclasses
      */
-    public int countAdvicesOfType(Class adviceClass) {
-        Assert.notNull(adviceClass, "Advice class must not be null");
+    public int countAdvicesOfType(Class<?> adviceClass) {
         int count = 0;
-        for (Object o : this.advisors) {
-            Advisor advisor = (Advisor) o;
-            if (advisor.getAdvice() != null &&
-                    adviceClass.isAssignableFrom(advisor.getAdvice().getClass())) {
-                count++;
+        if (adviceClass != null) {
+            for (Advisor advisor : this.advisors) {
+                if (adviceClass.isInstance(advisor.getAdvice())) {
+                    count++;
+                }
             }
         }
         return count;
@@ -429,11 +456,11 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * for the given method, based on this configuration.
      * @param method the proxied method
      * @param targetClass the target class
-     * @return List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
+     * @return a List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)
      */
-    public List getInterceptorsAndDynamicInterceptionAdvice(Method method, Class targetClass) {
+    public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, Class<?> targetClass) {
         MethodCacheKey cacheKey = new MethodCacheKey(method);
-        List cached = (List) this.methodCache.get(cacheKey);
+        List<Object> cached = this.methodCache.get(cacheKey);
         if (cached == null) {
             cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
                     this, method, targetClass);
@@ -446,9 +473,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Invoked when advice has changed.
      */
     protected void adviceChanged() {
-        synchronized (this.methodCache) {
-            this.methodCache.clear();
-        }
+        this.methodCache.clear();
     }
 
     /**
@@ -457,7 +482,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * @param other the AdvisedSupport object to copy configuration from
      */
     protected void copyConfigurationFrom(AdvisedSupport other) {
-        copyConfigurationFrom(other, other.targetSource, new ArrayList(other.advisors));
+        copyConfigurationFrom(other, other.targetSource, new ArrayList<Advisor>(other.advisors));
     }
 
     /**
@@ -467,13 +492,12 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * @param targetSource the new TargetSource
      * @param advisors the Advisors for the chain
      */
-    protected void copyConfigurationFrom(AdvisedSupport other, TargetSource targetSource, List advisors) {
+    protected void copyConfigurationFrom(AdvisedSupport other, TargetSource targetSource, List<Advisor> advisors) {
         copyFrom(other);
         this.targetSource = targetSource;
         this.advisorChainFactory = other.advisorChainFactory;
-        this.interfaces = new ArrayList(other.interfaces);
-        for (Object o : advisors) {
-            Advisor advisor = (Advisor) o;
+        this.interfaces = new ArrayList<Class<?>>(other.interfaces);
+        for (Advisor advisor : advisors) {
             if (advisor instanceof IntroductionAdvisor) {
                 validateIntroductionAdvisor((IntroductionAdvisor) advisor);
             }
@@ -486,7 +510,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
     /**
      * Build a configuration-only copy of this AdvisedSupport,
-     * replacing the TargetSource
+     * replacing the TargetSource.
      */
     AdvisedSupport getConfigurationOnlyCopy() {
         AdvisedSupport copy = new AdvisedSupport();
@@ -513,6 +537,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     }
 
 
+    @Override
     public String toProxyConfigString() {
         return toString();
     }
@@ -520,9 +545,10 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
     /**
      * For debugging/diagnostic use.
      */
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(getClass().getName() + ": ");
-        sb.append(this.interfaces.size()).append(" interfaces ");
+        StringBuilder sb = new StringBuilder(getClass().getName());
+        sb.append(": ").append(this.interfaces.size()).append(" interfaces ");
         sb.append(ClassUtils.classNamesToString(this.interfaces)).append("; ");
         sb.append(this.advisors.size()).append(" advisors ");
         sb.append(this.advisors).append("; ");
@@ -536,7 +562,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
      * Simple wrapper class around a Method. Used as the key when
      * caching methods, for efficient equals and hashCode comparisons.
      */
-    private static class MethodCacheKey {
+    private static final class MethodCacheKey implements Comparable<MethodCacheKey> {
 
         private final Method method;
 
@@ -547,18 +573,30 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
             this.hashCode = method.hashCode();
         }
 
+        @Override
         public boolean equals(Object other) {
-            if (other == this) {
-                return true;
-            }
-            MethodCacheKey otherKey = (MethodCacheKey) other;
-            return (this.method == otherKey.method);
+            return (this == other || (other instanceof MethodCacheKey &&
+                    this.method == ((MethodCacheKey) other).method));
         }
 
+        @Override
         public int hashCode() {
             return this.hashCode;
+        }
+
+        @Override
+        public String toString() {
+            return this.method.toString();
+        }
+
+        @Override
+        public int compareTo(MethodCacheKey other) {
+            int result = this.method.getName().compareTo(other.method.getName());
+            if (result == 0) {
+                result = this.method.toString().compareTo(other.method.toString());
+            }
+            return result;
         }
     }
 
 }
-

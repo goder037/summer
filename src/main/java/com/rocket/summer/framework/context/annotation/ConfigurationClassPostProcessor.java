@@ -1,12 +1,11 @@
 package com.rocket.summer.framework.context.annotation;
 
 import com.rocket.summer.framework.aop.framework.autoproxy.AutoProxyUtils;
+import com.rocket.summer.framework.beans.PropertyValues;
 import com.rocket.summer.framework.beans.factory.BeanClassLoaderAware;
 import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
-import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
-import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
-import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
-import com.rocket.summer.framework.beans.factory.config.SingletonBeanRegistry;
+import com.rocket.summer.framework.beans.factory.BeanFactory;
+import com.rocket.summer.framework.beans.factory.config.*;
 import com.rocket.summer.framework.beans.factory.parsing.FailFastProblemReporter;
 import com.rocket.summer.framework.beans.factory.parsing.PassThroughSourceExtractor;
 import com.rocket.summer.framework.beans.factory.parsing.ProblemReporter;
@@ -16,10 +15,13 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
 import com.rocket.summer.framework.context.EnvironmentAware;
+import com.rocket.summer.framework.context.ResourceLoaderAware;
 import com.rocket.summer.framework.core.Ordered;
+import com.rocket.summer.framework.core.PriorityOrdered;
 import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.io.DefaultResourceLoader;
 import com.rocket.summer.framework.core.io.ResourceLoader;
+import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.classreading.CachingMetadataReaderFactory;
 import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
 import com.rocket.summer.framework.util.Assert;
@@ -27,6 +29,7 @@ import com.rocket.summer.framework.util.ClassUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.beans.PropertyDescriptor;
 import java.util.*;
 
 import static com.rocket.summer.framework.context.annotation.AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
@@ -35,33 +38,36 @@ import static com.rocket.summer.framework.context.annotation.AnnotationConfigUti
  * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
  * {@link Configuration @Configuration} classes.
  *
- * <p>Registered by default when using {@literal <context:annotation-config/>} or
- * {@literal <context:component-scan/>}. Otherwise, may be declared manually as
+ * <p>Registered by default when using {@code <context:annotation-config/>} or
+ * {@code <context:component-scan/>}. Otherwise, may be declared manually as
  * with any other BeanFactoryPostProcessor.
  *
- * <p>This post processor is {@link Ordered#HIGHEST_PRECEDENCE} as it is important
- * that any {@link Bean} methods declared in Configuration classes have their
- * respective bean definitions registered before any other BeanFactoryPostProcessor
- * executes.
+ * <p>This post processor is priority-ordered as it is important that any
+ * {@link Bean} methods declared in {@code @Configuration} classes have
+ * their corresponding bean definitions registered before any other
+ * {@link BeanFactoryPostProcessor} executes.
  *
  * @author Chris Beams
  * @author Juergen Hoeller
+ * @author Phillip Webb
  * @since 3.0
  */
-public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor, BeanClassLoaderAware, EnvironmentAware {
-
-    /** Whether the CGLIB2 library is present on the classpath */
-    private static final boolean cglibAvailable = ClassUtils.isPresent(
-            "net.sf.cglib.proxy.Enhancer", ConfigurationClassPostProcessor.class.getClassLoader());
+public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
+        PriorityOrdered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {
 
     private static final String IMPORT_REGISTRY_BEAN_NAME =
             ConfigurationClassPostProcessor.class.getName() + ".importRegistry";
+
 
     private final Log logger = LogFactory.getLog(getClass());
 
     private SourceExtractor sourceExtractor = new PassThroughSourceExtractor();
 
     private ProblemReporter problemReporter = new FailFastProblemReporter();
+
+    private Environment environment;
+
+    private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
     private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -71,15 +77,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
     private final Set<Integer> registriesPostProcessed = new HashSet<Integer>();
 
-    private final Set<Integer> factoriesPostProcessed = new HashSet<>();
+    private final Set<Integer> factoriesPostProcessed = new HashSet<Integer>();
 
     private ConfigurationClassBeanDefinitionReader reader;
 
     private boolean localBeanNameGeneratorSet = false;
-
-    private Environment environment;
-
-    private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
     /* Using short class names as default bean names */
     private BeanNameGenerator componentScanBeanNameGenerator = new AnnotationBeanNameGenerator();
@@ -92,6 +94,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
         }
     };
 
+
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;  // within PriorityOrdered
+    }
+
     /**
      * Set the {@link SourceExtractor} to use for generated bean definitions
      * that correspond to {@link Bean} factory methods.
@@ -103,7 +111,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
     /**
      * Set the {@link ProblemReporter} to use.
      * <p>Used to register any problems detected with {@link Configuration} or {@link Bean}
-     * declarations. For instance, an @Bean method marked as {@literal final} is illegal
+     * declarations. For instance, an @Bean method marked as {@code final} is illegal
      * and would be reported as a problem. Defaults to {@link FailFastProblemReporter}.
      */
     public void setProblemReporter(ProblemReporter problemReporter) {
@@ -113,7 +121,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
     /**
      * Set the {@link MetadataReaderFactory} to use.
      * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
-     * {@link #setBeanClassLoader bean class loader}.
+     * {@linkplain #setBeanClassLoader bean class loader}.
      */
     public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
         Assert.notNull(metadataReaderFactory, "MetadataReaderFactory must not be null");
@@ -121,6 +129,46 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
         this.setMetadataReaderFactoryCalled = true;
     }
 
+    /**
+     * Set the {@link BeanNameGenerator} to be used when triggering component scanning
+     * from {@link Configuration} classes and when registering {@link Import}'ed
+     * configuration classes. The default is a standard {@link AnnotationBeanNameGenerator}
+     * for scanned components (compatible with the default in {@link ClassPathBeanDefinitionScanner})
+     * and a variant thereof for imported configuration classes (using unique fully-qualified
+     * class names instead of standard component overriding).
+     * <p>Note that this strategy does <em>not</em> apply to {@link Bean} methods.
+     * <p>This setter is typically only appropriate when configuring the post-processor as
+     * a standalone bean definition in XML, e.g. not using the dedicated
+     * {@code AnnotationConfig*} application contexts or the {@code
+     * <context:annotation-config>} element. Any bean name generator specified against
+     * the application context will take precedence over any value set here.
+     * @since 3.1.1
+     * @see AnnotationConfigApplicationContext#setBeanNameGenerator(BeanNameGenerator)
+     * @see AnnotationConfigUtils#CONFIGURATION_BEAN_NAME_GENERATOR
+     */
+    public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
+        Assert.notNull(beanNameGenerator, "BeanNameGenerator must not be null");
+        this.localBeanNameGeneratorSet = true;
+        this.componentScanBeanNameGenerator = beanNameGenerator;
+        this.importBeanNameGenerator = beanNameGenerator;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        Assert.notNull(environment, "Environment must not be null");
+        this.environment = environment;
+    }
+
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        Assert.notNull(resourceLoader, "ResourceLoader must not be null");
+        this.resourceLoader = resourceLoader;
+        if (!this.setMetadataReaderFactoryCalled) {
+            this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
+        }
+    }
+
+    @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
         this.beanClassLoader = beanClassLoader;
         if (!this.setMetadataReaderFactoryCalled) {
@@ -128,25 +176,23 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
         }
     }
 
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
-    }
-
 
     /**
      * Derive further bean definitions from the configuration classes in the registry.
      */
+    @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
         int registryId = System.identityHashCode(registry);
         if (this.registriesPostProcessed.contains(registryId)) {
             throw new IllegalStateException(
-                    "postProcessBeanDefinitionRegistry already called for this post-processor against " + registry);
+                    "postProcessBeanDefinitionRegistry already called on this post-processor against " + registry);
         }
         if (this.factoriesPostProcessed.contains(registryId)) {
             throw new IllegalStateException(
-                    "postProcessBeanFactory already called for this post-processor against " + registry);
+                    "postProcessBeanFactory already called on this post-processor against " + registry);
         }
         this.registriesPostProcessed.add(registryId);
+
         processConfigBeanDefinitions(registry);
     }
 
@@ -154,25 +200,22 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
      * Prepare the Configuration classes for servicing bean requests at runtime
      * by replacing them with CGLIB-enhanced subclasses.
      */
+    @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
         int factoryId = System.identityHashCode(beanFactory);
         if (this.factoriesPostProcessed.contains(factoryId)) {
             throw new IllegalStateException(
-                    "postProcessBeanFactory already called for this post-processor against " + beanFactory);
+                    "postProcessBeanFactory already called on this post-processor against " + beanFactory);
         }
-        this.factoriesPostProcessed.add((factoryId));
-        if (!this.registriesPostProcessed.contains((factoryId))) {
+        this.factoriesPostProcessed.add(factoryId);
+        if (!this.registriesPostProcessed.contains(factoryId)) {
             // BeanDefinitionRegistryPostProcessor hook apparently not supported...
-            // Simply call processConfigBeanDefinitions lazily at this point then.
+            // Simply call processConfigurationClasses lazily at this point then.
             processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
         }
-        enhanceConfigurationClasses(beanFactory);
-    }
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        Assert.notNull(environment, "Environment must not be null");
-        this.environment = environment;
+        enhanceConfigurationClasses(beanFactory);
+        beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
     }
 
     /**
@@ -331,5 +374,38 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
         }
     }
 
-}
 
+    private static class ImportAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
+
+        private final BeanFactory beanFactory;
+
+        public ImportAwareBeanPostProcessor(BeanFactory beanFactory) {
+            this.beanFactory = beanFactory;
+        }
+
+        @Override
+        public PropertyValues postProcessPropertyValues(
+                PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) {
+
+            // Inject the BeanFactory before AutowiredAnnotationBeanPostProcessor's
+            // postProcessPropertyValues method attempts to autowire other configuration beans.
+            if (bean instanceof ConfigurationClassEnhancer.EnhancedConfiguration) {
+                ((ConfigurationClassEnhancer.EnhancedConfiguration) bean).setBeanFactory(this.beanFactory);
+            }
+            return pvs;
+        }
+
+        @Override
+        public Object postProcessBeforeInitialization(Object bean, String beanName) {
+            if (bean instanceof ImportAware) {
+                ImportRegistry ir = this.beanFactory.getBean(IMPORT_REGISTRY_BEAN_NAME, ImportRegistry.class);
+                AnnotationMetadata importingClass = ir.getImportingClassFor(bean.getClass().getSuperclass().getName());
+                if (importingClass != null) {
+                    ((ImportAware) bean).setImportMetadata(importingClass);
+                }
+            }
+            return bean;
+        }
+    }
+
+}

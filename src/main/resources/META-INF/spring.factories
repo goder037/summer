@@ -1,6 +1,7 @@
 # Initializers
 com.rocket.summer.framework.context.ApplicationContextInitializer=\
 com.rocket.summer.framework.boot.autoconfigure.SharedMetadataReaderFactoryContextInitializer,\
+com.rocket.summer.framework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer
 com.rocket.summer.framework.boot.context.ConfigurationWarningsApplicationContextInitializer,\
 com.rocket.summer.framework.boot.context.ContextIdApplicationContextInitializer,\
 com.rocket.summer.framework.boot.context.config.DelegatingApplicationContextInitializer,\
@@ -8,7 +9,7 @@ com.rocket.summer.framework.boot.context.embedded.ServerPortInfoApplicationConte
 
 # PropertySource Loaders
 com.rocket.summer.framework.boot.env.PropertySourceLoader=\
-com.rocket.summer.framework.boot.env.PropertiesPropertySourceLoader,\
+com.rocket.summer.framework.boot.env.PropertiesPropertySourceLoader
 
 # Application Listeners
 com.rocket.summer.framework.context.ApplicationListener=\
