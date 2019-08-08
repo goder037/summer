@@ -11,12 +11,13 @@ package com.rocket.summer.framework.beans.factory;
  * {@link BeanFactory BeanFactory javadocs}.
  *
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @since 01.11.2003
  * @see BeanClassLoaderAware
  * @see BeanFactoryAware
  * @see InitializingBean
  */
-public interface BeanNameAware {
+public interface BeanNameAware extends Aware {
 
     /**
      * Set the name of the bean in the bean factory that created this bean.

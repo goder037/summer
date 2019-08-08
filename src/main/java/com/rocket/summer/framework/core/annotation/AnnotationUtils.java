@@ -116,6 +116,7 @@ public abstract class AnnotationUtils {
      * @return the first matching annotation, or {@code null} if not found
      * @since 4.0
      */
+    @SuppressWarnings("unchecked")
     public static <A extends Annotation> A getAnnotation(Annotation annotation, Class<A> annotationType) {
         if (annotationType.isInstance(annotation)) {
             return synthesizeAnnotation((A) annotation);
@@ -1551,7 +1552,7 @@ public abstract class AnnotationUtils {
      * @see #synthesizeAnnotation(Annotation, AnnotatedElement)
      * @see #synthesizeAnnotation(Map, Class, AnnotatedElement)
      */
-    static Annotation[] synthesizeAnnotationArray(Annotation[] annotations, Object annotatedElement) {
+    public static Annotation[] synthesizeAnnotationArray(Annotation[] annotations, Object annotatedElement) {
         if (annotations == null) {
             return null;
         }

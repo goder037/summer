@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.context;
 
+import com.rocket.summer.framework.beans.factory.Aware;
+
 /**
  * Interface to be implemented by any object that wishes to be notified
  * of the {@link ApplicationContext} that it runs in.
@@ -10,7 +12,7 @@ package com.rocket.summer.framework.context;
  * for bean lookup purposes.
  *
  * <p>This interface can also be implemented if an object needs access to file
- * resources, i.e. wants to call <code>getResource</code>, wants to publish
+ * resources, i.e. wants to call {@code getResource}, wants to publish
  * an application event, or requires access to the MessageSource. However,
  * it is preferable to implement the more specific {@link ResourceLoaderAware},
  * {@link ApplicationEventPublisherAware} or {@link MessageSourceAware} interface
@@ -30,13 +32,14 @@ package com.rocket.summer.framework.context;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * @author Chris Beams
  * @see ResourceLoaderAware
  * @see ApplicationEventPublisherAware
  * @see MessageSourceAware
  * @see com.rocket.summer.framework.context.support.ApplicationObjectSupport
  * @see com.rocket.summer.framework.beans.factory.BeanFactoryAware
  */
-public interface ApplicationContextAware {
+public interface ApplicationContextAware extends Aware {
 
     /**
      * Set the ApplicationContext that this object runs in.

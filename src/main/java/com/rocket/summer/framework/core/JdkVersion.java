@@ -1,16 +1,20 @@
 package com.rocket.summer.framework.core;
 
 /**
- * Internal helper class used to find the Java/JDK version
- * that Spring is operating on, to allow for automatically
- * adapting to the present platform's capabilities.
+ * Internal helper class used to find the Java/JVM version that Spring is
+ * operating on, to allow for automatically adapting to the present platform's
+ * capabilities.
  *
- * <p>Note that Spring requires JVM 1.4 or higher, as of Spring 2.5.
+ * <p>Note that Spring requires JVM 1.6 or higher, as of Spring 4.0.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rick Evans
+ * @author Sam Brannen
+ * @deprecated as of Spring 4.2.1, in favor of direct checks for the desired
+ * JDK API variants via reflection
  */
+@Deprecated
 public abstract class JdkVersion {
 
     /**
@@ -38,6 +42,16 @@ public abstract class JdkVersion {
      */
     public static final int JAVA_17 = 4;
 
+    /**
+     * Constant identifying the 1.8 JVM (Java 8).
+     */
+    public static final int JAVA_18 = 5;
+
+    /**
+     * Constant identifying the 1.9 JVM (Java 9).
+     */
+    public static final int JAVA_19 = 6;
+
 
     private static final String javaVersion;
 
@@ -46,25 +60,25 @@ public abstract class JdkVersion {
     static {
         javaVersion = System.getProperty("java.version");
         // version String should look like "1.4.2_10"
-        if (javaVersion.indexOf("1.7.") != -1) {
+        if (javaVersion.contains("1.9.")) {
+            majorJavaVersion = JAVA_19;
+        }
+        else if (javaVersion.contains("1.8.")) {
+            majorJavaVersion = JAVA_18;
+        }
+        else if (javaVersion.contains("1.7.")) {
             majorJavaVersion = JAVA_17;
         }
-        else if (javaVersion.indexOf("1.6.") != -1) {
-            majorJavaVersion = JAVA_16;
-        }
-        else if (javaVersion.indexOf("1.5.") != -1) {
-            majorJavaVersion = JAVA_15;
-        }
         else {
-            // else leave 1.4 as default (it's either 1.4 or unknown)
-            majorJavaVersion = JAVA_14;
+            // else leave 1.6 as default (it's either 1.6 or unknown)
+            majorJavaVersion = JAVA_16;
         }
     }
 
 
     /**
      * Return the full Java version string, as returned by
-     * <code>System.getProperty("java.version")</code>.
+     * {@code System.getProperty("java.version")}.
      * @return the full Java version string
      * @see System#getProperty(String)
      */
@@ -74,54 +88,15 @@ public abstract class JdkVersion {
 
     /**
      * Get the major version code. This means we can do things like
-     * <code>if (getMajorJavaVersion() < JAVA_14)</code>.
-     * @return a code comparable to the JAVA_XX codes in this class
-     * @see #JAVA_13
-     * @see #JAVA_14
-     * @see #JAVA_15
+     * {@code if (getMajorJavaVersion() >= JAVA_17)}.
+     * @return a code comparable to the {@code JAVA_XX} codes in this class
      * @see #JAVA_16
      * @see #JAVA_17
+     * @see #JAVA_18
+     * @see #JAVA_19
      */
     public static int getMajorJavaVersion() {
         return majorJavaVersion;
-    }
-
-    /**
-     * Convenience method to determine if the current JVM is at least Java 1.4.
-     * @return <code>true</code> if the current JVM is at least Java 1.4
-     * @see #getMajorJavaVersion()
-     * @see #JAVA_14
-     * @see #JAVA_15
-     * @see #JAVA_16
-     * @see #JAVA_17
-     */
-    public static boolean isAtLeastJava14() {
-        return true;
-    }
-
-    /**
-     * Convenience method to determine if the current JVM is at least
-     * Java 1.5 (Java 5).
-     * @return <code>true</code> if the current JVM is at least Java 1.5
-     * @see #getMajorJavaVersion()
-     * @see #JAVA_15
-     * @see #JAVA_16
-     * @see #JAVA_17
-     */
-    public static boolean isAtLeastJava15() {
-        return getMajorJavaVersion() >= JAVA_15;
-    }
-
-    /**
-     * Convenience method to determine if the current JVM is at least
-     * Java 1.6 (Java 6).
-     * @return <code>true</code> if the current JVM is at least Java 1.6
-     * @see #getMajorJavaVersion()
-     * @see #JAVA_16
-     * @see #JAVA_17
-     */
-    public static boolean isAtLeastJava16() {
-        return getMajorJavaVersion() >= JAVA_16;
     }
 
 }
