@@ -15,7 +15,8 @@ com.rocket.summer.framework.boot.env.PropertiesPropertySourceLoader
 com.rocket.summer.framework.context.ApplicationListener=\
 com.rocket.summer.framework.boot.ClearCachesApplicationListener,\
 com.rocket.summer.framework.boot.context.config.ConfigFileApplicationListener,\
-com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer
+com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer,\
+com.rocket.summer.framework.boot.logging.LoggingApplicationListener
 
 # Auto Configuration Import Listeners
 com.rocket.summer.framework.boot.autoconfigure.AutoConfigurationImportListener=\

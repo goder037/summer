@@ -3,18 +3,21 @@ package com.rocket.summer.framework.aop.support;
 import com.rocket.summer.framework.aop.*;
 import com.rocket.summer.framework.core.BridgeMethodResolver;
 import com.rocket.summer.framework.core.JdkVersion;
+import com.rocket.summer.framework.core.MethodIntrospector;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.*;
 
 /**
  * Utility methods for AOP support code.
- * Mainly for internal use within Spring's AOP support.
+ *
+ * <p>Mainly for internal use within Spring's AOP support.
  *
  * <p>See {@link com.rocket.summer.framework.aop.framework.AopProxyUtils} for a
  * collection of framework-specific AOP utility methods which depend
@@ -29,17 +32,22 @@ public abstract class AopUtils {
 
     /**
      * Check whether the given object is a JDK dynamic proxy or a CGLIB proxy.
+     * <p>This method additionally checks if the given object is an instance
+     * of {@link SpringProxy}.
      * @param object the object to check
      * @see #isJdkDynamicProxy
      * @see #isCglibProxy
      */
     public static boolean isAopProxy(Object object) {
         return (object instanceof SpringProxy &&
-                (Proxy.isProxyClass(object.getClass()) || isCglibProxyClass(object.getClass())));
+                (Proxy.isProxyClass(object.getClass()) || ClassUtils.isCglibProxyClass(object.getClass())));
     }
 
     /**
      * Check whether the given object is a JDK dynamic proxy.
+     * <p>This method goes beyond the implementation of
+     * {@link Proxy#isProxyClass(Class)} by additionally checking if the
+     * given object is an instance of {@link SpringProxy}.
      * @param object the object to check
      * @see java.lang.reflect.Proxy#isProxyClass
      */
@@ -49,37 +57,59 @@ public abstract class AopUtils {
 
     /**
      * Check whether the given object is a CGLIB proxy.
+     * <p>This method goes beyond the implementation of
+     * {@link ClassUtils#isCglibProxy(Object)} by additionally checking if
+     * the given object is an instance of {@link SpringProxy}.
      * @param object the object to check
+     * @see ClassUtils#isCglibProxy(Object)
      */
     public static boolean isCglibProxy(Object object) {
-        return (object instanceof SpringProxy && isCglibProxyClass(object.getClass()));
+        return (object instanceof SpringProxy && ClassUtils.isCglibProxy(object));
     }
 
     /**
-     * Check whether the specified class is a CGLIB-generated class.
-     * @param clazz the class to check
-     */
-    public static boolean isCglibProxyClass(Class clazz) {
-        return (clazz != null && clazz.getName().indexOf(ClassUtils.CGLIB_CLASS_SEPARATOR) != -1);
-    }
-
-    /**
-     * Determine the target class of the given bean instance,
-     * which might be an AOP proxy.
-     * <p>Returns the target class for an AOP proxy and the plain class else.
+     * Determine the target class of the given bean instance which might be an AOP proxy.
+     * <p>Returns the target class for an AOP proxy or the plain class otherwise.
      * @param candidate the instance to check (might be an AOP proxy)
-     * @return the target class (or the plain class of the given object as fallback)
+     * @return the target class (or the plain class of the given object as fallback;
+     * never {@code null})
      * @see com.rocket.summer.framework.aop.TargetClassAware#getTargetClass()
+     * @see com.rocket.summer.framework.aop.framework.AopProxyUtils#ultimateTargetClass(Object)
      */
-    public static Class getTargetClass(Object candidate) {
+    public static Class<?> getTargetClass(Object candidate) {
         Assert.notNull(candidate, "Candidate object must not be null");
+        Class<?> result = null;
         if (candidate instanceof TargetClassAware) {
-            return ((TargetClassAware) candidate).getTargetClass();
+            result = ((TargetClassAware) candidate).getTargetClass();
         }
-        if (isCglibProxyClass(candidate.getClass())) {
-            return candidate.getClass().getSuperclass();
+        if (result == null) {
+            result = (isCglibProxy(candidate) ? candidate.getClass().getSuperclass() : candidate.getClass());
         }
-        return candidate.getClass();
+        return result;
+    }
+
+    /**
+     * Select an invocable method on the target type: either the given method itself
+     * if actually exposed on the target type, or otherwise a corresponding method
+     * on one of the target type's interfaces or on the target type itself.
+     * @param method the method to check
+     * @param targetType the target type to search methods on (typically an AOP proxy)
+     * @return a corresponding invocable method on the target type
+     * @throws IllegalStateException if the given method is not invocable on the given
+     * target type (typically due to a proxy mismatch)
+     * @since 4.3
+     * @see MethodIntrospector#selectInvocableMethod(Method, Class)
+     */
+    public static Method selectInvocableMethod(Method method, Class<?> targetType) {
+        Method methodToUse = MethodIntrospector.selectInvocableMethod(method, targetType);
+        if (Modifier.isPrivate(methodToUse.getModifiers()) && !Modifier.isStatic(methodToUse.getModifiers()) &&
+                SpringProxy.class.isAssignableFrom(targetType)) {
+            throw new IllegalStateException(String.format(
+                    "Need to invoke method '%s' found on proxy for target class '%s' but cannot " +
+                            "be delegated to target bean. Switch its visibility to package or protected.",
+                    method.getName(), method.getDeclaringClass().getSimpleName()));
+        }
+        return methodToUse;
     }
 
     /**
@@ -118,28 +148,24 @@ public abstract class AopUtils {
     /**
      * Given a method, which may come from an interface, and a target class used
      * in the current AOP invocation, find the corresponding target method if there
-     * is one. E.g. the method may be <code>IFoo.bar()</code> and the target class
-     * may be <code>DefaultFoo</code>. In this case, the method may be
-     * <code>DefaultFoo.bar()</code>. This enables attributes on that method to be found.
+     * is one. E.g. the method may be {@code IFoo.bar()} and the target class
+     * may be {@code DefaultFoo}. In this case, the method may be
+     * {@code DefaultFoo.bar()}. This enables attributes on that method to be found.
      * <p><b>NOTE:</b> In contrast to {@link com.rocket.summer.framework.util.ClassUtils#getMostSpecificMethod},
      * this method resolves Java 5 bridge methods in order to retrieve attributes
      * from the <i>original</i> method definition.
      * @param method the method to be invoked, which may come from an interface
      * @param targetClass the target class for the current invocation.
-     * May be <code>null</code> or may not even implement the method.
+     * May be {@code null} or may not even implement the method.
      * @return the specific target method, or the original method if the
-     * <code>targetClass</code> doesn't implement it or is <code>null</code>
+     * {@code targetClass} doesn't implement it or is {@code null}
      * @see com.rocket.summer.framework.util.ClassUtils#getMostSpecificMethod
      */
-    public static Method getMostSpecificMethod(Method method, Class targetClass) {
+    public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
         Method resolvedMethod = ClassUtils.getMostSpecificMethod(method, targetClass);
         // If we are dealing with method with generic parameters, find the original method.
-        if (JdkVersion.isAtLeastJava15()) {
-            resolvedMethod = BridgeMethodResolver.findBridgedMethod(resolvedMethod);
-        }
-        return resolvedMethod;
+        return BridgeMethodResolver.findBridgedMethod(resolvedMethod);
     }
-
 
     /**
      * Can the given pointcut apply at all on the given class?
@@ -149,7 +175,7 @@ public abstract class AopUtils {
      * @param targetClass the class to test
      * @return whether the pointcut can apply on any method
      */
-    public static boolean canApply(Pointcut pc, Class targetClass) {
+    public static boolean canApply(Pointcut pc, Class<?> targetClass) {
         return canApply(pc, targetClass, false);
     }
 
@@ -163,22 +189,27 @@ public abstract class AopUtils {
      * for this bean includes any introductions
      * @return whether the pointcut can apply on any method
      */
-    public static boolean canApply(Pointcut pc, Class targetClass, boolean hasIntroductions) {
+    public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
+        Assert.notNull(pc, "Pointcut must not be null");
         if (!pc.getClassFilter().matches(targetClass)) {
             return false;
         }
 
         MethodMatcher methodMatcher = pc.getMethodMatcher();
+        if (methodMatcher == MethodMatcher.TRUE) {
+            // No need to iterate the methods if we're matching any method anyway...
+            return true;
+        }
+
         IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
         if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
             introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
         }
 
-        Set classes = new HashSet(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
+        Set<Class<?>> classes = new LinkedHashSet<Class<?>>(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
         classes.add(targetClass);
-        for (Object aClass : classes) {
-            Class clazz = (Class) aClass;
-            Method[] methods = clazz.getMethods();
+        for (Class<?> clazz : classes) {
+            Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
             for (Method method : methods) {
                 if ((introductionAwareMethodMatcher != null &&
                         introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions)) ||
@@ -199,7 +230,7 @@ public abstract class AopUtils {
      * @param targetClass class we're testing
      * @return whether the pointcut can apply on any method
      */
-    public static boolean canApply(Advisor advisor, Class targetClass) {
+    public static boolean canApply(Advisor advisor, Class<?> targetClass) {
         return canApply(advisor, targetClass, false);
     }
 
@@ -213,7 +244,7 @@ public abstract class AopUtils {
      * any introductions
      * @return whether the pointcut can apply on any method
      */
-    public static boolean canApply(Advisor advisor, Class targetClass, boolean hasIntroductions) {
+    public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
         if (advisor instanceof IntroductionAdvisor) {
             return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
         }
@@ -228,27 +259,25 @@ public abstract class AopUtils {
     }
 
     /**
-     * Determine the sublist of the <code>candidateAdvisors</code> list
+     * Determine the sublist of the {@code candidateAdvisors} list
      * that is applicable to the given class.
      * @param candidateAdvisors the Advisors to evaluate
      * @param clazz the target class
      * @return sublist of Advisors that can apply to an object of the given class
      * (may be the incoming List as-is)
      */
-    public static List findAdvisorsThatCanApply(List candidateAdvisors, Class clazz) {
+    public static List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class<?> clazz) {
         if (candidateAdvisors.isEmpty()) {
             return candidateAdvisors;
         }
-        List eligibleAdvisors = new LinkedList();
-        for (Object candidateAdvisor : candidateAdvisors) {
-            Advisor candidate = (Advisor) candidateAdvisor;
+        List<Advisor> eligibleAdvisors = new LinkedList<Advisor>();
+        for (Advisor candidate : candidateAdvisors) {
             if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
                 eligibleAdvisors.add(candidate);
             }
         }
         boolean hasIntroductions = !eligibleAdvisors.isEmpty();
-        for (Object candidateAdvisor : candidateAdvisors) {
-            Advisor candidate = (Advisor) candidateAdvisor;
+        for (Advisor candidate : candidateAdvisors) {
             if (candidate instanceof IntroductionAdvisor) {
                 // already processed
                 continue;
@@ -259,7 +288,6 @@ public abstract class AopUtils {
         }
         return eligibleAdvisors;
     }
-
 
     /**
      * Invoke the given target via reflection, as part of an AOP method invocation.
@@ -293,4 +321,3 @@ public abstract class AopUtils {
     }
 
 }
-

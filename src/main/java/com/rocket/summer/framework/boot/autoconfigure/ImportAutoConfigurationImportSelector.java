@@ -29,7 +29,7 @@ class ImportAutoConfigurationImportSelector extends AutoConfigurationImportSelec
     static {
         Set<String> names = new LinkedHashSet<String>();
         names.add(ImportAutoConfiguration.class.getName());
-        names.add("org.springframework.boot.autoconfigure.test.ImportAutoConfiguration");
+        names.add("com.rocket.summer.framework.boot.autoconfigure.test.ImportAutoConfiguration");
         ANNOTATION_NAMES = Collections.unmodifiableSet(names);
     }
 

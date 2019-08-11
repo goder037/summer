@@ -1,5 +1,6 @@
-package com.rocket.summer.framework.core.io;
+package com.rocket.summer.framework.core.io.support;
 
+import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.support.EncodedResource;
 import com.rocket.summer.framework.core.io.support.PropertiesLoaderUtils;
 import com.rocket.summer.framework.util.CollectionUtils;
