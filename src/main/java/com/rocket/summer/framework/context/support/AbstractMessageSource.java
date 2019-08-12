@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.web.ui.context.support;
+package com.rocket.summer.framework.context.support;
 
 import com.rocket.summer.framework.context.HierarchicalMessageSource;
 import com.rocket.summer.framework.context.MessageSource;

@@ -16,8 +16,8 @@ import com.rocket.summer.framework.web.bind.MissingServletRequestParameterExcept
 import com.rocket.summer.framework.web.bind.ServletRequestBindingException;
 import com.rocket.summer.framework.web.bind.annotation.RequestBody;
 import com.rocket.summer.framework.web.bind.annotation.RequestPart;
-import com.rocket.summer.framework.web.multipart.MissingServletRequestPartException;
 import com.rocket.summer.framework.web.multipart.MultipartFile;
+import com.rocket.summer.framework.web.multipart.support.MissingServletRequestPartException;
 import com.rocket.summer.framework.web.servlet.ModelAndView;
 import com.rocket.summer.framework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import com.rocket.summer.framework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
