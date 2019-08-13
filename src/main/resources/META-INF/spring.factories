@@ -36,6 +36,7 @@ com.rocket.summer.framework.boot.autoconfigure.web.EmbeddedServletContainerAutoC
 com.rocket.summer.framework.boot.autoconfigure.web.DispatcherServletAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.web.ErrorMvcAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.web.ServerPropertiesAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.web.WebMvcAutoConfiguration
 
 # Failure Analyzers
