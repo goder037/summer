@@ -12,12 +12,21 @@ com.rocket.summer.framework.boot.autoconfigure.logging.AutoConfigurationReportLo
 com.rocket.summer.framework.boot.env.PropertySourceLoader=\
 com.rocket.summer.framework.boot.env.PropertiesPropertySourceLoader
 
+# Run Listeners
+com.rocket.summer.framework.boot.SpringApplicationRunListener=\
+com.rocket.summer.framework.boot.context.event.EventPublishingRunListener
+
 # Application Listeners
 com.rocket.summer.framework.context.ApplicationListener=\
 com.rocket.summer.framework.boot.ClearCachesApplicationListener,\
+com.rocket.summer.framework.boot.builder.ParentContextCloserApplicationListener,\
+com.rocket.summer.framework.boot.context.FileEncodingApplicationListener,\
+com.rocket.summer.framework.boot.context.config.AnsiOutputApplicationListener,\
 com.rocket.summer.framework.boot.context.config.ConfigFileApplicationListener,\
-com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer,\
-com.rocket.summer.framework.boot.logging.LoggingApplicationListener
+com.rocket.summer.framework.boot.context.config.DelegatingApplicationListener,\
+com.rocket.summer.framework.boot.logging.ClasspathLoggingApplicationListener,\
+com.rocket.summer.framework.boot.logging.LoggingApplicationListener,\
+com.rocket.summer.framework.boot.autoconfigure.BackgroundPreinitializer
 
 # Auto Configuration Import Listeners
 com.rocket.summer.framework.boot.autoconfigure.AutoConfigurationImportListener=\
