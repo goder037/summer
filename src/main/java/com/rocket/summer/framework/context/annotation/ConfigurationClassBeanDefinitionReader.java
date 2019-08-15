@@ -9,6 +9,7 @@ import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
 import com.rocket.summer.framework.beans.factory.parsing.SourceExtractor;
 import com.rocket.summer.framework.beans.factory.support.*;
+import com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader;
 import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.core.env.Environment;
 import com.rocket.summer.framework.core.io.Resource;
@@ -23,14 +24,17 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * Reads a given fully-populated configuration model, registering bean definitions
- * with the given {@link BeanDefinitionRegistry} based on its contents.
+ * Reads a given fully-populated set of ConfigurationClass instances, registering bean
+ * definitions with the given {@link BeanDefinitionRegistry} based on its contents.
  *
  * <p>This class was modeled after the {@link BeanDefinitionReader} hierarchy, but does
- * not implement/extend any of its artifacts as a configuration model is not a {@link Resource}.
+ * not implement/extend any of its artifacts as a set of configuration classes is not a
+ * {@link Resource}.
  *
  * @author Chris Beams
  * @author Juergen Hoeller
+ * @author Phillip Webb
+ * @author Sam Brannen
  * @since 3.0
  * @see ConfigurationClassParser
  */
@@ -285,6 +289,13 @@ class ConfigurationClassBeanDefinitionReader {
         for (Map.Entry<String, Class<? extends BeanDefinitionReader>> entry : importedResources.entrySet()) {
             String resource = entry.getKey();
             Class<? extends BeanDefinitionReader> readerClass = entry.getValue();
+
+            // Default reader selection necessary?
+            if (BeanDefinitionReader.class == readerClass) {
+
+                // Primarily ".xml" files but for any other extension as well
+                readerClass = XmlBeanDefinitionReader.class;
+            }
 
             BeanDefinitionReader reader = readerInstanceCache.get(readerClass);
             if (reader == null) {

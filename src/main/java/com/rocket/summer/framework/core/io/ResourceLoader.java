@@ -29,8 +29,8 @@ public interface ResourceLoader {
 
 
     /**
-     * Return a Resource handle for the specified resource.
-     * The handle should always be a reusable resource descriptor,
+     * Return a Resource handle for the specified resource location.
+     * <p>The handle should always be a reusable resource descriptor,
      * allowing for multiple {@link Resource#getInputStream()} calls.
      * <p><ul>
      * <li>Must support fully qualified URLs, e.g. "file:C:/test.dat".
@@ -42,10 +42,10 @@ public interface ResourceLoader {
      * <p>Note that a Resource handle does not imply an existing resource;
      * you need to invoke {@link Resource#exists} to check for existence.
      * @param location the resource location
-     * @return a corresponding Resource handle
+     * @return a corresponding Resource handle (never {@code null})
      * @see #CLASSPATH_URL_PREFIX
-     * @see com.rocket.summer.framework.core.io.Resource#exists
-     * @see com.rocket.summer.framework.core.io.Resource#getInputStream
+     * @see Resource#exists()
+     * @see Resource#getInputStream()
      */
     Resource getResource(String location);
 
@@ -54,7 +54,9 @@ public interface ResourceLoader {
      * <p>Clients which need to access the ClassLoader directly can do so
      * in a uniform manner with the ResourceLoader, rather than relying
      * on the thread context ClassLoader.
-     * @return the ClassLoader (never <code>null</code>)
+     * @return the ClassLoader (only {@code null} if even the system
+     * ClassLoader isn't accessible)
+     * @see com.rocket.summer.framework.util.ClassUtils#getDefaultClassLoader()
      */
     ClassLoader getClassLoader();
 

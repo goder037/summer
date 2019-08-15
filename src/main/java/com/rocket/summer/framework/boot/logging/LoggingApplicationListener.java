@@ -8,6 +8,7 @@ import com.rocket.summer.framework.boot.context.event.ApplicationFailedEvent;
 import com.rocket.summer.framework.boot.context.event.ApplicationPreparedEvent;
 import com.rocket.summer.framework.boot.context.event.ApplicationStartingEvent;
 import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.context.event.ApplicationEvent;
 import com.rocket.summer.framework.context.event.ContextClosedEvent;
 import com.rocket.summer.framework.context.event.GenericApplicationListener;
@@ -138,8 +139,8 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 
     static {
         LOG_LEVEL_LOGGERS = new LinkedMultiValueMap<LogLevel, String>();
-        LOG_LEVEL_LOGGERS.add(LogLevel.DEBUG, "org.springframework.boot");
-        LOG_LEVEL_LOGGERS.add(LogLevel.TRACE, "org.springframework");
+        LOG_LEVEL_LOGGERS.add(LogLevel.DEBUG, "com.rocket.summer.framework.boot");
+        LOG_LEVEL_LOGGERS.add(LogLevel.TRACE, "com.rocket.summer.framework");
         LOG_LEVEL_LOGGERS.add(LogLevel.TRACE, "org.apache.tomcat");
         LOG_LEVEL_LOGGERS.add(LogLevel.TRACE, "org.apache.catalina");
         LOG_LEVEL_LOGGERS.add(LogLevel.TRACE, "org.eclipse.jetty");

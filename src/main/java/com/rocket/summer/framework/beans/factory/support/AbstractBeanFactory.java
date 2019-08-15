@@ -1,19 +1,65 @@
 package com.rocket.summer.framework.beans.factory.support;
 
-import com.rocket.summer.framework.beans.*;
-import com.rocket.summer.framework.beans.factory.*;
-import com.rocket.summer.framework.beans.factory.config.*;
+import java.beans.PropertyEditor;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.beans.BeanWrapper;
 import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.beans.PropertyEditorRegistrar;
+import com.rocket.summer.framework.beans.PropertyEditorRegistry;
+import com.rocket.summer.framework.beans.PropertyEditorRegistrySupport;
+import com.rocket.summer.framework.beans.SimpleTypeConverter;
+import com.rocket.summer.framework.beans.TypeConverter;
+import com.rocket.summer.framework.beans.TypeMismatchException;
+import com.rocket.summer.framework.beans.factory.BeanCreationException;
+import com.rocket.summer.framework.beans.factory.BeanCurrentlyInCreationException;
+import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
+import com.rocket.summer.framework.beans.factory.BeanFactory;
+import com.rocket.summer.framework.beans.factory.BeanFactoryUtils;
+import com.rocket.summer.framework.beans.factory.BeanIsAbstractException;
+import com.rocket.summer.framework.beans.factory.BeanIsNotAFactoryException;
+import com.rocket.summer.framework.beans.factory.BeanNotOfRequiredTypeException;
+import com.rocket.summer.framework.beans.factory.CannotLoadBeanClassException;
+import com.rocket.summer.framework.beans.factory.FactoryBean;
+import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
+import com.rocket.summer.framework.beans.factory.ObjectFactory;
+import com.rocket.summer.framework.beans.factory.SmartFactoryBean;
+import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
+import com.rocket.summer.framework.beans.factory.config.BeanDefinitionHolder;
+import com.rocket.summer.framework.beans.factory.config.BeanExpressionContext;
+import com.rocket.summer.framework.beans.factory.config.BeanExpressionResolver;
+import com.rocket.summer.framework.beans.factory.config.BeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
+import com.rocket.summer.framework.beans.factory.config.DestructionAwareBeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.Scope;
 import com.rocket.summer.framework.core.DecoratingClassLoader;
 import com.rocket.summer.framework.core.NamedThreadLocal;
 import com.rocket.summer.framework.core.ResolvableType;
 import com.rocket.summer.framework.core.convert.ConversionService;
-import com.rocket.summer.framework.util.*;
-
-import java.beans.PropertyEditor;
-import java.security.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.util.StringValueResolver;
 
 /**
  * Abstract base class for {@link com.rocket.summer.framework.beans.factory.BeanFactory}
@@ -129,6 +175,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     //---------------------------------------------------------------------
     // Implementation of BeanFactory interface
     //---------------------------------------------------------------------
+
     @Override
     public Object getBean(String name) throws BeansException {
         return doGetBean(name, null, null, false);
@@ -168,7 +215,6 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @return an instance of the bean
      * @throws BeansException if the bean could not be created
      */
-    @SuppressWarnings("unchecked")
     protected <T> T doGetBean(
             final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
             throws BeansException {

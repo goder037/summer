@@ -13,42 +13,33 @@ package com.rocket.summer.framework.web.context.request;
 public interface NativeWebRequest extends WebRequest {
 
     /**
-     * Return the underlying native request object, if available.
+     * Return the underlying native request object.
      * @see javax.servlet.http.HttpServletRequest
-     * @see javax.portlet.ActionRequest
-     * @see javax.portlet.RenderRequest
      */
     Object getNativeRequest();
 
     /**
-     * Return the underlying native response object, if available.
+     * Return the underlying native response object, if any.
      * @see javax.servlet.http.HttpServletResponse
-     * @see javax.portlet.ActionResponse
-     * @see javax.portlet.RenderResponse
      */
     Object getNativeResponse();
 
     /**
      * Return the underlying native request object, if available.
      * @param requiredType the desired type of request object
-     * @return the matching request object, or <code>null</code> if none
+     * @return the matching request object, or {@code null} if none
      * of that type is available
      * @see javax.servlet.http.HttpServletRequest
-     * @see javax.portlet.ActionRequest
-     * @see javax.portlet.RenderRequest
      */
     <T> T getNativeRequest(Class<T> requiredType);
 
     /**
-     * Return the underlying native request object, if available.
+     * Return the underlying native response object, if available.
      * @param requiredType the desired type of response object
-     * @return the matching response object, or <code>null</code> if none
+     * @return the matching response object, or {@code null} if none
      * of that type is available
-     * @see javax.servlet.http.HttpServletRequest
-     * @see javax.portlet.ActionRequest
-     * @see javax.portlet.RenderRequest
+     * @see javax.servlet.http.HttpServletResponse
      */
     <T> T getNativeResponse(Class<T> requiredType);
 
 }
-

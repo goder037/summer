@@ -5,11 +5,14 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Miscellaneous utility methods for number conversion and parsing.
- * Mainly for internal use within the framework; consider Jakarta's
- * Commons Lang for a more comprehensive suite of string utilities.
+ * <p>Mainly for internal use within the framework; consider Apache's
+ * Commons Lang for a more comprehensive suite of number utilities.
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -17,8 +20,28 @@ import java.text.ParseException;
  */
 public abstract class NumberUtils {
 
-    private static final boolean decimalFormatSupportsBigDecimal =
-            ClassUtils.hasMethod(DecimalFormat.class, "setParseBigDecimal", new Class[] {boolean.class});
+    private static final BigInteger LONG_MIN = BigInteger.valueOf(Long.MIN_VALUE);
+
+    private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
+
+    /**
+     * Standard number types (all immutable):
+     * Byte, Short, Integer, Long, BigInteger, Float, Double, BigDecimal.
+     */
+    public static final Set<Class<?>> STANDARD_NUMBER_TYPES;
+
+    static {
+        Set<Class<?>> numberTypes = new HashSet<Class<?>>(8);
+        numberTypes.add(Byte.class);
+        numberTypes.add(Short.class);
+        numberTypes.add(Integer.class);
+        numberTypes.add(Long.class);
+        numberTypes.add(BigInteger.class);
+        numberTypes.add(Float.class);
+        numberTypes.add(Double.class);
+        numberTypes.add(BigDecimal.class);
+        STANDARD_NUMBER_TYPES = Collections.unmodifiableSet(numberTypes);
+    }
 
 
     /**
@@ -47,31 +70,32 @@ public abstract class NumberUtils {
         if (targetClass.isInstance(number)) {
             return (T) number;
         }
-        else if (targetClass.equals(Byte.class)) {
-            long value = number.longValue();
+        else if (Byte.class == targetClass) {
+            long value = checkedLongValue(number, targetClass);
             if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return (T) new Byte(number.byteValue());
+            return (T) Byte.valueOf(number.byteValue());
         }
-        else if (targetClass.equals(Short.class)) {
-            long value = number.longValue();
+        else if (Short.class == targetClass) {
+            long value = checkedLongValue(number, targetClass);
             if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return (T) new Short(number.shortValue());
+            return (T) Short.valueOf(number.shortValue());
         }
-        else if (targetClass.equals(Integer.class)) {
-            long value = number.longValue();
+        else if (Integer.class == targetClass) {
+            long value = checkedLongValue(number, targetClass);
             if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
                 raiseOverflowException(number, targetClass);
             }
-            return (T) new Integer(number.intValue());
+            return (T) Integer.valueOf(number.intValue());
         }
-        else if (targetClass.equals(Long.class)) {
-            return (T) new Long(number.longValue());
+        else if (Long.class == targetClass) {
+            long value = checkedLongValue(number, targetClass);
+            return (T) Long.valueOf(value);
         }
-        else if (targetClass.equals(BigInteger.class)) {
+        else if (BigInteger.class == targetClass) {
             if (number instanceof BigDecimal) {
                 // do not lose precision - use BigDecimal's own conversion
                 return (T) ((BigDecimal) number).toBigInteger();
@@ -81,40 +105,75 @@ public abstract class NumberUtils {
                 return (T) BigInteger.valueOf(number.longValue());
             }
         }
-        else if (targetClass.equals(Float.class)) {
-            return (T) new Float(number.floatValue());
+        else if (Float.class == targetClass) {
+            return (T) Float.valueOf(number.floatValue());
         }
-        else if (targetClass.equals(Double.class)) {
-            return (T) new Double(number.doubleValue());
+        else if (Double.class == targetClass) {
+            return (T) Double.valueOf(number.doubleValue());
         }
-        else if (targetClass.equals(BigDecimal.class)) {
+        else if (BigDecimal.class == targetClass) {
             // always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
             // (see BigDecimal javadoc for details)
             return (T) new BigDecimal(number.toString());
         }
         else {
             throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
-                    number.getClass().getName() + "] to unknown target class [" + targetClass.getName() + "]");
+                    number.getClass().getName() + "] to unsupported target class [" + targetClass.getName() + "]");
         }
     }
 
     /**
-     * Parse the given text into a number instance of the given target class,
-     * using the corresponding <code>decode</code> / <code>valueOf</code> methods.
-     * <p>Trims the input <code>String</code> before attempting to parse the number.
-     * Supports numbers in hex format (with leading "0x", "0X" or "#") as well.
+     * Check for a {@code BigInteger}/{@code BigDecimal} long overflow
+     * before returning the given number as a long value.
+     * @param number the number to convert
+     * @param targetClass the target class to convert to
+     * @return the long value, if convertible without overflow
+     * @throws IllegalArgumentException if there is an overflow
+     * @see #raiseOverflowException
+     */
+    private static long checkedLongValue(Number number, Class<? extends Number> targetClass) {
+        BigInteger bigInt = null;
+        if (number instanceof BigInteger) {
+            bigInt = (BigInteger) number;
+        }
+        else if (number instanceof BigDecimal) {
+            bigInt = ((BigDecimal) number).toBigInteger();
+        }
+        // Effectively analogous to JDK 8's BigInteger.longValueExact()
+        if (bigInt != null && (bigInt.compareTo(LONG_MIN) < 0 || bigInt.compareTo(LONG_MAX) > 0)) {
+            raiseOverflowException(number, targetClass);
+        }
+        return number.longValue();
+    }
+
+    /**
+     * Raise an <em>overflow</em> exception for the given number and target class.
+     * @param number the number we tried to convert
+     * @param targetClass the target class we tried to convert to
+     * @throws IllegalArgumentException if there is an overflow
+     */
+    private static void raiseOverflowException(Number number, Class<?> targetClass) {
+        throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
+                number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
+    }
+
+    /**
+     * Parse the given {@code text} into a {@link Number} instance of the given
+     * target class, using the corresponding {@code decode} / {@code valueOf} method.
+     * <p>Trims the input {@code String} before attempting to parse the number.
+     * <p>Supports numbers in hex format (with leading "0x", "0X", or "#") as well.
      * @param text the text to convert
      * @param targetClass the target class to parse into
      * @return the parsed number
      * @throws IllegalArgumentException if the target class is not supported
      * (i.e. not a standard Number subclass as included in the JDK)
-     * @see java.lang.Byte#decode
-     * @see java.lang.Short#decode
-     * @see java.lang.Integer#decode
-     * @see java.lang.Long#decode
+     * @see Byte#decode
+     * @see Short#decode
+     * @see Integer#decode
+     * @see Long#decode
      * @see #decodeBigInteger(String)
-     * @see java.lang.Float#valueOf
-     * @see java.lang.Double#valueOf
+     * @see Float#valueOf
+     * @see Double#valueOf
      * @see java.math.BigDecimal#BigDecimal(String)
      */
     @SuppressWarnings("unchecked")
@@ -123,28 +182,28 @@ public abstract class NumberUtils {
         Assert.notNull(targetClass, "Target class must not be null");
         String trimmed = StringUtils.trimAllWhitespace(text);
 
-        if (targetClass.equals(Byte.class)) {
+        if (Byte.class == targetClass) {
             return (T) (isHexNumber(trimmed) ? Byte.decode(trimmed) : Byte.valueOf(trimmed));
         }
-        else if (targetClass.equals(Short.class)) {
+        else if (Short.class == targetClass) {
             return (T) (isHexNumber(trimmed) ? Short.decode(trimmed) : Short.valueOf(trimmed));
         }
-        else if (targetClass.equals(Integer.class)) {
+        else if (Integer.class == targetClass) {
             return (T) (isHexNumber(trimmed) ? Integer.decode(trimmed) : Integer.valueOf(trimmed));
         }
-        else if (targetClass.equals(Long.class)) {
+        else if (Long.class == targetClass) {
             return (T) (isHexNumber(trimmed) ? Long.decode(trimmed) : Long.valueOf(trimmed));
         }
-        else if (targetClass.equals(BigInteger.class)) {
+        else if (BigInteger.class == targetClass) {
             return (T) (isHexNumber(trimmed) ? decodeBigInteger(trimmed) : new BigInteger(trimmed));
         }
-        else if (targetClass.equals(Float.class)) {
+        else if (Float.class == targetClass) {
             return (T) Float.valueOf(trimmed);
         }
-        else if (targetClass.equals(Double.class)) {
+        else if (Double.class == targetClass) {
             return (T) Double.valueOf(trimmed);
         }
-        else if (targetClass.equals(BigDecimal.class) || targetClass.equals(Number.class)) {
+        else if (BigDecimal.class == targetClass || Number.class == targetClass) {
             return (T) new BigDecimal(trimmed);
         }
         else {
@@ -154,23 +213,13 @@ public abstract class NumberUtils {
     }
 
     /**
-     * Raise an overflow exception for the given number and target class.
-     * @param number the number we tried to convert
-     * @param targetClass the target class we tried to convert to
-     */
-    private static void raiseOverflowException(Number number, Class targetClass) {
-        throw new IllegalArgumentException("Could not convert number [" + number + "] of type [" +
-                number.getClass().getName() + "] to target class [" + targetClass.getName() + "]: overflow");
-    }
-
-    /**
-     * Parse the given text into a number instance of the given target class,
-     * using the given NumberFormat. Trims the input <code>String</code>
-     * before attempting to parse the number.
+     * Parse the given {@code text} into a {@link Number} instance of the
+     * given target class, using the supplied {@link NumberFormat}.
+     * <p>Trims the input {@code String} before attempting to parse the number.
      * @param text the text to convert
      * @param targetClass the target class to parse into
-     * @param numberFormat the NumberFormat to use for parsing (if <code>null</code>,
-     * this method falls back to <code>parseNumber(String, Class)</code>)
+     * @param numberFormat the {@code NumberFormat} to use for parsing (if
+     * {@code null}, this method falls back to {@link #parseNumber(String, Class)})
      * @return the parsed number
      * @throws IllegalArgumentException if the target class is not supported
      * (i.e. not a standard Number subclass as included in the JDK)
@@ -178,7 +227,7 @@ public abstract class NumberUtils {
      * @see #convertNumberToTargetClass
      * @see #parseNumber(String, Class)
      */
-    public static Number parseNumber(String text, Class targetClass, NumberFormat numberFormat) {
+    public static <T extends Number> T parseNumber(String text, Class<T> targetClass, NumberFormat numberFormat) {
         if (numberFormat != null) {
             Assert.notNull(text, "Text must not be null");
             Assert.notNull(targetClass, "Target class must not be null");
@@ -186,8 +235,7 @@ public abstract class NumberUtils {
             boolean resetBigDecimal = false;
             if (numberFormat instanceof DecimalFormat) {
                 decimalFormat = (DecimalFormat) numberFormat;
-                if (BigDecimal.class.equals(targetClass) && decimalFormatSupportsBigDecimal &&
-                        !decimalFormat.isParseBigDecimal()) {
+                if (BigDecimal.class == targetClass && !decimalFormat.isParseBigDecimal()) {
                     decimalFormat.setParseBigDecimal(true);
                     resetBigDecimal = true;
                 }
@@ -197,10 +245,7 @@ public abstract class NumberUtils {
                 return convertNumberToTargetClass(number, targetClass);
             }
             catch (ParseException ex) {
-                IllegalArgumentException iae =
-                        new IllegalArgumentException("Could not parse number: " + ex.getMessage());
-                iae.initCause(ex);
-                throw iae;
+                throw new IllegalArgumentException("Could not parse number: " + ex.getMessage());
             }
             finally {
                 if (resetBigDecimal) {
@@ -214,8 +259,9 @@ public abstract class NumberUtils {
     }
 
     /**
-     * Determine whether the given value String indicates a hex number, i.e. needs to be
-     * passed into <code>Integer.decode</code> instead of <code>Integer.valueOf</code> (etc).
+     * Determine whether the given {@code value} String indicates a hex number,
+     * i.e. needs to be passed into {@code Integer.decode} instead of
+     * {@code Integer.valueOf}, etc.
      */
     private static boolean isHexNumber(String value) {
         int index = (value.startsWith("-") ? 1 : 0);
@@ -223,8 +269,8 @@ public abstract class NumberUtils {
     }
 
     /**
-     * Decode a {@link java.math.BigInteger} from a {@link String} value.
-     * Supports decimal, hex and octal notation.
+     * Decode a {@link java.math.BigInteger} from the supplied {@link String} value.
+     * <p>Supports decimal, hex, and octal notation.
      * @see BigInteger#BigInteger(String, int)
      */
     private static BigInteger decodeBigInteger(String value) {
@@ -257,4 +303,3 @@ public abstract class NumberUtils {
     }
 
 }
-

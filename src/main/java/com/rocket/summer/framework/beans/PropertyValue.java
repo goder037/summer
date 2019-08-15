@@ -24,13 +24,12 @@ import java.io.Serializable;
  * @see PropertyValues
  * @see BeanWrapper
  */
+@SuppressWarnings("serial")
 public class PropertyValue extends BeanMetadataAttributeAccessor implements Serializable {
 
     private final String name;
 
     private final Object value;
-
-    private Object source;
 
     private boolean optional = false;
 
@@ -42,15 +41,12 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
     volatile Boolean conversionNecessary;
 
     /** Package-visible field for caching the resolved property path tokens */
-    volatile Object resolvedTokens;
-
-    /** Package-visible field for caching the resolved PropertyDescriptor */
-    volatile PropertyDescriptor resolvedDescriptor;
+    transient volatile Object resolvedTokens;
 
 
     /**
      * Create a new PropertyValue instance.
-     * @param name the name of the property (never <code>null</code>)
+     * @param name the name of the property (never {@code null})
      * @param value the value of the property (possibly before type conversion)
      */
     public PropertyValue(String name, Object value) {
@@ -60,52 +56,38 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 
     /**
      * Copy constructor.
-     * @param original the PropertyValue to copy (never <code>null</code>)
+     * @param original the PropertyValue to copy (never {@code null})
      */
     public PropertyValue(PropertyValue original) {
         Assert.notNull(original, "Original must not be null");
         this.name = original.getName();
         this.value = original.getValue();
-        this.source = original.getSource();
+        this.optional = original.isOptional();
+        this.converted = original.converted;
+        this.convertedValue = original.convertedValue;
         this.conversionNecessary = original.conversionNecessary;
         this.resolvedTokens = original.resolvedTokens;
-        this.resolvedDescriptor = original.resolvedDescriptor;
+        setSource(original.getSource());
         copyAttributesFrom(original);
     }
 
     /**
      * Constructor that exposes a new value for an original value holder.
      * The original holder will be exposed as source of the new holder.
-     * @param original the PropertyValue to link to (never <code>null</code>)
+     * @param original the PropertyValue to link to (never {@code null})
      * @param newValue the new value to apply
      */
     public PropertyValue(PropertyValue original, Object newValue) {
         Assert.notNull(original, "Original must not be null");
         this.name = original.getName();
         this.value = newValue;
-        this.source = original;
+        this.optional = original.isOptional();
         this.conversionNecessary = original.conversionNecessary;
         this.resolvedTokens = original.resolvedTokens;
-        this.resolvedDescriptor = original.resolvedDescriptor;
+        setSource(original);
         copyAttributesFrom(original);
     }
 
-    /**
-     * Copy the attributes from the supplied AttributeAccessor to this accessor.
-     * @param source the AttributeAccessor to copy from
-     */
-    protected void copyAttributesFrom(AttributeAccessor source) {
-        Assert.notNull(source, "Source must not be null");
-        String[] attributeNames = source.attributeNames();
-        for (int i = 0; i < attributeNames.length; i++) {
-            String attributeName = attributeNames[i];
-            setAttribute(attributeName, source.getAttribute(attributeName));
-        }
-    }
-
-    public boolean isOptional() {
-        return this.optional;
-    }
 
     /**
      * Return the name of the property.
@@ -131,15 +113,35 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
      */
     public PropertyValue getOriginalPropertyValue() {
         PropertyValue original = this;
-        while (original.source instanceof PropertyValue && original.source != original) {
-            original = (PropertyValue) original.source;
+        Object source = getSource();
+        while (source instanceof PropertyValue && source != original) {
+            original = (PropertyValue) source;
+            source = original.getSource();
         }
         return original;
     }
 
     /**
-     * Return whether this holder contains a converted value already (<code>true</code>),
-     * or whether the value still needs to be converted (<code>false</code>).
+     * Set whether this is an optional value, that is, to be ignored
+     * when no corresponding property exists on the target class.
+     * @since 3.0
+     */
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    /**
+     * Return whether this is an optional value, that is, to be ignored
+     * when no corresponding property exists on the target class.
+     * @since 3.0
+     */
+    public boolean isOptional() {
+        return this.optional;
+    }
+
+    /**
+     * Return whether this holder contains a converted value already ({@code true}),
+     * or whether the value still needs to be converted ({@code false}).
      */
     public synchronized boolean isConverted() {
         return this.converted;
@@ -163,6 +165,7 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
     }
 
 
+    @Override
     public boolean equals(Object other) {
         if (this == other) {
             return true;
@@ -173,16 +176,17 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
         PropertyValue otherPv = (PropertyValue) other;
         return (this.name.equals(otherPv.name) &&
                 ObjectUtils.nullSafeEquals(this.value, otherPv.value) &&
-                ObjectUtils.nullSafeEquals(this.source, otherPv.source));
+                ObjectUtils.nullSafeEquals(getSource(), otherPv.getSource()));
     }
 
+    @Override
     public int hashCode() {
         return this.name.hashCode() * 29 + ObjectUtils.nullSafeHashCode(this.value);
     }
 
+    @Override
     public String toString() {
         return "bean property '" + this.name + "'";
     }
 
 }
-

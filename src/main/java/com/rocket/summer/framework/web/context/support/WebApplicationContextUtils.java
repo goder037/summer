@@ -14,6 +14,7 @@ import com.rocket.summer.framework.web.context.request.*;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Collections;
@@ -25,28 +26,27 @@ import static com.rocket.summer.framework.web.context.support.StandardServletEnv
 import static com.rocket.summer.framework.web.context.support.StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME;
 
 /**
- * Convenience methods for retrieving the root
- * {@link com.rocket.summer.framework.web.context.WebApplicationContext} for a given
- * <code>ServletContext</code>. This is e.g. useful for accessing a Spring
- * context from within custom web views or Struts actions.
+ * Convenience methods for retrieving the root {@link WebApplicationContext} for
+ * a given {@link ServletContext}. This is useful for programmatically accessing
+ * a Spring application context from within custom web views or MVC actions.
  *
  * <p>Note that there are more convenient ways of accessing the root context for
- * many web frameworks, either part of Spring or available as external library.
+ * many web frameworks, either part of Spring or available as an external library.
  * This helper class is just the most generic way to access the root context.
  *
  * @author Juergen Hoeller
  * @see com.rocket.summer.framework.web.context.ContextLoader
  * @see com.rocket.summer.framework.web.servlet.FrameworkServlet
  * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
- * @see com.rocket.summer.framework.web.jsf.FacesContextUtils
- * @see com.rocket.summer.framework.web.jsf.SpringBeanVariableResolver
- * @see com.rocket.summer.framework.web.jsf.el.SpringBeanFacesELResolver
  */
 public abstract class WebApplicationContextUtils {
 
+
+
+
     /**
-     * Find the root WebApplicationContext for this web application, which is
-     * typically loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
+     * Find the root {@code WebApplicationContext} for this web app, typically
+     * loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
      * <p>Will rethrow an exception that happened on root context startup,
      * to differentiate between a failed context startup and no context at all.
      * @param sc ServletContext to find the web application context for
@@ -54,9 +54,7 @@ public abstract class WebApplicationContextUtils {
      * @throws IllegalStateException if the root WebApplicationContext could not be found
      * @see com.rocket.summer.framework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
      */
-    public static WebApplicationContext getRequiredWebApplicationContext(ServletContext sc)
-            throws IllegalStateException {
-
+    public static WebApplicationContext getRequiredWebApplicationContext(ServletContext sc) throws IllegalStateException {
         WebApplicationContext wac = getWebApplicationContext(sc);
         if (wac == null) {
             throw new IllegalStateException("No WebApplicationContext found: no ContextLoaderListener registered?");
@@ -65,12 +63,12 @@ public abstract class WebApplicationContextUtils {
     }
 
     /**
-     * Find the root WebApplicationContext for this web application, which is
-     * typically loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
+     * Find the root {@code WebApplicationContext} for this web app, typically
+     * loaded via {@link com.rocket.summer.framework.web.context.ContextLoaderListener}.
      * <p>Will rethrow an exception that happened on root context startup,
      * to differentiate between a failed context startup and no context at all.
      * @param sc ServletContext to find the web application context for
-     * @return the root WebApplicationContext for this web app, or <code>null</code> if none
+     * @return the root WebApplicationContext for this web app, or {@code null} if none
      * @see com.rocket.summer.framework.web.context.WebApplicationContext#ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE
      */
     public static WebApplicationContext getWebApplicationContext(ServletContext sc) {
@@ -78,32 +76,10 @@ public abstract class WebApplicationContextUtils {
     }
 
     /**
-     * Replace {@code Servlet}-based stub property sources with actual instances
-     * populated with the given context and config objects.
-     * @see com.rocket.summer.framework.core.env.PropertySource.StubPropertySource
-     * @see com.rocket.summer.framework.web.context.support.WebApplicationContextUtils#initServletPropertySources(MutablePropertySources, ServletContext)
-     * @see com.rocket.summer.framework.core.env.ConfigurableEnvironment#getPropertySources()
-     */
-    public static void initServletPropertySources(
-            MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
-        Assert.notNull(propertySources, "propertySources must not be null");
-        if(servletContext != null &&
-                propertySources.contains(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) &&
-                propertySources.get(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
-            propertySources.replace(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, new ServletContextPropertySource(SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
-        }
-        if(servletConfig != null &&
-                propertySources.contains(SERVLET_CONFIG_PROPERTY_SOURCE_NAME) &&
-                propertySources.get(SERVLET_CONFIG_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
-            propertySources.replace(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, new ServletConfigPropertySource(SERVLET_CONFIG_PROPERTY_SOURCE_NAME, servletConfig));
-        }
-    }
-
-    /**
-     * Find a custom WebApplicationContext for this web application.
+     * Find a custom {@code WebApplicationContext} for this web app.
      * @param sc ServletContext to find the web application context for
      * @param attrName the name of the ServletContext attribute to look for
-     * @return the desired WebApplicationContext for this web app, or <code>null</code> if none
+     * @return the desired WebApplicationContext for this web app, or {@code null} if none
      */
     public static WebApplicationContext getWebApplicationContext(ServletContext sc, String attrName) {
         Assert.notNull(sc, "ServletContext must not be null");
@@ -124,6 +100,40 @@ public abstract class WebApplicationContextUtils {
             throw new IllegalStateException("Context attribute is not of type WebApplicationContext: " + attr);
         }
         return (WebApplicationContext) attr;
+    }
+
+    /**
+     * Find a unique {@code WebApplicationContext} for this web app: either the
+     * root web app context (preferred) or a unique {@code WebApplicationContext}
+     * among the registered {@code ServletContext} attributes (typically coming
+     * from a single {@code DispatcherServlet} in the current web application).
+     * <p>Note that {@code DispatcherServlet}'s exposure of its context can be
+     * controlled through its {@code publishContext} property, which is {@code true}
+     * by default but can be selectively switched to only publish a single context
+     * despite multiple {@code DispatcherServlet} registrations in the web app.
+     * @param sc ServletContext to find the web application context for
+     * @return the desired WebApplicationContext for this web app, or {@code null} if none
+     * @since 4.2
+     * @see #getWebApplicationContext(ServletContext)
+     * @see ServletContext#getAttributeNames()
+     */
+    public static WebApplicationContext findWebApplicationContext(ServletContext sc) {
+        WebApplicationContext wac = getWebApplicationContext(sc);
+        if (wac == null) {
+            Enumeration<String> attrNames = sc.getAttributeNames();
+            while (attrNames.hasMoreElements()) {
+                String attrName = attrNames.nextElement();
+                Object attrValue = sc.getAttribute(attrName);
+                if (attrValue instanceof WebApplicationContext) {
+                    if (wac != null) {
+                        throw new IllegalStateException("No unique WebApplicationContext found: more than one " +
+                                "DispatcherServlet registered with publishContext=true?");
+                    }
+                    wac = (WebApplicationContext) attrValue;
+                }
+            }
+        }
+        return wac;
     }
 
 
@@ -154,6 +164,7 @@ public abstract class WebApplicationContextUtils {
         }
 
         beanFactory.registerResolvableDependency(ServletRequest.class, new RequestObjectFactory());
+        beanFactory.registerResolvableDependency(ServletResponse.class, new ResponseObjectFactory());
         beanFactory.registerResolvableDependency(HttpSession.class, new SessionObjectFactory());
         beanFactory.registerResolvableDependency(WebRequest.class, new WebRequestObjectFactory());
     }
@@ -172,34 +183,34 @@ public abstract class WebApplicationContextUtils {
      * Register web-specific environment beans ("contextParameters", "contextAttributes")
      * with the given BeanFactory, as used by the WebApplicationContext.
      * @param bf the BeanFactory to configure
-     * @param sc the ServletContext that we're running within
-     * @param config the ServletConfig of the containing Portlet
+     * @param servletContext the ServletContext that we're running within
+     * @param servletConfig the ServletConfig of the containing Portlet
      */
     public static void registerEnvironmentBeans(
-            ConfigurableListableBeanFactory bf, ServletContext sc, ServletConfig config) {
+            ConfigurableListableBeanFactory bf, ServletContext servletContext, ServletConfig servletConfig) {
 
-        if (sc != null && !bf.containsBean(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME)) {
-            bf.registerSingleton(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME, sc);
+        if (servletContext != null && !bf.containsBean(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME)) {
+            bf.registerSingleton(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME, servletContext);
         }
 
-        if (config != null && !bf.containsBean(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME)) {
-            bf.registerSingleton(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME, config);
+        if (servletConfig != null && !bf.containsBean(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME)) {
+            bf.registerSingleton(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME, servletConfig);
         }
 
         if (!bf.containsBean(WebApplicationContext.CONTEXT_PARAMETERS_BEAN_NAME)) {
             Map<String, String> parameterMap = new HashMap<String, String>();
-            if (sc != null) {
-                Enumeration paramNameEnum = sc.getInitParameterNames();
+            if (servletContext != null) {
+                Enumeration<?> paramNameEnum = servletContext.getInitParameterNames();
                 while (paramNameEnum.hasMoreElements()) {
                     String paramName = (String) paramNameEnum.nextElement();
-                    parameterMap.put(paramName, sc.getInitParameter(paramName));
+                    parameterMap.put(paramName, servletContext.getInitParameter(paramName));
                 }
             }
-            if (config != null) {
-                Enumeration paramNameEnum = config.getInitParameterNames();
+            if (servletConfig != null) {
+                Enumeration<?> paramNameEnum = servletConfig.getInitParameterNames();
                 while (paramNameEnum.hasMoreElements()) {
                     String paramName = (String) paramNameEnum.nextElement();
-                    parameterMap.put(paramName, config.getInitParameter(paramName));
+                    parameterMap.put(paramName, servletConfig.getInitParameter(paramName));
                 }
             }
             bf.registerSingleton(WebApplicationContext.CONTEXT_PARAMETERS_BEAN_NAME,
@@ -208,15 +219,59 @@ public abstract class WebApplicationContextUtils {
 
         if (!bf.containsBean(WebApplicationContext.CONTEXT_ATTRIBUTES_BEAN_NAME)) {
             Map<String, Object> attributeMap = new HashMap<String, Object>();
-            if (sc != null) {
-                Enumeration attrNameEnum = sc.getAttributeNames();
+            if (servletContext != null) {
+                Enumeration<?> attrNameEnum = servletContext.getAttributeNames();
                 while (attrNameEnum.hasMoreElements()) {
                     String attrName = (String) attrNameEnum.nextElement();
-                    attributeMap.put(attrName, sc.getAttribute(attrName));
+                    attributeMap.put(attrName, servletContext.getAttribute(attrName));
                 }
             }
             bf.registerSingleton(WebApplicationContext.CONTEXT_ATTRIBUTES_BEAN_NAME,
                     Collections.unmodifiableMap(attributeMap));
+        }
+    }
+
+    /**
+     * Convenient variant of {@link #initServletPropertySources(MutablePropertySources,
+     * ServletContext, ServletConfig)} that always provides {@code null} for the
+     * {@link ServletConfig} parameter.
+     * @see #initServletPropertySources(MutablePropertySources, ServletContext, ServletConfig)
+     */
+    public static void initServletPropertySources(MutablePropertySources propertySources, ServletContext servletContext) {
+        initServletPropertySources(propertySources, servletContext, null);
+    }
+
+    /**
+     * Replace {@code Servlet}-based {@link PropertySource.StubPropertySource stub property sources} with
+     * actual instances populated with the given {@code servletContext} and
+     * {@code servletConfig} objects.
+     * <p>This method is idempotent with respect to the fact it may be called any number
+     * of times but will perform replacement of stub property sources with their
+     * corresponding actual property sources once and only once.
+     * @param propertySources the {@link MutablePropertySources} to initialize (must not
+     * be {@code null})
+     * @param servletContext the current {@link ServletContext} (ignored if {@code null}
+     * or if the {@link StandardServletEnvironment#SERVLET_CONTEXT_PROPERTY_SOURCE_NAME
+     * servlet context property source} has already been initialized)
+     * @param servletConfig the current {@link ServletConfig} (ignored if {@code null}
+     * or if the {@link StandardServletEnvironment#SERVLET_CONFIG_PROPERTY_SOURCE_NAME
+     * servlet config property source} has already been initialized)
+     * @see com.rocket.summer.framework.core.env.PropertySource.StubPropertySource
+     * @see com.rocket.summer.framework.core.env.ConfigurableEnvironment#getPropertySources()
+     */
+    public static void initServletPropertySources(
+            MutablePropertySources propertySources, ServletContext servletContext, ServletConfig servletConfig) {
+
+        Assert.notNull(propertySources, "'propertySources' must not be null");
+        if (servletContext != null && propertySources.contains(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) &&
+                propertySources.get(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
+            propertySources.replace(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
+                    new ServletContextPropertySource(StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME, servletContext));
+        }
+        if (servletConfig != null && propertySources.contains(StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME) &&
+                propertySources.get(StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME) instanceof PropertySource.StubPropertySource) {
+            propertySources.replace(StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
+                    new ServletConfigPropertySource(StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME, servletConfig));
         }
     }
 
@@ -236,8 +291,10 @@ public abstract class WebApplicationContextUtils {
     /**
      * Factory that exposes the current request object on demand.
      */
+    @SuppressWarnings("serial")
     private static class RequestObjectFactory implements ObjectFactory<ServletRequest>, Serializable {
 
+        @Override
         public ServletRequest getObject() {
             return currentRequestAttributes().getRequest();
         }
@@ -250,10 +307,35 @@ public abstract class WebApplicationContextUtils {
 
 
     /**
+     * Factory that exposes the current response object on demand.
+     */
+    @SuppressWarnings("serial")
+    private static class ResponseObjectFactory implements ObjectFactory<ServletResponse>, Serializable {
+
+        @Override
+        public ServletResponse getObject() {
+            ServletResponse response = currentRequestAttributes().getResponse();
+            if (response == null) {
+                throw new IllegalStateException("Current servlet response not available - " +
+                        "consider using RequestContextFilter instead of RequestContextListener");
+            }
+            return response;
+        }
+
+        @Override
+        public String toString() {
+            return "Current HttpServletResponse";
+        }
+    }
+
+
+    /**
      * Factory that exposes the current session object on demand.
      */
+    @SuppressWarnings("serial")
     private static class SessionObjectFactory implements ObjectFactory<HttpSession>, Serializable {
 
+        @Override
         public HttpSession getObject() {
             return currentRequestAttributes().getRequest().getSession();
         }
@@ -268,10 +350,13 @@ public abstract class WebApplicationContextUtils {
     /**
      * Factory that exposes the current WebRequest object on demand.
      */
+    @SuppressWarnings("serial")
     private static class WebRequestObjectFactory implements ObjectFactory<WebRequest>, Serializable {
 
+        @Override
         public WebRequest getObject() {
-            return new ServletWebRequest(currentRequestAttributes().getRequest());
+            ServletRequestAttributes requestAttr = currentRequestAttributes();
+            return new ServletWebRequest(requestAttr.getRequest(), requestAttr.getResponse());
         }
 
         @Override
@@ -279,6 +364,5 @@ public abstract class WebApplicationContextUtils {
             return "Current ServletWebRequest";
         }
     }
-
 
 }

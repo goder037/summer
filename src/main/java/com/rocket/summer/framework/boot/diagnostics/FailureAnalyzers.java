@@ -1,5 +1,6 @@
 package com.rocket.summer.framework.boot.diagnostics;
 
+import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.BeanFactoryAware;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;

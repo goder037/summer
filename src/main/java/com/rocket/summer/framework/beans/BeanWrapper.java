@@ -33,17 +33,30 @@ import java.beans.PropertyDescriptor;
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
 
     /**
+     * Specify a limit for array and collection auto-growing.
+     * <p>Default is unlimited on a plain BeanWrapper.
+     * @since 4.1
+     */
+    void setAutoGrowCollectionLimit(int autoGrowCollectionLimit);
+
+    /**
+     * Return the limit for array and collection auto-growing.
+     * @since 4.1
+     */
+    int getAutoGrowCollectionLimit();
+
+    /**
      * Return the bean instance wrapped by this object, if any.
-     * @return the bean instance, or <code>null</code> if none set
+     * @return the bean instance, or {@code null} if none set
      */
     Object getWrappedInstance();
 
     /**
      * Return the type of the wrapped JavaBean object.
      * @return the type of the wrapped bean instance,
-     * or <code>null</code> if no wrapped object has been set
+     * or {@code null} if no wrapped object has been set
      */
-    Class getWrappedClass();
+    Class<?> getWrappedClass();
 
     /**
      * Obtain the PropertyDescriptors for the wrapped object
@@ -61,30 +74,5 @@ public interface BeanWrapper extends ConfigurablePropertyAccessor {
      * @throws InvalidPropertyException if there is no such property
      */
     PropertyDescriptor getPropertyDescriptor(String propertyName) throws InvalidPropertyException;
-
-    /**
-     * Set whether this BeanWrapper should attempt to "auto-grow" a nested path that contains a null value.
-     * <p>If "true", a null path location will be populated with a default object value and traversed
-     * instead of resulting in a {@link NullValueInNestedPathException}. Turning this flag on also
-     * enables auto-growth of collection elements when accessing an out-of-bounds index.
-     * <p>Default is "false" on a plain BeanWrapper.
-     */
-    void setAutoGrowNestedPaths(boolean autoGrowNestedPaths);
-
-    /**
-     * Return whether "auto-growing" of nested paths has been activated.
-     */
-    boolean isAutoGrowNestedPaths();
-
-    /**
-     * Specify a limit for array and collection auto-growing.
-     * <p>Default is unlimited on a plain BeanWrapper.
-     */
-    void setAutoGrowCollectionLimit(int autoGrowCollectionLimit);
-
-    /**
-     * Return the limit for array and collection auto-growing.
-     */
-    int getAutoGrowCollectionLimit();
 
 }

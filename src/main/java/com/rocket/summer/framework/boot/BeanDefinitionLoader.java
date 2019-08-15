@@ -1,7 +1,11 @@
 package com.rocket.summer.framework.boot;
 
+import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
+import com.rocket.summer.framework.beans.factory.support.BeanDefinitionReader;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
+import com.rocket.summer.framework.beans.factory.xml.XmlBeanDefinitionReader;
 import com.rocket.summer.framework.context.annotation.AnnotatedBeanDefinitionReader;
 import com.rocket.summer.framework.context.annotation.ClassPathBeanDefinitionScanner;
 import com.rocket.summer.framework.core.annotation.AnnotationUtils;
@@ -26,7 +30,7 @@ import java.util.Set;
 /**
  * Loads bean definitions from underlying sources, including XML and JavaConfig. Acts as a
  * simple facade over {@link AnnotatedBeanDefinitionReader},
- * {@link ClassPathBeanDefinitionScanner}. See
+ * {@link XmlBeanDefinitionReader} and {@link ClassPathBeanDefinitionScanner}. See
  * {@link SpringApplication} for the types of sources that are supported.
  *
  * @author Phillip Webb
@@ -37,6 +41,8 @@ class BeanDefinitionLoader {
     private final Object[] sources;
 
     private final AnnotatedBeanDefinitionReader annotatedReader;
+
+    private final XmlBeanDefinitionReader xmlReader;
 
     private final ClassPathBeanDefinitionScanner scanner;
 
@@ -53,6 +59,7 @@ class BeanDefinitionLoader {
         Assert.notEmpty(sources, "Sources must not be empty");
         this.sources = sources;
         this.annotatedReader = new AnnotatedBeanDefinitionReader(registry);
+        this.xmlReader = new XmlBeanDefinitionReader(registry);
         this.scanner = new ClassPathBeanDefinitionScanner(registry);
         this.scanner.addExcludeFilter(new ClassExcludeFilter(sources));
     }
@@ -63,6 +70,7 @@ class BeanDefinitionLoader {
      */
     public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
         this.annotatedReader.setBeanNameGenerator(beanNameGenerator);
+        this.xmlReader.setBeanNameGenerator(beanNameGenerator);
         this.scanner.setBeanNameGenerator(beanNameGenerator);
     }
 
@@ -72,6 +80,7 @@ class BeanDefinitionLoader {
      */
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
+        this.xmlReader.setResourceLoader(resourceLoader);
         this.scanner.setResourceLoader(resourceLoader);
     }
 
@@ -81,6 +90,7 @@ class BeanDefinitionLoader {
      */
     public void setEnvironment(ConfigurableEnvironment environment) {
         this.annotatedReader.setEnvironment(environment);
+        this.xmlReader.setEnvironment(environment);
         this.scanner.setEnvironment(environment);
     }
 
@@ -114,6 +124,7 @@ class BeanDefinitionLoader {
     }
 
     private int load(Class<?> source) {
+
         if (isComponent(source)) {
             this.annotatedReader.register(source);
             return 1;
@@ -121,12 +132,17 @@ class BeanDefinitionLoader {
         return 0;
     }
 
+    private int load(Resource source) {
+        return this.xmlReader.loadBeanDefinitions(source);
+    }
+
     private int load(Package source) {
         return this.scanner.scan(source.getName());
     }
 
     private int load(CharSequence source) {
-        String resolvedSource = SystemPropertyUtils.resolvePlaceholders(source.toString());
+        String resolvedSource = this.xmlReader.getEnvironment()
+                .resolvePlaceholders(source.toString());
         // Attempt as a Class
         try {
             return load(ClassUtils.forName(resolvedSource, null));
@@ -156,6 +172,10 @@ class BeanDefinitionLoader {
             return load(packageResource);
         }
         throw new IllegalArgumentException("Invalid source '" + resolvedSource + "'");
+    }
+
+    private boolean isGroovyPresent() {
+        return ClassUtils.isPresent("groovy.lang.MetaClass", null);
     }
 
     private Resource[] findResources(String source) {
@@ -260,4 +280,3 @@ class BeanDefinitionLoader {
     }
 
 }
-

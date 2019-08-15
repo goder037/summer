@@ -2,10 +2,13 @@ package com.rocket.summer.framework.core.convert;
 
 import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
+import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
 import com.rocket.summer.framework.util.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -13,19 +16,23 @@ import java.util.Map;
 
 /**
  * A description of a JavaBeans Property that allows us to avoid a dependency on
- * <code>java.beans.PropertyDescriptor</code>. The <code>java.beans</code> package
+ * {@code java.beans.PropertyDescriptor}. The {@code java.beans} package
  * is not available in a number of environments (e.g. Android, Java ME), so this is
  * desirable for portability of Spring's core conversion facility.
  *
- * <p>Used to build a TypeDescriptor from a property location.
- * The built TypeDescriptor can then be used to convert from/to the property type.
+ * <p>Used to build a {@link TypeDescriptor} from a property location. The built
+ * {@code TypeDescriptor} can then be used to convert from/to the property type.
  *
  * @author Keith Donald
+ * @author Phillip Webb
  * @since 3.1
  * @see TypeDescriptor#TypeDescriptor(Property)
  * @see TypeDescriptor#nested(Property, int)
  */
 public final class Property {
+
+    private static Map<Property, Annotation[]> annotationCache =
+            new ConcurrentReferenceHashMap<Property, Annotation[]>();
 
     private final Class<?> objectType;
 
@@ -37,16 +44,19 @@ public final class Property {
 
     private final MethodParameter methodParameter;
 
-    private final Annotation[] annotations;
+    private Annotation[] annotations;
 
 
     public Property(Class<?> objectType, Method readMethod, Method writeMethod) {
+        this(objectType, readMethod, writeMethod, null);
+    }
+
+    public Property(Class<?> objectType, Method readMethod, Method writeMethod, String name) {
         this.objectType = objectType;
         this.readMethod = readMethod;
         this.writeMethod = writeMethod;
         this.methodParameter = resolveMethodParameter();
-        this.name = resolveName();
-        this.annotations = resolveAnnotations();
+        this.name = (name != null ? name : resolveName());
     }
 
 
@@ -65,21 +75,21 @@ public final class Property {
     }
 
     /**
-     * The property type: e.g. <code>java.lang.String</code>
+     * The property type: e.g. {@code java.lang.String}
      */
     public Class<?> getType() {
         return this.methodParameter.getParameterType();
     }
 
     /**
-     * The property getter method: e.g. <code>getFoo()</code>
+     * The property getter method: e.g. {@code getFoo()}
      */
     public Method getReadMethod() {
         return this.readMethod;
     }
 
     /**
-     * The property setter method: e.g. <code>setFoo(String)</code>
+     * The property setter method: e.g. {@code setFoo(String)}
      */
     public Method getWriteMethod() {
         return this.writeMethod;
@@ -93,6 +103,9 @@ public final class Property {
     }
 
     Annotation[] getAnnotations() {
+        if (this.annotations == null) {
+            this.annotations = resolveAnnotations();
+        }
         return this.annotations;
     }
 
@@ -115,10 +128,11 @@ public final class Property {
             return StringUtils.uncapitalize(this.readMethod.getName().substring(index));
         }
         else {
-            int index = this.writeMethod.getName().indexOf("set") + 3;
+            int index = this.writeMethod.getName().indexOf("set");
             if (index == -1) {
                 throw new IllegalArgumentException("Not a setter method");
             }
+            index += 3;
             return StringUtils.uncapitalize(this.writeMethod.getName().substring(index));
         }
     }
@@ -163,26 +177,27 @@ public final class Property {
     }
 
     private Annotation[] resolveAnnotations() {
-        Map<Class<?>, Annotation> annMap = new LinkedHashMap<Class<?>, Annotation>();
-        Method readMethod = getReadMethod();
-        if (readMethod != null) {
-            for (Annotation ann : readMethod.getAnnotations()) {
-                annMap.put(ann.annotationType(), ann);
+        Annotation[] annotations = annotationCache.get(this);
+        if (annotations == null) {
+            Map<Class<? extends Annotation>, Annotation> annotationMap =
+                    new LinkedHashMap<Class<? extends Annotation>, Annotation>();
+            addAnnotationsToMap(annotationMap, getReadMethod());
+            addAnnotationsToMap(annotationMap, getWriteMethod());
+            addAnnotationsToMap(annotationMap, getField());
+            annotations = annotationMap.values().toArray(new Annotation[annotationMap.size()]);
+            annotationCache.put(this, annotations);
+        }
+        return annotations;
+    }
+
+    private void addAnnotationsToMap(
+            Map<Class<? extends Annotation>, Annotation> annotationMap, AnnotatedElement object) {
+
+        if (object != null) {
+            for (Annotation annotation : object.getAnnotations()) {
+                annotationMap.put(annotation.annotationType(), annotation);
             }
         }
-        Method writeMethod = getWriteMethod();
-        if (writeMethod != null) {
-            for (Annotation ann : writeMethod.getAnnotations()) {
-                annMap.put(ann.annotationType(), ann);
-            }
-        }
-        Field field = getField();
-        if (field != null) {
-            for (Annotation ann : field.getAnnotations()) {
-                annMap.put(ann.annotationType(), ann);
-            }
-        }
-        return annMap.values().toArray(new Annotation[annMap.size()]);
     }
 
     private Field getField() {
@@ -194,11 +209,9 @@ public final class Property {
         Field field = ReflectionUtils.findField(declaringClass, name);
         if (field == null) {
             // Same lenient fallback checking as in CachedIntrospectionResults...
-            field = ReflectionUtils.findField(declaringClass,
-                    name.substring(0, 1).toLowerCase() + name.substring(1));
+            field = ReflectionUtils.findField(declaringClass, StringUtils.uncapitalize(name));
             if (field == null) {
-                field = ReflectionUtils.findField(declaringClass,
-                        name.substring(0, 1).toUpperCase() + name.substring(1));
+                field = ReflectionUtils.findField(declaringClass, StringUtils.capitalize(name));
             }
         }
         return field;
@@ -211,6 +224,27 @@ public final class Property {
         else {
             return getWriteMethod().getDeclaringClass();
         }
+    }
+
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Property)) {
+            return false;
+        }
+        Property otherProperty = (Property) other;
+        return (ObjectUtils.nullSafeEquals(this.objectType, otherProperty.objectType) &&
+                ObjectUtils.nullSafeEquals(this.name, otherProperty.name) &&
+                ObjectUtils.nullSafeEquals(this.readMethod, otherProperty.readMethod) &&
+                ObjectUtils.nullSafeEquals(this.writeMethod, otherProperty.writeMethod));
+    }
+
+    @Override
+    public int hashCode() {
+        return (ObjectUtils.nullSafeHashCode(this.objectType) * 31 + ObjectUtils.nullSafeHashCode(this.name));
     }
 
 }

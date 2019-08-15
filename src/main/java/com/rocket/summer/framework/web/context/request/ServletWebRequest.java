@@ -1,38 +1,64 @@
 package com.rocket.summer.framework.web.context.request;
 
-import com.rocket.summer.framework.util.CollectionUtils;
-import com.rocket.summer.framework.util.ObjectUtils;
-import com.rocket.summer.framework.util.StringUtils;
+import com.rocket.summer.framework.http.HttpMethod;
+import com.rocket.summer.framework.http.HttpStatus;
+import com.rocket.summer.framework.util.*;
 import com.rocket.summer.framework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * {@link WebRequest} adapter for an {@link javax.servlet.http.HttpServletRequest}.
  *
  * @author Juergen Hoeller
+ * @author Brian Clozel
+ * @author Markus Malkusch
  * @since 2.0
  */
 public class ServletWebRequest extends ServletRequestAttributes implements NativeWebRequest {
 
-    private static final String HEADER_ETAG = "ETag";
+    private static final String ETAG = "ETag";
 
-    private static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
+    private static final String IF_MODIFIED_SINCE = "If-Modified-Since";
 
-    private static final String HEADER_IF_NONE_MATCH = "If-None-Match";
+    private static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
 
-    private static final String HEADER_LAST_MODIFIED = "Last-Modified";
+    private static final String IF_NONE_MATCH = "If-None-Match";
 
-    private static final String METHOD_GET = "GET";
+    private static final String LAST_MODIFIED = "Last-Modified";
 
+    private static final List<String> SAFE_METHODS = Arrays.asList("GET", "HEAD");
 
-    private HttpServletResponse response;
+    /**
+     * Pattern matching ETag multiple field values in headers such as "If-Match", "If-None-Match".
+     * @see <a href="https://tools.ietf.org/html/rfc7232#section-2.3">Section 2.3 of RFC 7232</a>
+     */
+    private static final Pattern ETAG_HEADER_VALUE_PATTERN = Pattern.compile("\\*|\\s*((W\\/)?(\"[^\"]*\"))\\s*,?");
+
+    /**
+     * Date formats as specified in the HTTP RFC.
+     * @see <a href="https://tools.ietf.org/html/rfc7231#section-7.1.1.1">Section 7.1.1.1 of RFC 7231</a>
+     */
+    private static final String[] DATE_FORMATS = new String[] {
+            "EEE, dd MMM yyyy HH:mm:ss zzz",
+            "EEE, dd-MMM-yy HH:mm:ss zzz",
+            "EEE MMM dd HH:mm:ss yyyy"
+    };
+
+    private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    /** Checking for Servlet 3.0+ HttpServletResponse.getHeader(String) */
+    private static final boolean servlet3Present =
+            ClassUtils.hasMethod(HttpServletResponse.class, "getHeader", String.class);
 
     private boolean notModified = false;
 
@@ -51,115 +77,285 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
      * @param response current HTTP response (for automatic last-modified handling)
      */
     public ServletWebRequest(HttpServletRequest request, HttpServletResponse response) {
-        this(request);
-        this.response = response;
+        super(request, response);
     }
 
 
-    /**
-     * Exposes the native {@link HttpServletRequest} that we're wrapping (if any).
-     */
-    public final HttpServletResponse getResponse() {
-        return this.response;
-    }
-
+    @Override
     public Object getNativeRequest() {
         return getRequest();
     }
 
+    @Override
     public Object getNativeResponse() {
         return getResponse();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public <T> T getNativeRequest(Class<T> requiredType) {
         return WebUtils.getNativeRequest(getRequest(), requiredType);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public <T> T getNativeResponse(Class<T> requiredType) {
         return WebUtils.getNativeResponse(getResponse(), requiredType);
     }
 
+    /**
+     * Return the HTTP method of the request.
+     * @since 4.0.2
+     */
+    public HttpMethod getHttpMethod() {
+        return HttpMethod.resolve(getRequest().getMethod());
+    }
 
+    @Override
     public String getHeader(String headerName) {
         return getRequest().getHeader(headerName);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public String[] getHeaderValues(String headerName) {
         String[] headerValues = StringUtils.toStringArray(getRequest().getHeaders(headerName));
         return (!ObjectUtils.isEmpty(headerValues) ? headerValues : null);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Iterator<String> getHeaderNames() {
         return CollectionUtils.toIterator(getRequest().getHeaderNames());
     }
 
+    @Override
     public String getParameter(String paramName) {
         return getRequest().getParameter(paramName);
     }
 
+    @Override
     public String[] getParameterValues(String paramName) {
         return getRequest().getParameterValues(paramName);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Iterator<String> getParameterNames() {
         return CollectionUtils.toIterator(getRequest().getParameterNames());
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public Map<String, String[]> getParameterMap() {
         return getRequest().getParameterMap();
     }
 
+    @Override
     public Locale getLocale() {
         return getRequest().getLocale();
     }
 
+    @Override
     public String getContextPath() {
         return getRequest().getContextPath();
     }
 
+    @Override
     public String getRemoteUser() {
         return getRequest().getRemoteUser();
     }
 
+    @Override
     public Principal getUserPrincipal() {
         return getRequest().getUserPrincipal();
     }
 
+    @Override
     public boolean isUserInRole(String role) {
         return getRequest().isUserInRole(role);
     }
 
+    @Override
     public boolean isSecure() {
         return getRequest().isSecure();
     }
 
+
+    @Override
     public boolean checkNotModified(long lastModifiedTimestamp) {
-        if (lastModifiedTimestamp >= 0 && !this.notModified &&
-                (this.response == null || !this.response.containsHeader(HEADER_LAST_MODIFIED))) {
-            long ifModifiedSince = getRequest().getDateHeader(HEADER_IF_MODIFIED_SINCE);
-            this.notModified = (ifModifiedSince >= (lastModifiedTimestamp / 1000 * 1000));
-            if (this.response != null) {
-                if (this.notModified && METHOD_GET.equals(getRequest().getMethod())) {
-                    this.response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                }
-                else {
-                    this.response.setDateHeader(HEADER_LAST_MODIFIED, lastModifiedTimestamp);
+        return checkNotModified(null, lastModifiedTimestamp);
+    }
+
+    @Override
+    public boolean checkNotModified(String etag) {
+        return checkNotModified(etag, -1);
+    }
+
+    @Override
+    public boolean checkNotModified(String etag, long lastModifiedTimestamp) {
+        HttpServletResponse response = getResponse();
+        if (this.notModified || !isStatusOK(response)) {
+            return this.notModified;
+        }
+
+        // Evaluate conditions in order of precedence.
+        // See https://tools.ietf.org/html/rfc7232#section-6
+
+        if (validateIfUnmodifiedSince(lastModifiedTimestamp)) {
+            if (this.notModified) {
+                response.setStatus(HttpStatus.PRECONDITION_FAILED.value());
+            }
+            return this.notModified;
+        }
+
+        boolean validated = validateIfNoneMatch(etag);
+        if (!validated) {
+            validateIfModifiedSince(lastModifiedTimestamp);
+        }
+
+        // Update response
+        boolean isHttpGetOrHead = SAFE_METHODS.contains(getRequest().getMethod());
+        if (this.notModified) {
+            response.setStatus(isHttpGetOrHead ?
+                    HttpStatus.NOT_MODIFIED.value() : HttpStatus.PRECONDITION_FAILED.value());
+        }
+        if (isHttpGetOrHead) {
+            if(lastModifiedTimestamp > 0 && isHeaderAbsent(response, LAST_MODIFIED)) {
+                response.setDateHeader(LAST_MODIFIED, lastModifiedTimestamp);
+            }
+            if (StringUtils.hasLength(etag) && isHeaderAbsent(response, ETAG)) {
+                response.setHeader(ETAG, padEtagIfNecessary(etag));
+            }
+        }
+
+        return this.notModified;
+    }
+
+    private boolean isStatusOK(HttpServletResponse response) {
+        if (response == null || !servlet3Present) {
+            // Can't check response.getStatus() - let's assume we're good
+            return true;
+        }
+        return response.getStatus() == 200;
+    }
+
+    private boolean isHeaderAbsent(HttpServletResponse response, String header) {
+        if (response == null || !servlet3Present) {
+            // Can't check response.getHeader(header) - let's assume it's not set
+            return true;
+        }
+        return (response.getHeader(header) == null);
+    }
+
+    private boolean validateIfUnmodifiedSince(long lastModifiedTimestamp) {
+        if (lastModifiedTimestamp < 0) {
+            return false;
+        }
+        long ifUnmodifiedSince = parseDateHeader(IF_UNMODIFIED_SINCE);
+        if (ifUnmodifiedSince == -1) {
+            return false;
+        }
+        // We will perform this validation...
+        this.notModified = (ifUnmodifiedSince < (lastModifiedTimestamp / 1000 * 1000));
+        return true;
+    }
+
+    private boolean validateIfNoneMatch(String etag) {
+        if (!StringUtils.hasLength(etag)) {
+            return false;
+        }
+
+        Enumeration<String> ifNoneMatch;
+        try {
+            ifNoneMatch = getRequest().getHeaders(IF_NONE_MATCH);
+        }
+        catch (IllegalArgumentException ex) {
+            return false;
+        }
+        if (!ifNoneMatch.hasMoreElements()) {
+            return false;
+        }
+
+        // We will perform this validation...
+        etag = padEtagIfNecessary(etag);
+        while (ifNoneMatch.hasMoreElements()) {
+            String clientETags = ifNoneMatch.nextElement();
+            Matcher etagMatcher = ETAG_HEADER_VALUE_PATTERN.matcher(clientETags);
+            // Compare weak/strong ETags as per https://tools.ietf.org/html/rfc7232#section-2.3
+            while (etagMatcher.find()) {
+                if (StringUtils.hasLength(etagMatcher.group()) &&
+                        etag.replaceFirst("^W/", "").equals(etagMatcher.group(3))) {
+                    this.notModified = true;
+                    break;
                 }
             }
         }
-        return this.notModified;
+
+        return true;
+    }
+
+    private String padEtagIfNecessary(String etag) {
+        if (!StringUtils.hasLength(etag)) {
+            return etag;
+        }
+        if ((etag.startsWith("\"") || etag.startsWith("W/\"")) && etag.endsWith("\"")) {
+            return etag;
+        }
+        return "\"" + etag + "\"";
+    }
+
+    private boolean validateIfModifiedSince(long lastModifiedTimestamp) {
+        if (lastModifiedTimestamp < 0) {
+            return false;
+        }
+        long ifModifiedSince = parseDateHeader(IF_MODIFIED_SINCE);
+        if (ifModifiedSince == -1) {
+            return false;
+        }
+        // We will perform this validation...
+        this.notModified = ifModifiedSince >= (lastModifiedTimestamp / 1000 * 1000);
+        return true;
     }
 
     public boolean isNotModified() {
         return this.notModified;
     }
 
+    private long parseDateHeader(String headerName) {
+        long dateValue = -1;
+        try {
+            dateValue = getRequest().getDateHeader(headerName);
+        }
+        catch (IllegalArgumentException ex) {
+            String headerValue = getHeader(headerName);
+            // Possibly an IE 10 style value: "Wed, 09 Apr 2014 09:57:42 GMT; length=13774"
+            int separatorIndex = headerValue.indexOf(';');
+            if (separatorIndex != -1) {
+                String datePart = headerValue.substring(0, separatorIndex);
+                dateValue = parseDateValue(datePart);
+            }
+        }
+        return dateValue;
+    }
+
+    private long parseDateValue(String headerValue) {
+        if (headerValue == null) {
+            // No header value sent at all
+            return -1;
+        }
+        if (headerValue.length() >= 3) {
+            // Short "0" or "-1" like values are never valid HTTP date headers...
+            // Let's only bother with SimpleDateFormat parsing for long enough values.
+            for (String dateFormat : DATE_FORMATS) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat, Locale.US);
+                simpleDateFormat.setTimeZone(GMT);
+                try {
+                    return simpleDateFormat.parse(headerValue).getTime();
+                }
+                catch (ParseException ex) {
+                    // ignore
+                }
+            }
+        }
+        return -1;
+    }
+
+    @Override
     public String getDescription(boolean includeClientInfo) {
         HttpServletRequest request = getRequest();
         StringBuilder sb = new StringBuilder();
@@ -188,4 +384,3 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
     }
 
 }
-

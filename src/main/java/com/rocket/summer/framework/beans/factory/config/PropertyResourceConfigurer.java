@@ -4,7 +4,7 @@ import com.rocket.summer.framework.beans.factory.BeanInitializationException;
 import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.core.PriorityOrdered;
-import com.rocket.summer.framework.core.io.PropertiesLoaderSupport;
+import com.rocket.summer.framework.core.io.support.PropertiesLoaderSupport;
 import com.rocket.summer.framework.util.ObjectUtils;
 
 import java.io.IOException;

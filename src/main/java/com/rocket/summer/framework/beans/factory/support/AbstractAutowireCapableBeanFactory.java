@@ -1468,8 +1468,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         for (PropertyValue pv : original) {
             if (pv.isConverted()) {
                 deepCopy.add(pv);
-            }
-            else {
+            } else {
                 String propertyName = pv.getName();
                 Object originalValue = pv.getValue();
                 Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
@@ -1506,8 +1505,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // Set our (possibly massaged) deep copy.
         try {
             bw.setPropertyValues(new MutablePropertyValues(deepCopy));
-        }
-        catch (BeansException ex) {
+        } catch (BeansException ex) {
             throw new BeanCreationException(
                     mbd.getResourceDescription(), beanName, "Error setting property values", ex);
         }
@@ -1705,6 +1703,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
         }
     }
+
 
     /**
      * Applies the {@code postProcessAfterInitialization} callback of all
