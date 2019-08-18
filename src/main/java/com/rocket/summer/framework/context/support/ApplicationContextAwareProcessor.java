@@ -34,7 +34,7 @@ import java.security.PrivilegedAction;
  * @see com.rocket.summer.framework.context.ApplicationContextAware
  * @see com.rocket.summer.framework.context.support.AbstractApplicationContext#refresh()
  */
-class ApplicationContextAwareProcessor implements BeanPostProcessor {
+public class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
     private final ConfigurableApplicationContext applicationContext;
 

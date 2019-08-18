@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.beans.factory;
 
+import com.rocket.summer.framework.context.support.ApplicationContextAwareProcessor;
+
 /**
  * Marker superinterface indicating that a bean is eligible to be
  * notified by the Spring container of a particular framework object
@@ -11,7 +13,7 @@ package com.rocket.summer.framework.beans.factory;
  * <p>Note that merely implementing {@link Aware} provides no default
  * functionality. Rather, processing must be done explicitly, for example
  * in a {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor BeanPostProcessor}.
- * Refer to {@link com.rocket.summer.framework.context.support.ApplicationContextAwareProcessor}
+ * Refer to {@link ApplicationContextAwareProcessor}
  * and {@link com.rocket.summer.framework.beans.factory.support.AbstractAutowireCapableBeanFactory}
  * for examples of processing {@code *Aware} interface callbacks.
  *

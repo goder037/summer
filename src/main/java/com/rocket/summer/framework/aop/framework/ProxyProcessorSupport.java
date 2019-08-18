@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.aop.framework;
 
+import java.io.Closeable;
+
 import com.rocket.summer.framework.beans.factory.Aware;
 import com.rocket.summer.framework.beans.factory.BeanClassLoaderAware;
 import com.rocket.summer.framework.beans.factory.DisposableBean;
@@ -7,8 +9,6 @@ import com.rocket.summer.framework.beans.factory.InitializingBean;
 import com.rocket.summer.framework.core.Ordered;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ObjectUtils;
-
-import java.io.Closeable;
 
 /**
  * Base class with common functionality for proxy processors, in particular
@@ -132,4 +132,3 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
     }
 
 }
-

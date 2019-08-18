@@ -25,19 +25,19 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
      * processor's {@link #postProcessBeforeInstantiation} callback.
      * @param beanClass the raw class of the bean
      * @param beanName the name of the bean
-     * @return the type of the bean, or <code>null</code> if not predictable
-     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @return the type of the bean, or {@code null} if not predictable
+     * @throws com.rocket.summer.framework.context.BeansException in case of errors
      */
-    Class predictBeanType(Class beanClass, String beanName) throws BeansException;
+    Class<?> predictBeanType(Class<?> beanClass, String beanName) throws BeansException;
 
     /**
      * Determine the candidate constructors to use for the given bean.
-     * @param beanClass the raw class of the bean (never <code>null</code>)
+     * @param beanClass the raw class of the bean (never {@code null})
      * @param beanName the name of the bean
-     * @return the candidate constructors, or <code>null</code> if none specified
-     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @return the candidate constructors, or {@code null} if none specified
+     * @throws com.rocket.summer.framework.context.BeansException in case of errors
      */
-    Constructor[] determineCandidateConstructors(Class beanClass, String beanName) throws BeansException;
+    Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException;
 
     /**
      * Obtain a reference for early access to the specified bean,
@@ -57,9 +57,8 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
      * @param beanName the name of the bean
      * @return the object to expose as bean reference
      * (typically with the passed-in bean instance as default)
-     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
+     * @throws com.rocket.summer.framework.context.BeansException in case of errors
      */
     Object getEarlyBeanReference(Object bean, String beanName) throws BeansException;
 
 }
-
