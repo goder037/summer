@@ -1,5 +1,27 @@
 package com.rocket.summer.framework.context.annotation;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.net.UnknownHostException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.rocket.summer.framework.beans.BeanUtils;
 import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
 import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -12,11 +34,15 @@ import com.rocket.summer.framework.beans.factory.support.AbstractBeanDefinition;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionReader;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.beans.factory.support.BeanNameGenerator;
+import com.rocket.summer.framework.context.annotation.ConfigurationCondition.ConfigurationPhase;
 import com.rocket.summer.framework.core.NestedIOException;
 import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
 import com.rocket.summer.framework.core.annotation.AnnotationUtils;
-import com.rocket.summer.framework.core.env.*;
+import com.rocket.summer.framework.core.env.CompositePropertySource;
+import com.rocket.summer.framework.core.env.ConfigurableEnvironment;
+import com.rocket.summer.framework.core.env.Environment;
+import com.rocket.summer.framework.core.env.MutablePropertySources;
 import com.rocket.summer.framework.core.env.PropertySource;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
@@ -30,15 +56,11 @@ import com.rocket.summer.framework.core.type.StandardAnnotationMetadata;
 import com.rocket.summer.framework.core.type.classreading.MetadataReader;
 import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
 import com.rocket.summer.framework.core.type.filter.AssignableTypeFilter;
-import com.rocket.summer.framework.util.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.net.UnknownHostException;
-import java.util.*;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.CollectionUtils;
+import com.rocket.summer.framework.util.LinkedMultiValueMap;
+import com.rocket.summer.framework.util.MultiValueMap;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * Parses a {@link Configuration} class definition, populating a collection of
@@ -178,7 +200,7 @@ class ConfigurationClassParser {
 
 
     protected void processConfigurationClass(ConfigurationClass configClass) throws IOException {
-        if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationCondition.ConfigurationPhase.PARSE_CONFIGURATION)) {
+        if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
             return;
         }
 
@@ -244,7 +266,7 @@ class ConfigurationClassParser {
         Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
                 sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
         if (!componentScans.isEmpty() &&
-                !this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationCondition.ConfigurationPhase.REGISTER_BEAN)) {
+                !this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
             for (AnnotationAttributes componentScan : componentScans) {
                 // The config class is annotated with @ComponentScan -> perform the scan immediately
                 Set<BeanDefinitionHolder> scannedBeanDefinitions =
