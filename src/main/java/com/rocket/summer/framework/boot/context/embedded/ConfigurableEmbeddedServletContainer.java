@@ -1,9 +1,5 @@
 package com.rocket.summer.framework.boot.context.embedded;
 
-import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
-import com.rocket.summer.framework.boot.web.servlet.ErrorPageRegistry;
-import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
-
 import java.io.File;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
@@ -12,6 +8,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
+import com.rocket.summer.framework.boot.web.servlet.ErrorPageRegistry;
+import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
 
 /**
  * Simple interface that represents customizations to an
@@ -144,6 +144,12 @@ public interface ConfigurableEmbeddedServletContainer extends ErrorPageRegistry 
     void setSslStoreProvider(SslStoreProvider sslStoreProvider);
 
     /**
+     * Sets the configuration that will be applied to the container's JSP servlet.
+     * @param jspServlet the JSP servlet configuration
+     */
+    void setJspServlet(JspServlet jspServlet);
+
+    /**
      * Sets the compression configuration that will be applied to the container's default
      * connector.
      * @param compression the compression configuration
@@ -163,4 +169,3 @@ public interface ConfigurableEmbeddedServletContainer extends ErrorPageRegistry 
     void setLocaleCharsetMappings(Map<Locale, Charset> localeCharsetMappings);
 
 }
-

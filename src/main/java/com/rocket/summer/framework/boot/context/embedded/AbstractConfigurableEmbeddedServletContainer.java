@@ -1,14 +1,22 @@
 package com.rocket.summer.framework.boot.context.embedded;
 
-import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
-import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
-import com.rocket.summer.framework.util.Assert;
-
 import java.io.File;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
+import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
 
 /**
  * Abstract base class for {@link ConfigurableEmbeddedServletContainer} implementations.
@@ -55,6 +63,8 @@ public abstract class AbstractConfigurableEmbeddedServletContainer
     private Ssl ssl;
 
     private SslStoreProvider sslStoreProvider;
+
+    private JspServlet jspServlet = new JspServlet();
 
     private Compression compression;
 
@@ -281,6 +291,15 @@ public abstract class AbstractConfigurableEmbeddedServletContainer
         return this.sslStoreProvider;
     }
 
+    @Override
+    public void setJspServlet(JspServlet jspServlet) {
+        this.jspServlet = jspServlet;
+    }
+
+    public JspServlet getJspServlet() {
+        return this.jspServlet;
+    }
+
     public Compression getCompression() {
         return this.compression;
     }
@@ -329,5 +348,14 @@ public abstract class AbstractConfigurableEmbeddedServletContainer
                 .toArray(new ServletContextInitializer[mergedInitializers.size()]);
     }
 
-}
+    /**
+     * Returns whether or not the JSP servlet should be registered with the embedded
+     * container.
+     * @return {@code true} if the container should be registered, otherwise {@code false}
+     */
+    protected boolean shouldRegisterJspServlet() {
+        return this.jspServlet != null && this.jspServlet.getRegistered() && ClassUtils
+                .isPresent(this.jspServlet.getClassName(), getClass().getClassLoader());
+    }
 
+}

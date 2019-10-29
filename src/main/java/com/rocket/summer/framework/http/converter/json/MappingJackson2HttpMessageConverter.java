@@ -17,154 +17,91 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
- * Implementation of {@link com.rocket.summer.framework.http.converter.HttpMessageConverter HttpMessageConverter}
- * that can read and write JSON using <a href="http://jackson.codehaus.org/">Jackson 2's</a> {@link ObjectMapper}.
+ * Implementation of {@link com.rocket.summer.framework.http.converter.HttpMessageConverter} that can read and
+ * write JSON using <a href="https://wiki.fasterxml.com/JacksonHome">Jackson 2.x's</a> {@link ObjectMapper}.
  *
- * <p>This converter can be used to bind to typed beans, or untyped {@link java.util.HashMap HashMap} instances.
+ * <p>This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.
  *
- * <p>By default, this converter supports {@code application/json}. This can be overridden by setting the
- * {@link #setSupportedMediaTypes(List) supportedMediaTypes} property.
+ * <p>By default, this converter supports {@code application/json} and {@code application/*+json}
+ * with {@code UTF-8} character set. This can be overridden by setting the
+ * {@link #setSupportedMediaTypes supportedMediaTypes} property.
+ *
+ * <p>The default constructor uses the default configuration provided by {@link Jackson2ObjectMapperBuilder}.
+ *
+ * <p>Compatible with Jackson 2.6 and higher, as of Spring 4.3.
  *
  * @author Arjen Poutsma
  * @author Keith Donald
+ * @author Rossen Stoyanchev
+ * @author Juergen Hoeller
+ * @author Sebastien Deleuze
  * @since 3.1.2
- * @see com.rocket.summer.framework.web.servlet.view.json.MappingJackson2JsonView
  */
-public class MappingJackson2HttpMessageConverter extends AbstractHttpMessageConverter<Object> {
+public class MappingJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
 
-    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
-
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    private boolean prefixJson = false;
+    private String jsonPrefix;
 
 
     /**
-     * Construct a new {@code BindingJacksonHttpMessageConverter}.
+     * Construct a new {@link MappingJackson2HttpMessageConverter} using default configuration
+     * provided by {@link Jackson2ObjectMapperBuilder}.
      */
     public MappingJackson2HttpMessageConverter() {
-        super(new MediaType("application", "json", DEFAULT_CHARSET));
+        this(Jackson2ObjectMapperBuilder.json().build());
     }
 
     /**
-     * Set the {@code ObjectMapper} for this view. If not set, a default
-     * {@link ObjectMapper#ObjectMapper() ObjectMapper} is used.
-     * <p>Setting a custom-configured {@code ObjectMapper} is one way to take further control of the JSON
-     * serialization process. For example, an extended {@link com.fasterxml.jackson.databind.ser.SerializerFactory}
-     * can be configured that provides custom serializers for specific types. The other option for refining
-     * the serialization process is to use Jackson's provided annotations on the types to be serialized,
-     * in which case a custom-configured ObjectMapper is unnecessary.
+     * Construct a new {@link MappingJackson2HttpMessageConverter} with a custom {@link ObjectMapper}.
+     * You can use {@link Jackson2ObjectMapperBuilder} to build it easily.
+     * @see Jackson2ObjectMapperBuilder#json()
      */
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        Assert.notNull(objectMapper, "ObjectMapper must not be null");
-        this.objectMapper = objectMapper;
+    public MappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
+        super(objectMapper, MediaType.APPLICATION_JSON, new MediaType("application", "*+json"));
     }
 
     /**
-     * Return the underlying {@code ObjectMapper} for this view.
+     * Specify a custom prefix to use for this view's JSON output.
+     * Default is none.
+     * @see #setPrefixJson
      */
-    public ObjectMapper getObjectMapper() {
-        return this.objectMapper;
+    public void setJsonPrefix(String jsonPrefix) {
+        this.jsonPrefix = jsonPrefix;
     }
 
     /**
-     * Indicate whether the JSON output by this view should be prefixed with "{} &&". Default is false.
+     * Indicate whether the JSON output by this view should be prefixed with ")]}', ". Default is false.
      * <p>Prefixing the JSON string in this manner is used to help prevent JSON Hijacking.
      * The prefix renders the string syntactically invalid as a script so that it cannot be hijacked.
-     * This prefix does not affect the evaluation of JSON, but if JSON validation is performed on the
-     * string, the prefix would need to be ignored.
+     * This prefix should be stripped before parsing the string as JSON.
+     * @see #setJsonPrefix
      */
     public void setPrefixJson(boolean prefixJson) {
-        this.prefixJson = prefixJson;
+        this.jsonPrefix = (prefixJson ? ")]}', " : null);
     }
 
 
     @Override
-    public boolean canRead(Class<?> clazz, MediaType mediaType) {
-        JavaType javaType = getJavaType(clazz);
-        return (this.objectMapper.canDeserialize(javaType) && canRead(mediaType));
-    }
-
-    @Override
-    public boolean canWrite(Class<?> clazz, MediaType mediaType) {
-        return (this.objectMapper.canSerialize(clazz) && canWrite(mediaType));
-    }
-
-    @Override
-    protected boolean supports(Class<?> clazz) {
-        // should not be called, since we override canRead/Write instead
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected Object readInternal(Class<?> clazz, HttpInputMessage inputMessage)
-            throws IOException, HttpMessageNotReadableException {
-
-        JavaType javaType = getJavaType(clazz);
-        try {
-            return this.objectMapper.readValue(inputMessage.getBody(), javaType);
+    @SuppressWarnings("deprecation")
+    protected void writePrefix(JsonGenerator generator, Object object) throws IOException {
+        if (this.jsonPrefix != null) {
+            generator.writeRaw(this.jsonPrefix);
         }
-        catch (IOException ex) {
-            throw new HttpMessageNotReadableException("Could not read JSON: " + ex.getMessage(), ex);
+        String jsonpFunction =
+                (object instanceof MappingJacksonValue ? ((MappingJacksonValue) object).getJsonpFunction() : null);
+        if (jsonpFunction != null) {
+            generator.writeRaw("/**/");
+            generator.writeRaw(jsonpFunction + "(");
         }
     }
 
     @Override
-    protected void writeInternal(Object object, HttpOutputMessage outputMessage)
-            throws IOException, HttpMessageNotWritableException {
-
-        JsonEncoding encoding = getJsonEncoding(outputMessage.getHeaders().getContentType());
-        JsonGenerator jsonGenerator =
-                this.objectMapper.getFactory().createGenerator(outputMessage.getBody(), encoding);
-        try {
-            if (this.prefixJson) {
-                jsonGenerator.writeRaw("{} && ");
-            }
-            this.objectMapper.writeValue(jsonGenerator, object);
+    @SuppressWarnings("deprecation")
+    protected void writeSuffix(JsonGenerator generator, Object object) throws IOException {
+        String jsonpFunction =
+                (object instanceof MappingJacksonValue ? ((MappingJacksonValue) object).getJsonpFunction() : null);
+        if (jsonpFunction != null) {
+            generator.writeRaw(");");
         }
-        catch (IOException ex) {
-            throw new HttpMessageNotWritableException("Could not write JSON: " + ex.getMessage(), ex);
-        }
-    }
-
-
-    /**
-     * Return the Jackson {@link JavaType} for the specified class.
-     * <p>The default implementation returns {@link ObjectMapper#constructType(java.lang.reflect.Type)},
-     * but this can be overridden in subclasses, to allow for custom generic collection handling.
-     * For instance:
-     * <pre class="code">
-     * protected JavaType getJavaType(Class&lt;?&gt; clazz) {
-     *   if (List.class.isAssignableFrom(clazz)) {
-     *     return objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, MyBean.class);
-     *   } else {
-     *     return super.getJavaType(clazz);
-     *   }
-     * }
-     * </pre>
-     * @param clazz the class to return the java type for
-     * @return the java type
-     */
-    protected JavaType getJavaType(Class<?> clazz) {
-        return objectMapper.constructType(clazz);
-    }
-
-    /**
-     * Determine the JSON encoding to use for the given content type.
-     * @param contentType the media type as requested by the caller
-     * @return the JSON encoding to use (never <code>null</code>)
-     */
-    protected JsonEncoding getJsonEncoding(MediaType contentType) {
-        if (contentType != null && contentType.getCharset() != null) {
-            Charset charset = contentType.getCharset();
-            for (JsonEncoding encoding : JsonEncoding.values()) {
-                if (charset.name().equals(encoding.getJavaName())) {
-                    return encoding;
-                }
-            }
-        }
-        return JsonEncoding.UTF8;
     }
 
 }

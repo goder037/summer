@@ -1,5 +1,11 @@
 package com.rocket.summer.framework.context.annotation;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.rocket.summer.framework.beans.factory.parsing.Location;
 import com.rocket.summer.framework.beans.factory.parsing.Problem;
 import com.rocket.summer.framework.beans.factory.parsing.ProblemReporter;
@@ -11,8 +17,6 @@ import com.rocket.summer.framework.core.type.StandardAnnotationMetadata;
 import com.rocket.summer.framework.core.type.classreading.MetadataReader;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
-
-import java.util.*;
 
 /**
  * Represents a user-defined {@link Configuration @Configuration} class.
