@@ -1552,7 +1552,7 @@ public abstract class AnnotationUtils {
      * @see #synthesizeAnnotation(Annotation, AnnotatedElement)
      * @see #synthesizeAnnotation(Map, Class, AnnotatedElement)
      */
-    public static Annotation[] synthesizeAnnotationArray(Annotation[] annotations, Object annotatedElement) {
+    static Annotation[] synthesizeAnnotationArray(Annotation[] annotations, Object annotatedElement) {
         if (annotations == null) {
             return null;
         }
