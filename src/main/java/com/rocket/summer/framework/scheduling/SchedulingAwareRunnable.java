@@ -14,9 +14,9 @@ package com.rocket.summer.framework.scheduling;
  * @author Juergen Hoeller
  * @since 2.0
  * @see commonj.work.Work
- * @see org.springframework.core.task.TaskExecutor
+ * @see com.rocket.summer.framework.core.task.TaskExecutor
  * @see SchedulingTaskExecutor
- * @see org.springframework.scheduling.commonj.WorkManagerTaskExecutor
+ * @see com.rocket.summer.framework.scheduling.commonj.WorkManagerTaskExecutor
  */
 public interface SchedulingAwareRunnable extends Runnable {
 

@@ -1,5 +1,8 @@
 package com.rocket.summer.framework.data.redis.connection;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -302,24 +305,12 @@ public interface RedisGeoCommands {
      * @param <T>
      * @since 1.8
      */
+    @Data
     @RequiredArgsConstructor
     public static class GeoLocation<T> {
 
         private final T name;
         private final Point point;
-
-        public GeoLocation(T name, Point point) {
-            this.name = name;
-            this.point = point;
-        }
-
-        public T getName() {
-            return name;
-        }
-
-        public Point getPoint() {
-            return point;
-        }
     }
 
     /**
@@ -364,4 +355,3 @@ public interface RedisGeoCommands {
         }
     }
 }
-
