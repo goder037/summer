@@ -3,12 +3,12 @@ package com.rocket.summer.framework.data.redis.core;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import net.sf.cglib.proxy.MethodProxy;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.rocket.summer.framework.aop.framework.ProxyFactory;
-import com.rocket.summer.framework.cglib.proxy.MethodProxy;
 import com.rocket.summer.framework.data.redis.connection.RedisConnection;
 import com.rocket.summer.framework.data.redis.connection.RedisConnectionFactory;
 import com.rocket.summer.framework.transaction.support.ResourceHolder;
@@ -303,7 +303,7 @@ public abstract class RedisConnectionUtils {
      * @since 1.3
      */
     static class ConnectionSplittingInterceptor implements MethodInterceptor,
-            com.rocket.summer.framework.cglib.proxy.MethodInterceptor {
+            net.sf.cglib.proxy.MethodInterceptor {
 
         private final RedisConnectionFactory factory;
 
