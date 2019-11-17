@@ -11,11 +11,7 @@ import com.rocket.summer.framework.boot.autoconfigure.cache.CacheAutoConfigurati
 import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnBean;
 import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnClass;
 import com.rocket.summer.framework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import com.rocket.summer.framework.boot.autoconfigure.couchbase.CouchbaseAutoConfiguration;
-import com.rocket.summer.framework.boot.autoconfigure.data.jpa.EntityManagerFactoryDependsOnPostProcessor;
 import com.rocket.summer.framework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import com.rocket.summer.framework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
-import com.rocket.summer.framework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import com.rocket.summer.framework.boot.context.properties.EnableConfigurationProperties;
 import com.rocket.summer.framework.cache.CacheManager;
 import com.rocket.summer.framework.cache.annotation.EnableCaching;
@@ -25,8 +21,6 @@ import com.rocket.summer.framework.context.annotation.Configuration;
 import com.rocket.summer.framework.context.annotation.Import;
 import com.rocket.summer.framework.context.annotation.ImportSelector;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
-import com.rocket.summer.framework.orm.jpa.AbstractEntityManagerFactoryBean;
-import com.rocket.summer.framework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import com.rocket.summer.framework.util.Assert;
 
 /**
@@ -44,7 +38,6 @@ import com.rocket.summer.framework.util.Assert;
 @ConditionalOnBean(CacheAspectSupport.class)
 @ConditionalOnMissingBean(value = CacheManager.class, name = "cacheResolver")
 @EnableConfigurationProperties(CacheProperties.class)
-@AutoConfigureBefore(HibernateJpaAutoConfiguration.class)
 @AutoConfigureAfter({ RedisAutoConfiguration.class })
 @Import(CacheConfigurationImportSelector.class)
 public class CacheAutoConfiguration {
@@ -60,18 +53,6 @@ public class CacheAutoConfiguration {
     public CacheManagerValidator cacheAutoConfigurationValidator(
             CacheProperties cacheProperties, ObjectProvider<CacheManager> cacheManager) {
         return new CacheManagerValidator(cacheProperties, cacheManager);
-    }
-
-    @Configuration
-    @ConditionalOnClass(LocalContainerEntityManagerFactoryBean.class)
-    @ConditionalOnBean(AbstractEntityManagerFactoryBean.class)
-    protected static class CacheManagerJpaDependencyConfiguration
-            extends EntityManagerFactoryDependsOnPostProcessor {
-
-        public CacheManagerJpaDependencyConfiguration() {
-            super("cacheManager");
-        }
-
     }
 
     /**
