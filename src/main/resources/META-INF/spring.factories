@@ -39,6 +39,11 @@ com.rocket.summer.framework.boot.autoconfigure.condition.OnClassCondition
 
 # Auto Configure
 com.rocket.summer.framework.boot.autoconfigure.EnableAutoConfiguration=\
+com.rocket.summer.framework.boot.autoconfigure.admin.SpringApplicationAdminJmxAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.data.redis.RedisAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.cache.CacheAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration,\
+com.rocket.summer.framework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.context.MessageSourceAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.jackson.JacksonAutoConfiguration,\
 com.rocket.summer.framework.boot.autoconfigure.jmx.JmxAutoConfiguration,\
