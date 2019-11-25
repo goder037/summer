@@ -18,7 +18,7 @@ import java.util.*;
  * @author Sam Brannen
  * @since 4.0
  */
-abstract class AnnotationReadingVisitorUtils {
+public abstract class AnnotationReadingVisitorUtils {
 
     public static AnnotationAttributes convertClassValues(Object annotatedElement,
                                                           ClassLoader classLoader, AnnotationAttributes original, boolean classValuesAsString) {

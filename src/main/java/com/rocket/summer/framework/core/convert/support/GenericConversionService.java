@@ -1,14 +1,35 @@
 package com.rocket.summer.framework.core.convert.support;
 
-import com.rocket.summer.framework.core.GenericTypeResolver;
-import com.rocket.summer.framework.core.convert.*;
-import com.rocket.summer.framework.core.convert.converter.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.rocket.summer.framework.core.DecoratingProxy;
+import com.rocket.summer.framework.core.ResolvableType;
+import com.rocket.summer.framework.core.convert.ConversionException;
+import com.rocket.summer.framework.core.convert.ConversionFailedException;
+import com.rocket.summer.framework.core.convert.ConversionService;
+import com.rocket.summer.framework.core.convert.ConverterNotFoundException;
+import com.rocket.summer.framework.core.convert.TypeDescriptor;
+import com.rocket.summer.framework.core.convert.converter.ConditionalConverter;
+import com.rocket.summer.framework.core.convert.converter.ConditionalGenericConverter;
+import com.rocket.summer.framework.core.convert.converter.Converter;
+import com.rocket.summer.framework.core.convert.converter.ConverterFactory;
+import com.rocket.summer.framework.core.convert.converter.ConverterRegistry;
+import com.rocket.summer.framework.core.convert.converter.GenericConverter;
+import com.rocket.summer.framework.core.convert.converter.GenericConverter.ConvertiblePair;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
-
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
+import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * Base {@link ConversionService} implementation suitable for use in most environments.
@@ -18,94 +39,104 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Keith Donald
  * @author Juergen Hoeller
  * @author Chris Beams
+ * @author Phillip Webb
+ * @author David Haraburda
  * @since 3.0
  */
 public class GenericConversionService implements ConfigurableConversionService {
 
-    private static final GenericConverter NO_OP_CONVERTER = new GenericConverter() {
-        public Set<ConvertiblePair> getConvertibleTypes() {
-            return null;
-        }
-        public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-            return source;
-        }
-        public String toString() {
-            return "NO_OP";
-        }
-    };
+    /**
+     * General NO-OP converter used when conversion is not required.
+     */
+    private static final GenericConverter NO_OP_CONVERTER = new NoOpConverter("NO_OP");
 
-    private static final GenericConverter NO_MATCH = new GenericConverter() {
-        public Set<ConvertiblePair> getConvertibleTypes() {
-            throw new UnsupportedOperationException();
-        }
-        public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-            throw new UnsupportedOperationException();
-        }
-        public String toString() {
-            return "NO_MATCH";
-        }
-    };
+    /**
+     * Used as a cache entry when no converter is available.
+     * This converter is never returned.
+     */
+    private static final GenericConverter NO_MATCH = new NoOpConverter("NO_MATCH");
 
 
-    private final Map<Class<?>, Map<Class<?>, MatchableConverters>> converters =
-            new HashMap<Class<?>, Map<Class<?>, MatchableConverters>>(36);
+    /** Java 8's java.util.Optional.empty() */
+    private static Object javaUtilOptionalEmpty = null;
+
+    static {
+        try {
+            Class<?> clazz = ClassUtils.forName("java.util.Optional", GenericConversionService.class.getClassLoader());
+            javaUtilOptionalEmpty = ClassUtils.getMethod(clazz, "empty").invoke(null);
+        }
+        catch (Exception ex) {
+            // Java 8 not available - conversion to Optional not supported then.
+        }
+    }
+
+
+    private final Converters converters = new Converters();
 
     private final Map<ConverterCacheKey, GenericConverter> converterCache =
-            new ConcurrentHashMap<ConverterCacheKey, GenericConverter>();
+            new ConcurrentReferenceHashMap<ConverterCacheKey, GenericConverter>(64);
 
 
-    // implementing ConverterRegistry
+    // ConverterRegistry implementation
 
+    @Override
     public void addConverter(Converter<?, ?> converter) {
-        GenericConverter.ConvertiblePair typeInfo = getRequiredTypeInfo(converter, Converter.class);
-        if (typeInfo == null) {
-            throw new IllegalArgumentException("Unable to the determine sourceType <S> and targetType <T> which " +
-                    "your Converter<S, T> converts between; declare these generic types.");
+        ResolvableType[] typeInfo = getRequiredTypeInfo(converter.getClass(), Converter.class);
+        if (typeInfo == null && converter instanceof DecoratingProxy) {
+            typeInfo = getRequiredTypeInfo(((DecoratingProxy) converter).getDecoratedClass(), Converter.class);
         }
-        addConverter(new ConverterAdapter(typeInfo, converter));
+        if (typeInfo == null) {
+            throw new IllegalArgumentException("Unable to determine source type <S> and target type <T> for your " +
+                    "Converter [" + converter.getClass().getName() + "]; does the class parameterize those types?");
+        }
+        addConverter(new ConverterAdapter(converter, typeInfo[0], typeInfo[1]));
     }
 
-    public void addConverter(Class<?> sourceType, Class<?> targetType, Converter<?, ?> converter) {
-        GenericConverter.ConvertiblePair typeInfo = new GenericConverter.ConvertiblePair(sourceType, targetType);
-        addConverter(new ConverterAdapter(typeInfo, converter));
+    @Override
+    public <S, T> void addConverter(Class<S> sourceType, Class<T> targetType, Converter<? super S, ? extends T> converter) {
+        addConverter(new ConverterAdapter(
+                converter, ResolvableType.forClass(sourceType), ResolvableType.forClass(targetType)));
     }
 
+    @Override
     public void addConverter(GenericConverter converter) {
-        Set<GenericConverter.ConvertiblePair> convertibleTypes = converter.getConvertibleTypes();
-        for (GenericConverter.ConvertiblePair convertibleType : convertibleTypes) {
-            getMatchableConverters(convertibleType.getSourceType(), convertibleType.getTargetType()).add(converter);
-        }
+        this.converters.add(converter);
         invalidateCache();
     }
 
-    public void addConverterFactory(ConverterFactory<?, ?> converterFactory) {
-        GenericConverter.ConvertiblePair typeInfo = getRequiredTypeInfo(converterFactory, ConverterFactory.class);
+    @Override
+    public void addConverterFactory(ConverterFactory<?, ?> factory) {
+        ResolvableType[] typeInfo = getRequiredTypeInfo(factory.getClass(), ConverterFactory.class);
+        if (typeInfo == null && factory instanceof DecoratingProxy) {
+            typeInfo = getRequiredTypeInfo(((DecoratingProxy) factory).getDecoratedClass(), ConverterFactory.class);
+        }
         if (typeInfo == null) {
-            throw new IllegalArgumentException("Unable to the determine sourceType <S> and targetRangeType R which " +
-                    "your ConverterFactory<S, R> converts between; declare these generic types.");
+            throw new IllegalArgumentException("Unable to determine source type <S> and target type <T> for your " +
+                    "ConverterFactory [" + factory.getClass().getName() + "]; does the class parameterize those types?");
         }
-        addConverter(new ConverterFactoryAdapter(typeInfo, converterFactory));
+        addConverter(new ConverterFactoryAdapter(factory,
+                new ConvertiblePair(typeInfo[0].resolve(), typeInfo[1].resolve())));
     }
 
+    @Override
     public void removeConvertible(Class<?> sourceType, Class<?> targetType) {
-        getSourceConverterMap(sourceType).remove(targetType);
+        this.converters.remove(sourceType, targetType);
         invalidateCache();
     }
 
 
-    // implementing ConversionService
+    // ConversionService implementation
 
+    @Override
     public boolean canConvert(Class<?> sourceType, Class<?> targetType) {
-        if (targetType == null) {
-            throw new IllegalArgumentException("The targetType to convert to cannot be null");
-        }
-        return canConvert(sourceType != null ? TypeDescriptor.valueOf(sourceType) : null, TypeDescriptor.valueOf(targetType));
+        Assert.notNull(targetType, "Target type to convert to cannot be null");
+        return canConvert((sourceType != null ? TypeDescriptor.valueOf(sourceType) : null),
+                TypeDescriptor.valueOf(targetType));
     }
 
+    @Override
     public boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
-        if (targetType == null) {
-            throw new IllegalArgumentException("The targetType to convert to cannot be null");
-        }
+        Assert.notNull(targetType, "Target type to convert to cannot be null");
         if (sourceType == null) {
             return true;
         }
@@ -113,80 +144,91 @@ public class GenericConversionService implements ConfigurableConversionService {
         return (converter != null);
     }
 
+    /**
+     * Return whether conversion between the source type and the target type can be bypassed.
+     * <p>More precisely, this method will return true if objects of sourceType can be
+     * converted to the target type by returning the source object unchanged.
+     * @param sourceType context about the source type to convert from
+     * (may be {@code null} if source is {@code null})
+     * @param targetType context about the target type to convert to (required)
+     * @return {@code true} if conversion can be bypassed; {@code false} otherwise
+     * @throws IllegalArgumentException if targetType is {@code null}
+     * @since 3.2
+     */
+    public boolean canBypassConvert(TypeDescriptor sourceType, TypeDescriptor targetType) {
+        Assert.notNull(targetType, "Target type to convert to cannot be null");
+        if (sourceType == null) {
+            return true;
+        }
+        GenericConverter converter = getConverter(sourceType, targetType);
+        return (converter == NO_OP_CONVERTER);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T convert(Object source, Class<T> targetType) {
-        if (targetType == null) {
-            throw new IllegalArgumentException("The targetType to convert to cannot be null");
-        }
+        Assert.notNull(targetType, "Target type to convert to cannot be null");
         return (T) convert(source, TypeDescriptor.forObject(source), TypeDescriptor.valueOf(targetType));
     }
 
+    @Override
     public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-        if (targetType == null) {
-            throw new IllegalArgumentException("The targetType to convert to cannot be null");
-        }
+        Assert.notNull(targetType, "Target type to convert to cannot be null");
         if (sourceType == null) {
-            Assert.isTrue(source == null, "The source must be [null] if sourceType == [null]");
-            return handleResult(sourceType, targetType, convertNullSource(sourceType, targetType));
+            Assert.isTrue(source == null, "Source must be [null] if source type == [null]");
+            return handleResult(null, targetType, convertNullSource(null, targetType));
         }
         if (source != null && !sourceType.getObjectType().isInstance(source)) {
-            throw new IllegalArgumentException("The source to convert from must be an instance of " +
-                    sourceType + "; instead it was a " + source.getClass().getName());
+            throw new IllegalArgumentException("Source to convert from must be an instance of [" +
+                    sourceType + "]; instead it was a [" + source.getClass().getName() + "]");
         }
         GenericConverter converter = getConverter(sourceType, targetType);
         if (converter != null) {
             Object result = ConversionUtils.invokeConverter(converter, source, sourceType, targetType);
             return handleResult(sourceType, targetType, result);
         }
-        else {
-            return handleConverterNotFound(source, sourceType, targetType);
-        }
+        return handleConverterNotFound(source, sourceType, targetType);
     }
 
     /**
-     * Convenience operation for converting a source object to the specified targetType, where the targetType is a descriptor that provides additional conversion context.
-     * Simply delegates to {@link #convert(Object, TypeDescriptor, TypeDescriptor)} and encapsulates the construction of the sourceType descriptor using {@link TypeDescriptor#forObject(Object)}.
+     * Convenience operation for converting a source object to the specified targetType,
+     * where the target type is a descriptor that provides additional conversion context.
+     * Simply delegates to {@link #convert(Object, TypeDescriptor, TypeDescriptor)} and
+     * encapsulates the construction of the source type descriptor using
+     * {@link TypeDescriptor#forObject(Object)}.
      * @param source the source object
      * @param targetType the target type
      * @return the converted value
      * @throws ConversionException if a conversion exception occurred
-     * @throws IllegalArgumentException if targetType is null
-     * @throws IllegalArgumentException if sourceType is null but source is not null
+     * @throws IllegalArgumentException if targetType is {@code null},
+     * or sourceType is {@code null} but source is not {@code null}
      */
     public Object convert(Object source, TypeDescriptor targetType) {
         return convert(source, TypeDescriptor.forObject(source), targetType);
     }
 
+    @Override
     public String toString() {
-        List<String> converterStrings = new ArrayList<String>();
-        for (Map<Class<?>, MatchableConverters> targetConverters : this.converters.values()) {
-            for (MatchableConverters matchable : targetConverters.values()) {
-                converterStrings.add(matchable.toString());
-            }
-        }
-        Collections.sort(converterStrings);
-        StringBuilder builder = new StringBuilder();
-        builder.append("ConversionService converters = ").append("\n");
-        for (String converterString : converterStrings) {
-            builder.append("\t");
-            builder.append(converterString);
-            builder.append("\n");
-        }
-        return builder.toString();
+        return this.converters.toString();
     }
 
 
-    // subclassing hooks
+    // Protected template methods
 
     /**
-     * Template method to convert a null source.
-     * <p>Default implementation returns <code>null</code>.
-     * Subclasses may override to return custom null objects for specific target types.
-     * @param sourceType the sourceType to convert from
-     * @param targetType the targetType to convert to
+     * Template method to convert a {@code null} source.
+     * <p>The default implementation returns {@code null} or the Java 8
+     * {@link java.util.Optional#empty()} instance if the target type is
+     * {@code java.util.Optional}. Subclasses may override this to return
+     * custom {@code null} objects for specific target types.
+     * @param sourceType the source type to convert from
+     * @param targetType the target type to convert to
      * @return the converted null object
      */
     protected Object convertNullSource(TypeDescriptor sourceType, TypeDescriptor targetType) {
+        if (javaUtilOptionalEmpty != null && targetType.getObjectType() == javaUtilOptionalEmpty.getClass()) {
+            return javaUtilOptionalEmpty;
+        }
         return null;
     }
 
@@ -195,10 +237,10 @@ public class GenericConversionService implements ConfigurableConversionService {
      * First queries this ConversionService's converter cache.
      * On a cache miss, then performs an exhaustive search for a matching converter.
      * If no converter matches, returns the default converter.
-     * Subclasses may override.
      * @param sourceType the source type to convert from
      * @param targetType the target type to convert to
-     * @return the generic converter that will perform the conversion, or <code>null</code> if no suitable converter was found
+     * @return the generic converter that will perform the conversion,
+     * or {@code null} if no suitable converter was found
      * @see #getDefaultConverter(TypeDescriptor, TypeDescriptor)
      */
     protected GenericConverter getConverter(TypeDescriptor sourceType, TypeDescriptor targetType) {
@@ -207,27 +249,25 @@ public class GenericConversionService implements ConfigurableConversionService {
         if (converter != null) {
             return (converter != NO_MATCH ? converter : null);
         }
-        else {
-            converter = findConverterForClassPair(sourceType, targetType);
-            if (converter == null) {
-                converter = getDefaultConverter(sourceType, targetType);
-            }
-            if (converter != null) {
-                this.converterCache.put(key, converter);
-                return converter;
-            }
-            else {
-                this.converterCache.put(key, NO_MATCH);
-                return null;
-            }
+
+        converter = this.converters.find(sourceType, targetType);
+        if (converter == null) {
+            converter = getDefaultConverter(sourceType, targetType);
         }
+
+        if (converter != null) {
+            this.converterCache.put(key, converter);
+            return converter;
+        }
+
+        this.converterCache.put(key, NO_MATCH);
+        return null;
     }
 
     /**
      * Return the default converter if no converter is found for the given sourceType/targetType pair.
-     * Returns a NO_OP Converter if the sourceType is assignable to the targetType.
-     * Returns <code>null</code> otherwise, indicating no suitable converter could be found.
-     * Subclasses may override.
+     * <p>Returns a NO_OP Converter if the source type is assignable to the target type.
+     * Returns {@code null} otherwise, indicating no suitable converter could be found.
      * @param sourceType the source type to convert from
      * @param targetType the target type to convert to
      * @return the default generic converter that will perform the conversion
@@ -236,211 +276,36 @@ public class GenericConversionService implements ConfigurableConversionService {
         return (sourceType.isAssignableTo(targetType) ? NO_OP_CONVERTER : null);
     }
 
-    // internal helpers
 
-    private GenericConverter.ConvertiblePair getRequiredTypeInfo(Object converter, Class<?> genericIfc) {
-        Class<?>[] args = GenericTypeResolver.resolveTypeArguments(converter.getClass(), genericIfc);
-        return (args != null ? new GenericConverter.ConvertiblePair(args[0], args[1]) : null);
-    }
+    // Internal helpers
 
-    private MatchableConverters getMatchableConverters(Class<?> sourceType, Class<?> targetType) {
-        Map<Class<?>, MatchableConverters> sourceMap = getSourceConverterMap(sourceType);
-        MatchableConverters matchable = sourceMap.get(targetType);
-        if (matchable == null) {
-            matchable = new MatchableConverters();
-            sourceMap.put(targetType, matchable);
+    private ResolvableType[] getRequiredTypeInfo(Class<?> converterClass, Class<?> genericIfc) {
+        ResolvableType resolvableType = ResolvableType.forClass(converterClass).as(genericIfc);
+        ResolvableType[] generics = resolvableType.getGenerics();
+        if (generics.length < 2) {
+            return null;
         }
-        return matchable;
+        Class<?> sourceType = generics[0].resolve();
+        Class<?> targetType = generics[1].resolve();
+        if (sourceType == null || targetType == null) {
+            return null;
+        }
+        return generics;
     }
 
     private void invalidateCache() {
         this.converterCache.clear();
     }
 
-    private Map<Class<?>, MatchableConverters> getSourceConverterMap(Class<?> sourceType) {
-        Map<Class<?>, MatchableConverters> sourceMap = converters.get(sourceType);
-        if (sourceMap == null) {
-            sourceMap = new HashMap<Class<?>, MatchableConverters>();
-            this.converters.put(sourceType, sourceMap);
-        }
-        return sourceMap;
-    }
-
-    private GenericConverter findConverterForClassPair(TypeDescriptor sourceType, TypeDescriptor targetType) {
-        Class<?> sourceObjectType = sourceType.getObjectType();
-        if (sourceObjectType.isInterface()) {
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(sourceObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                Map<Class<?>, MatchableConverters> converters = getTargetConvertersForSource(currentClass);
-                GenericConverter converter = getMatchingConverterForTarget(sourceType, targetType, converters);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?>[] interfaces = currentClass.getInterfaces();
-                for (Class<?> ifc : interfaces) {
-                    classQueue.addFirst(ifc);
-                }
-            }
-            Map<Class<?>, MatchableConverters> objectConverters = getTargetConvertersForSource(Object.class);
-            return getMatchingConverterForTarget(sourceType, targetType, objectConverters);
-        }
-        else if (sourceObjectType.isArray()) {
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(sourceObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                Map<Class<?>, MatchableConverters> converters = getTargetConvertersForSource(currentClass);
-                GenericConverter converter = getMatchingConverterForTarget(sourceType, targetType, converters);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?> componentType = ClassUtils.resolvePrimitiveIfNecessary(currentClass.getComponentType());
-                if (componentType.getSuperclass() != null) {
-                    classQueue.addFirst(Array.newInstance(componentType.getSuperclass(), 0).getClass());
-                }
-                else if (componentType.isInterface()) {
-                    classQueue.addFirst(Object[].class);
-                }
-            }
-            return null;
-        }
-        else {
-            HashSet<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(sourceObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                Map<Class<?>, MatchableConverters> converters = getTargetConvertersForSource(currentClass);
-                GenericConverter converter = getMatchingConverterForTarget(sourceType, targetType, converters);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?> superClass = currentClass.getSuperclass();
-                if (superClass != null && superClass != Object.class) {
-                    classQueue.addFirst(superClass);
-                }
-                for (Class<?> interfaceType : currentClass.getInterfaces()) {
-                    addInterfaceHierarchy(interfaceType, interfaces);
-                }
-            }
-            for (Class<?> interfaceType : interfaces) {
-                Map<Class<?>, MatchableConverters> converters = getTargetConvertersForSource(interfaceType);
-                GenericConverter converter = getMatchingConverterForTarget(sourceType, targetType, converters);
-                if (converter != null) {
-                    return converter;
-                }
-            }
-            Map<Class<?>, MatchableConverters> objectConverters = getTargetConvertersForSource(Object.class);
-            return getMatchingConverterForTarget(sourceType, targetType, objectConverters);
-        }
-    }
-
-    private Map<Class<?>, MatchableConverters> getTargetConvertersForSource(Class<?> sourceType) {
-        Map<Class<?>, MatchableConverters> converters = this.converters.get(sourceType);
-        if (converters == null) {
-            converters = Collections.emptyMap();
-        }
-        return converters;
-    }
-
-    private GenericConverter getMatchingConverterForTarget(TypeDescriptor sourceType, TypeDescriptor targetType,
-                                                           Map<Class<?>, MatchableConverters> converters) {
-        Class<?> targetObjectType = targetType.getObjectType();
-        if (targetObjectType.isInterface()) {
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(targetObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                MatchableConverters matchable = converters.get(currentClass);
-                GenericConverter converter = matchConverter(matchable, sourceType, targetType);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?>[] interfaces = currentClass.getInterfaces();
-                for (Class<?> ifc : interfaces) {
-                    classQueue.addFirst(ifc);
-                }
-            }
-            return matchConverter(converters.get(Object.class), sourceType, targetType);
-        }
-        else if (targetObjectType.isArray()) {
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(targetObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                MatchableConverters matchable = converters.get(currentClass);
-                GenericConverter converter = matchConverter(matchable, sourceType, targetType);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?> componentType = ClassUtils.resolvePrimitiveIfNecessary(currentClass.getComponentType());
-                if (componentType.getSuperclass() != null) {
-                    classQueue.addFirst(Array.newInstance(componentType.getSuperclass(), 0).getClass());
-                }
-                else if (componentType.isInterface()) {
-                    classQueue.addFirst(Object[].class);
-                }
-            }
-            return null;
-        }
-        else {
-            Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
-            LinkedList<Class<?>> classQueue = new LinkedList<Class<?>>();
-            classQueue.addFirst(targetObjectType);
-            while (!classQueue.isEmpty()) {
-                Class<?> currentClass = classQueue.removeLast();
-                MatchableConverters matchable = converters.get(currentClass);
-                GenericConverter converter = matchConverter(matchable, sourceType, targetType);
-                if (converter != null) {
-                    return converter;
-                }
-                Class<?> superClass = currentClass.getSuperclass();
-                if (superClass != null && superClass != Object.class) {
-                    classQueue.addFirst(superClass);
-                }
-                for (Class<?> interfaceType : currentClass.getInterfaces()) {
-                    addInterfaceHierarchy(interfaceType, interfaces);
-                }
-            }
-            for (Class<?> interfaceType : interfaces) {
-                MatchableConverters matchable = converters.get(interfaceType);
-                GenericConverter converter = matchConverter(matchable, sourceType, targetType);
-                if (converter != null) {
-                    return converter;
-                }
-            }
-            return matchConverter(converters.get(Object.class), sourceType, targetType);
-        }
-    }
-
-    private void addInterfaceHierarchy(Class<?> interfaceType, Set<Class<?>> interfaces) {
-        interfaces.add(interfaceType);
-        for (Class<?> inheritedInterface : interfaceType.getInterfaces()) {
-            addInterfaceHierarchy(inheritedInterface, interfaces);
-        }
-    }
-
-    private GenericConverter matchConverter(
-            MatchableConverters matchable, TypeDescriptor sourceFieldType, TypeDescriptor targetFieldType) {
-        if (matchable == null) {
-            return null;
-        }
-        return matchable.matchConverter(sourceFieldType, targetFieldType);
-    }
-
     private Object handleConverterNotFound(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
         if (source == null) {
             assertNotPrimitiveTargetType(sourceType, targetType);
+            return null;
+        }
+        if (sourceType.isAssignableTo(targetType) && targetType.getObjectType().isInstance(source)) {
             return source;
         }
-        else if (sourceType.isAssignableTo(targetType) && targetType.getObjectType().isInstance(source)) {
-            return source;
-        }
-        else {
-            throw new ConverterNotFoundException(sourceType, targetType);
-        }
+        throw new ConverterNotFoundException(sourceType, targetType);
     }
 
     private Object handleResult(TypeDescriptor sourceType, TypeDescriptor targetType, Object result) {
@@ -449,6 +314,7 @@ public class GenericConversionService implements ConfigurableConversionService {
         }
         return result;
     }
+
     private void assertNotPrimitiveTargetType(TypeDescriptor sourceType, TypeDescriptor targetType) {
         if (targetType.isPrimitive()) {
             throw new ConversionFailedException(sourceType, targetType, null,
@@ -457,26 +323,46 @@ public class GenericConversionService implements ConfigurableConversionService {
     }
 
 
+    /**
+     * Adapts a {@link Converter} to a {@link GenericConverter}.
+     */
     @SuppressWarnings("unchecked")
-    private final class ConverterAdapter implements GenericConverter {
-
-        private final ConvertiblePair typeInfo;
+    private final class ConverterAdapter implements ConditionalGenericConverter {
 
         private final Converter<Object, Object> converter;
 
-        public ConverterAdapter(ConvertiblePair typeInfo, Converter<?, ?> converter) {
+        private final ConvertiblePair typeInfo;
+
+        private final ResolvableType targetType;
+
+        public ConverterAdapter(Converter<?, ?> converter, ResolvableType sourceType, ResolvableType targetType) {
             this.converter = (Converter<Object, Object>) converter;
-            this.typeInfo = typeInfo;
+            this.typeInfo = new ConvertiblePair(sourceType.resolve(Object.class), targetType.resolve(Object.class));
+            this.targetType = targetType;
         }
 
+        @Override
         public Set<ConvertiblePair> getConvertibleTypes() {
             return Collections.singleton(this.typeInfo);
         }
 
-        public boolean matchesTargetType(TypeDescriptor targetType) {
-            return this.typeInfo.getTargetType().equals(targetType.getObjectType());
+        @Override
+        public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+            // Check raw type first...
+            if (this.typeInfo.getTargetType() != targetType.getObjectType()) {
+                return false;
+            }
+            // Full check for complex generic type match required?
+            ResolvableType rt = targetType.getResolvableType();
+            if (!(rt.getType() instanceof Class) && !rt.isAssignableFrom(this.targetType) &&
+                    !this.targetType.hasUnresolvableGenerics()) {
+                return false;
+            }
+            return !(this.converter instanceof ConditionalConverter) ||
+                    ((ConditionalConverter) this.converter).matches(sourceType, targetType);
         }
 
+        @Override
         public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
             if (source == null) {
                 return convertNullSource(sourceType, targetType);
@@ -484,29 +370,49 @@ public class GenericConversionService implements ConfigurableConversionService {
             return this.converter.convert(source);
         }
 
+        @Override
         public String toString() {
-            return this.typeInfo.getSourceType().getName() + " -> " + this.typeInfo.getTargetType().getName() +
-                    " : " + this.converter.toString();
+            return (this.typeInfo + " : " + this.converter);
         }
     }
 
 
+    /**
+     * Adapts a {@link ConverterFactory} to a {@link GenericConverter}.
+     */
     @SuppressWarnings("unchecked")
-    private final class ConverterFactoryAdapter implements GenericConverter {
-
-        private final ConvertiblePair typeInfo;
+    private final class ConverterFactoryAdapter implements ConditionalGenericConverter {
 
         private final ConverterFactory<Object, Object> converterFactory;
 
-        public ConverterFactoryAdapter(ConvertiblePair typeInfo, ConverterFactory<?, ?> converterFactory) {
+        private final ConvertiblePair typeInfo;
+
+        public ConverterFactoryAdapter(ConverterFactory<?, ?> converterFactory, ConvertiblePair typeInfo) {
             this.converterFactory = (ConverterFactory<Object, Object>) converterFactory;
             this.typeInfo = typeInfo;
         }
 
+        @Override
         public Set<ConvertiblePair> getConvertibleTypes() {
             return Collections.singleton(this.typeInfo);
         }
 
+        @Override
+        public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+            boolean matches = true;
+            if (this.converterFactory instanceof ConditionalConverter) {
+                matches = ((ConditionalConverter) this.converterFactory).matches(sourceType, targetType);
+            }
+            if (matches) {
+                Converter<?, ?> converter = this.converterFactory.getConverter(targetType.getType());
+                if (converter instanceof ConditionalConverter) {
+                    matches = ((ConditionalConverter) converter).matches(sourceType, targetType);
+                }
+            }
+            return matches;
+        }
+
+        @Override
         public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
             if (source == null) {
                 return convertNullSource(sourceType, targetType);
@@ -514,70 +420,17 @@ public class GenericConversionService implements ConfigurableConversionService {
             return this.converterFactory.getConverter(targetType.getObjectType()).convert(source);
         }
 
+        @Override
         public String toString() {
-            return this.typeInfo.getSourceType().getName() + " -> " + this.typeInfo.getTargetType().getName() +
-                    " : " + this.converterFactory.toString();
+            return (this.typeInfo + " : " + this.converterFactory);
         }
     }
 
 
-    private static class MatchableConverters {
-
-        private LinkedList<ConditionalGenericConverter> conditionalConverters;
-
-        private GenericConverter defaultConverter;
-
-        public void add(GenericConverter converter) {
-            if (converter instanceof ConditionalGenericConverter) {
-                if (this.conditionalConverters == null) {
-                    this.conditionalConverters = new LinkedList<ConditionalGenericConverter>();
-                }
-                this.conditionalConverters.addFirst((ConditionalGenericConverter) converter);
-            }
-            else {
-                this.defaultConverter = converter;
-            }
-        }
-
-        public GenericConverter matchConverter(TypeDescriptor sourceType, TypeDescriptor targetType) {
-            if (this.conditionalConverters != null) {
-                for (ConditionalGenericConverter conditional : this.conditionalConverters) {
-                    if (conditional.matches(sourceType, targetType)) {
-                        return conditional;
-                    }
-                }
-            }
-            if (this.defaultConverter instanceof ConverterAdapter) {
-                ConverterAdapter adapter = (ConverterAdapter) this.defaultConverter;
-                if (!adapter.matchesTargetType(targetType)) {
-                    return null;
-                }
-            }
-            return this.defaultConverter;
-        }
-
-        public String toString() {
-            if (this.conditionalConverters != null) {
-                StringBuilder builder = new StringBuilder();
-                for (Iterator<ConditionalGenericConverter> it = this.conditionalConverters.iterator(); it.hasNext();) {
-                    builder.append(it.next());
-                    if (it.hasNext()) {
-                        builder.append(", ");
-                    }
-                }
-                if (this.defaultConverter != null) {
-                    builder.append(", ").append(this.defaultConverter);
-                }
-                return builder.toString();
-            }
-            else {
-                return this.defaultConverter.toString();
-            }
-        }
-    }
-
-
-    private static final class ConverterCacheKey {
+    /**
+     * Key for use with the converter cache.
+     */
+    private static final class ConverterCacheKey implements Comparable<ConverterCacheKey> {
 
         private final TypeDescriptor sourceType;
 
@@ -588,6 +441,7 @@ public class GenericConversionService implements ConfigurableConversionService {
             this.targetType = targetType;
         }
 
+        @Override
         public boolean equals(Object other) {
             if (this == other) {
                 return true;
@@ -596,15 +450,243 @@ public class GenericConversionService implements ConfigurableConversionService {
                 return false;
             }
             ConverterCacheKey otherKey = (ConverterCacheKey) other;
-            return this.sourceType.equals(otherKey.sourceType) && this.targetType.equals(otherKey.targetType);
+            return (ObjectUtils.nullSafeEquals(this.sourceType, otherKey.sourceType) &&
+                    ObjectUtils.nullSafeEquals(this.targetType, otherKey.targetType));
         }
 
+        @Override
         public int hashCode() {
-            return this.sourceType.hashCode() * 29 + this.targetType.hashCode();
+            return (ObjectUtils.nullSafeHashCode(this.sourceType) * 29 +
+                    ObjectUtils.nullSafeHashCode(this.targetType));
         }
 
+        @Override
         public String toString() {
-            return "ConverterCacheKey [sourceType = " + this.sourceType + ", targetType = " + this.targetType + "]";
+            return ("ConverterCacheKey [sourceType = " + this.sourceType +
+                    ", targetType = " + this.targetType + "]");
+        }
+
+        @Override
+        public int compareTo(ConverterCacheKey other) {
+            int result = this.sourceType.getResolvableType().toString().compareTo(
+                    other.sourceType.getResolvableType().toString());
+            if (result == 0) {
+                result = this.targetType.getResolvableType().toString().compareTo(
+                        other.targetType.getResolvableType().toString());
+            }
+            return result;
+        }
+    }
+
+
+    /**
+     * Manages all converters registered with the service.
+     */
+    private static class Converters {
+
+        private final Set<GenericConverter> globalConverters = new LinkedHashSet<GenericConverter>();
+
+        private final Map<ConvertiblePair, ConvertersForPair> converters =
+                new LinkedHashMap<ConvertiblePair, ConvertersForPair>(36);
+
+        public void add(GenericConverter converter) {
+            Set<ConvertiblePair> convertibleTypes = converter.getConvertibleTypes();
+            if (convertibleTypes == null) {
+                Assert.state(converter instanceof ConditionalConverter,
+                        "Only conditional converters may return null convertible types");
+                this.globalConverters.add(converter);
+            }
+            else {
+                for (ConvertiblePair convertiblePair : convertibleTypes) {
+                    ConvertersForPair convertersForPair = getMatchableConverters(convertiblePair);
+                    convertersForPair.add(converter);
+                }
+            }
+        }
+
+        private ConvertersForPair getMatchableConverters(ConvertiblePair convertiblePair) {
+            ConvertersForPair convertersForPair = this.converters.get(convertiblePair);
+            if (convertersForPair == null) {
+                convertersForPair = new ConvertersForPair();
+                this.converters.put(convertiblePair, convertersForPair);
+            }
+            return convertersForPair;
+        }
+
+        public void remove(Class<?> sourceType, Class<?> targetType) {
+            this.converters.remove(new ConvertiblePair(sourceType, targetType));
+        }
+
+        /**
+         * Find a {@link GenericConverter} given a source and target type.
+         * <p>This method will attempt to match all possible converters by working
+         * through the class and interface hierarchy of the types.
+         * @param sourceType the source type
+         * @param targetType the target type
+         * @return a matching {@link GenericConverter}, or {@code null} if none found
+         */
+        public GenericConverter find(TypeDescriptor sourceType, TypeDescriptor targetType) {
+            // Search the full type hierarchy
+            List<Class<?>> sourceCandidates = getClassHierarchy(sourceType.getType());
+            List<Class<?>> targetCandidates = getClassHierarchy(targetType.getType());
+            for (Class<?> sourceCandidate : sourceCandidates) {
+                for (Class<?> targetCandidate : targetCandidates) {
+                    ConvertiblePair convertiblePair = new ConvertiblePair(sourceCandidate, targetCandidate);
+                    GenericConverter converter = getRegisteredConverter(sourceType, targetType, convertiblePair);
+                    if (converter != null) {
+                        return converter;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private GenericConverter getRegisteredConverter(TypeDescriptor sourceType,
+                                                        TypeDescriptor targetType, ConvertiblePair convertiblePair) {
+
+            // Check specifically registered converters
+            ConvertersForPair convertersForPair = this.converters.get(convertiblePair);
+            if (convertersForPair != null) {
+                GenericConverter converter = convertersForPair.getConverter(sourceType, targetType);
+                if (converter != null) {
+                    return converter;
+                }
+            }
+            // Check ConditionalConverters for a dynamic match
+            for (GenericConverter globalConverter : this.globalConverters) {
+                if (((ConditionalConverter) globalConverter).matches(sourceType, targetType)) {
+                    return globalConverter;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Returns an ordered class hierarchy for the given type.
+         * @param type the type
+         * @return an ordered list of all classes that the given type extends or implements
+         */
+        private List<Class<?>> getClassHierarchy(Class<?> type) {
+            List<Class<?>> hierarchy = new ArrayList<Class<?>>(20);
+            Set<Class<?>> visited = new HashSet<Class<?>>(20);
+            addToClassHierarchy(0, ClassUtils.resolvePrimitiveIfNecessary(type), false, hierarchy, visited);
+            boolean array = type.isArray();
+
+            int i = 0;
+            while (i < hierarchy.size()) {
+                Class<?> candidate = hierarchy.get(i);
+                candidate = (array ? candidate.getComponentType() : ClassUtils.resolvePrimitiveIfNecessary(candidate));
+                Class<?> superclass = candidate.getSuperclass();
+                if (superclass != null && superclass != Object.class && superclass != Enum.class) {
+                    addToClassHierarchy(i + 1, candidate.getSuperclass(), array, hierarchy, visited);
+                }
+                addInterfacesToClassHierarchy(candidate, array, hierarchy, visited);
+                i++;
+            }
+
+            if (Enum.class.isAssignableFrom(type)) {
+                addToClassHierarchy(hierarchy.size(), Enum.class, array, hierarchy, visited);
+                addToClassHierarchy(hierarchy.size(), Enum.class, false, hierarchy, visited);
+                addInterfacesToClassHierarchy(Enum.class, array, hierarchy, visited);
+            }
+
+            addToClassHierarchy(hierarchy.size(), Object.class, array, hierarchy, visited);
+            addToClassHierarchy(hierarchy.size(), Object.class, false, hierarchy, visited);
+            return hierarchy;
+        }
+
+        private void addInterfacesToClassHierarchy(Class<?> type, boolean asArray,
+                                                   List<Class<?>> hierarchy, Set<Class<?>> visited) {
+
+            for (Class<?> implementedInterface : type.getInterfaces()) {
+                addToClassHierarchy(hierarchy.size(), implementedInterface, asArray, hierarchy, visited);
+            }
+        }
+
+        private void addToClassHierarchy(int index, Class<?> type, boolean asArray,
+                                         List<Class<?>> hierarchy, Set<Class<?>> visited) {
+
+            if (asArray) {
+                type = Array.newInstance(type, 0).getClass();
+            }
+            if (visited.add(type)) {
+                hierarchy.add(index, type);
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("ConversionService converters =\n");
+            for (String converterString : getConverterStrings()) {
+                builder.append('\t').append(converterString).append('\n');
+            }
+            return builder.toString();
+        }
+
+        private List<String> getConverterStrings() {
+            List<String> converterStrings = new ArrayList<String>();
+            for (ConvertersForPair convertersForPair : converters.values()) {
+                converterStrings.add(convertersForPair.toString());
+            }
+            Collections.sort(converterStrings);
+            return converterStrings;
+        }
+    }
+
+
+    /**
+     * Manages converters registered with a specific {@link ConvertiblePair}.
+     */
+    private static class ConvertersForPair {
+
+        private final LinkedList<GenericConverter> converters = new LinkedList<GenericConverter>();
+
+        public void add(GenericConverter converter) {
+            this.converters.addFirst(converter);
+        }
+
+        public GenericConverter getConverter(TypeDescriptor sourceType, TypeDescriptor targetType) {
+            for (GenericConverter converter : this.converters) {
+                if (!(converter instanceof ConditionalGenericConverter) ||
+                        ((ConditionalGenericConverter) converter).matches(sourceType, targetType)) {
+                    return converter;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return StringUtils.collectionToCommaDelimitedString(this.converters);
+        }
+    }
+
+
+    /**
+     * Internal converter that performs no operation.
+     */
+    private static class NoOpConverter implements GenericConverter {
+
+        private final String name;
+
+        public NoOpConverter(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public Set<ConvertiblePair> getConvertibleTypes() {
+            return null;
+        }
+
+        @Override
+        public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+            return source;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
         }
     }
 

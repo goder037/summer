@@ -1,15 +1,15 @@
 package com.rocket.summer.framework.core.type.classreading;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import com.rocket.summer.framework.core.io.DefaultResourceLoader;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
 import com.rocket.summer.framework.util.ClassUtils;
 
-import java.io.IOException;
-
 /**
  * Simple implementation of the {@link MetadataReaderFactory} interface,
- * creating a new ASM {@link org.objectweb.asm.ClassReader} for every request.
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -45,10 +45,39 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
     }
 
 
+    /**
+     * Return the ResourceLoader that this MetadataReaderFactory has been
+     * constructed with.
+     */
+    public final ResourceLoader getResourceLoader() {
+        return this.resourceLoader;
+    }
+
+
+    @Override
     public MetadataReader getMetadataReader(String className) throws IOException {
-        String resourcePath = ResourceLoader.CLASSPATH_URL_PREFIX +
-                ClassUtils.convertClassNameToResourcePath(className) + ClassUtils.CLASS_FILE_SUFFIX;
-        return getMetadataReader(this.resourceLoader.getResource(resourcePath));
+        try {
+            String resourcePath = ResourceLoader.CLASSPATH_URL_PREFIX +
+                    ClassUtils.convertClassNameToResourcePath(className) + ClassUtils.CLASS_FILE_SUFFIX;
+            Resource resource = this.resourceLoader.getResource(resourcePath);
+            return getMetadataReader(resource);
+        }
+        catch (FileNotFoundException ex) {
+            // Maybe an inner class name using the dot name syntax? Need to use the dollar syntax here...
+            // ClassUtils.forName has an equivalent check for resolution into Class references later on.
+            int lastDotIndex = className.lastIndexOf('.');
+            if (lastDotIndex != -1) {
+                String innerClassName =
+                        className.substring(0, lastDotIndex) + '$' + className.substring(lastDotIndex + 1);
+                String innerClassResourcePath = ResourceLoader.CLASSPATH_URL_PREFIX +
+                        ClassUtils.convertClassNameToResourcePath(innerClassName) + ClassUtils.CLASS_FILE_SUFFIX;
+                Resource innerClassResource = this.resourceLoader.getResource(innerClassResourcePath);
+                if (innerClassResource.exists()) {
+                    return getMetadataReader(innerClassResource);
+                }
+            }
+            throw ex;
+        }
     }
 
     @Override
