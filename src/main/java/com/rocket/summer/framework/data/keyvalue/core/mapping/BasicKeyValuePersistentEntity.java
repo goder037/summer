@@ -20,7 +20,7 @@ public class BasicKeyValuePersistentEntity<T> extends BasicPersistentEntity<T, K
 
     /**
      * @param information must not be {@literal null}.
-     * @param keySpaceResolver can be {@literal null}.
+     * @param fallbackKeySpaceResolver can be {@literal null}.
      */
     public BasicKeyValuePersistentEntity(TypeInformation<T> information, KeySpaceResolver fallbackKeySpaceResolver) {
 

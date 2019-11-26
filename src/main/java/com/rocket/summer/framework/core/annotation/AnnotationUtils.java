@@ -1,13 +1,31 @@
 package com.rocket.summer.framework.core.annotation;
 
-import com.rocket.summer.framework.core.BridgeMethodResolver;
-import com.rocket.summer.framework.util.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import com.rocket.summer.framework.core.BridgeMethodResolver;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
+import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.ReflectionUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * General utility methods for working with annotations, handling meta-annotations,

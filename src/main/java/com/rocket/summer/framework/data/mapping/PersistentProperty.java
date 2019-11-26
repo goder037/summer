@@ -213,4 +213,3 @@ public interface PersistentProperty<P extends PersistentProperty<P>> {
      */
     boolean usePropertyAccess();
 }
-

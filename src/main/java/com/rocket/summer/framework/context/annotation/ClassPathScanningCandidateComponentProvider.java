@@ -1,16 +1,29 @@
 package com.rocket.summer.framework.context.annotation;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
 import com.rocket.summer.framework.beans.factory.annotation.AnnotatedBeanDefinition;
+import com.rocket.summer.framework.beans.factory.annotation.Lookup;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
+import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.context.ResourceLoaderAware;
 import com.rocket.summer.framework.core.env.Environment;
+import com.rocket.summer.framework.core.env.EnvironmentCapable;
 import com.rocket.summer.framework.core.env.StandardEnvironment;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.io.ResourceLoader;
-import com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver;
 import com.rocket.summer.framework.core.io.support.ResourcePatternResolver;
 import com.rocket.summer.framework.core.io.support.ResourcePatternUtils;
+import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.classreading.CachingMetadataReaderFactory;
 import com.rocket.summer.framework.core.type.classreading.MetadataReader;
 import com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory;
@@ -22,15 +35,6 @@ import com.rocket.summer.framework.stereotype.Repository;
 import com.rocket.summer.framework.stereotype.Service;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
-import com.rocket.summer.framework.util.SystemPropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A component provider that scans the classpath from a base package. It then
@@ -38,36 +42,37 @@ import java.util.Set;
  *
  * <p>This implementation is based on Spring's
  * {@link com.rocket.summer.framework.core.type.classreading.MetadataReader MetadataReader}
- * facility, backed by an ASM {@link org.objectweb.asm.ClassReader ClassReader}.
+ * facility, backed by an ASM {@link com.rocket.summer.framework.asm.ClassReader ClassReader}.
  *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Ramnivas Laddad
+ * @author Chris Beams
  * @since 2.5
  * @see com.rocket.summer.framework.core.type.classreading.MetadataReaderFactory
  * @see com.rocket.summer.framework.core.type.AnnotationMetadata
  * @see ScannedGenericBeanDefinition
  */
-public class ClassPathScanningCandidateComponentProvider implements ResourceLoaderAware {
+public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
 
-    protected static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
+    static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-
-    private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(this.resourcePatternResolver);
-
     private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
+
+    private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
+
+    private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
 
     private Environment environment;
 
     private ConditionEvaluator conditionEvaluator;
 
-    private final List<TypeFilter> includeFilters = new LinkedList<TypeFilter>();
+    private ResourcePatternResolver resourcePatternResolver;
 
-    private final List<TypeFilter> excludeFilters = new LinkedList<TypeFilter>();
+    private MetadataReaderFactory metadataReaderFactory;
 
 
     /**
@@ -78,7 +83,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
     }
 
     /**
-     * Create a ClassPathScanningCandidateComponentProvider.
+     * Create a ClassPathScanningCandidateComponentProvider with a {@link StandardEnvironment}.
      * @param useDefaultFilters whether to register the default filters for the
      * {@link Component @Component}, {@link Repository @Repository},
      * {@link Service @Service}, and {@link Controller @Controller}
@@ -86,42 +91,26 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
      * @see #registerDefaultFilters()
      */
     public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters) {
+        this(useDefaultFilters, new StandardEnvironment());
+    }
+
+    /**
+     * Create a ClassPathScanningCandidateComponentProvider with the given {@link Environment}.
+     * @param useDefaultFilters whether to register the default filters for the
+     * {@link Component @Component}, {@link Repository @Repository},
+     * {@link Service @Service}, and {@link Controller @Controller}
+     * stereotype annotations
+     * @param environment the Environment to use
+     * @see #registerDefaultFilters()
+     */
+    public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters, Environment environment) {
         if (useDefaultFilters) {
             registerDefaultFilters();
         }
+        setEnvironment(environment);
+        setResourceLoader(null);
     }
 
-    /**
-     * Set the Environment to use when resolving placeholders and evaluating
-     * {@link Conditional @Conditional}-annotated component classes.
-     * <p>The default is a {@link StandardEnvironment}.
-     * @param environment the Environment to use
-     */
-    public void setEnvironment(Environment environment) {
-        Assert.notNull(environment, "Environment must not be null");
-        this.environment = environment;
-        this.conditionEvaluator = null;
-    }
-
-    /**
-     * Set the ResourceLoader to use for resource locations.
-     * This will typically be a ResourcePatternResolver implementation.
-     * <p>Default is PathMatchingResourcePatternResolver, also capable of
-     * resource pattern resolving through the ResourcePatternResolver interface.
-     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
-     * @see com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver
-     */
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
-        this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
-    }
-
-    /**
-     * Return the ResourceLoader that this component provider uses.
-     */
-    public final ResourceLoader getResourceLoader() {
-        return this.resourcePatternResolver;
-    }
 
     /**
      * Set the resource pattern to use when scanning the classpath.
@@ -166,13 +155,97 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
 
     /**
      * Register the default filter for {@link Component @Component}.
-     * This will implicitly register all annotations that have the
+     * <p>This will implicitly register all annotations that have the
      * {@link Component @Component} meta-annotation including the
      * {@link Repository @Repository}, {@link Service @Service}, and
      * {@link Controller @Controller} stereotype annotations.
+     * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
+     * JSR-330's {@link javax.inject.Named} annotations, if available.
+     *
      */
+    @SuppressWarnings("unchecked")
     protected void registerDefaultFilters() {
         this.includeFilters.add(new AnnotationTypeFilter(Component.class));
+        ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
+        try {
+            this.includeFilters.add(new AnnotationTypeFilter(
+                    ((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false));
+            logger.debug("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
+        }
+        catch (ClassNotFoundException ex) {
+            // JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
+        }
+        try {
+            this.includeFilters.add(new AnnotationTypeFilter(
+                    ((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Named", cl)), false));
+            logger.debug("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
+        }
+        catch (ClassNotFoundException ex) {
+            // JSR-330 API not available - simply skip.
+        }
+    }
+
+    /**
+     * Set the Environment to use when resolving placeholders and evaluating
+     * {@link Conditional @Conditional}-annotated component classes.
+     * <p>The default is a {@link StandardEnvironment}.
+     * @param environment the Environment to use
+     */
+    public void setEnvironment(Environment environment) {
+        Assert.notNull(environment, "Environment must not be null");
+        this.environment = environment;
+        this.conditionEvaluator = null;
+    }
+
+    @Override
+    public final Environment getEnvironment() {
+        return this.environment;
+    }
+
+    /**
+     * Return the {@link BeanDefinitionRegistry} used by this scanner, if any.
+     */
+    protected BeanDefinitionRegistry getRegistry() {
+        return null;
+    }
+
+    /**
+     * Set the {@link ResourceLoader} to use for resource locations.
+     * This will typically be a {@link ResourcePatternResolver} implementation.
+     * <p>Default is a {@code PathMatchingResourcePatternResolver}, also capable of
+     * resource pattern resolving through the {@code ResourcePatternResolver} interface.
+     * @see com.rocket.summer.framework.core.io.support.ResourcePatternResolver
+     * @see com.rocket.summer.framework.core.io.support.PathMatchingResourcePatternResolver
+     */
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
+        this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
+    }
+
+    /**
+     * Return the ResourceLoader that this component provider uses.
+     */
+    public final ResourceLoader getResourceLoader() {
+        return this.resourcePatternResolver;
+    }
+
+    /**
+     * Set the {@link MetadataReaderFactory} to use.
+     * <p>Default is a {@link CachingMetadataReaderFactory} for the specified
+     * {@linkplain #setResourceLoader resource loader}.
+     * <p>Call this setter method <i>after</i> {@link #setResourceLoader} in order
+     * for the given MetadataReaderFactory to override the default factory.
+     */
+    public void setMetadataReaderFactory(MetadataReaderFactory metadataReaderFactory) {
+        this.metadataReaderFactory = metadataReaderFactory;
+    }
+
+    /**
+     * Return the MetadataReaderFactory used by this component provider.
+     */
+    public final MetadataReaderFactory getMetadataReaderFactory() {
+        return this.metadataReaderFactory;
     }
 
 
@@ -185,37 +258,42 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
         Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
         try {
             String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
-                    resolveBasePackage(basePackage) + "/" + this.resourcePattern;
+                    resolveBasePackage(basePackage) + '/' + this.resourcePattern;
             Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
             boolean traceEnabled = logger.isTraceEnabled();
             boolean debugEnabled = logger.isDebugEnabled();
-            for (int i = 0; i < resources.length; i++) {
-                Resource resource = resources[i];
+            for (Resource resource : resources) {
                 if (traceEnabled) {
                     logger.trace("Scanning " + resource);
                 }
                 if (resource.isReadable()) {
-                    MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
-                    if (isCandidateComponent(metadataReader)) {
-                        ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
-                        sbd.setResource(resource);
-                        sbd.setSource(resource);
-                        if (isCandidateComponent(sbd)) {
-                            if (debugEnabled) {
-                                logger.debug("Identified candidate component class: " + resource);
+                    try {
+                        MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+                        if (isCandidateComponent(metadataReader)) {
+                            ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
+                            sbd.setResource(resource);
+                            sbd.setSource(resource);
+                            if (isCandidateComponent(sbd)) {
+                                if (debugEnabled) {
+                                    logger.debug("Identified candidate component class: " + resource);
+                                }
+                                candidates.add(sbd);
                             }
-                            candidates.add(sbd);
+                            else {
+                                if (debugEnabled) {
+                                    logger.debug("Ignored because not a concrete top-level class: " + resource);
+                                }
+                            }
                         }
                         else {
-                            if (debugEnabled) {
-                                logger.debug("Ignored because not a concrete top-level class: " + resource);
+                            if (traceEnabled) {
+                                logger.trace("Ignored because not matching any filter: " + resource);
                             }
                         }
                     }
-                    else {
-                        if (traceEnabled) {
-                            logger.trace("Ignored because not matching any filter: " + resource);
-                        }
+                    catch (Throwable ex) {
+                        throw new BeanDefinitionStoreException(
+                                "Failed to read candidate component class: " + resource, ex);
                     }
                 }
                 else {
@@ -231,6 +309,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
         return candidates;
     }
 
+
     /**
      * Resolve the specified base package into a pattern specification for
      * the package search path.
@@ -240,7 +319,7 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
      * @return the pattern specification to be used for package searching
      */
     protected String resolveBasePackage(String basePackage) {
-        return ClassUtils.convertClassNameToResourcePath(SystemPropertyUtils.resolvePlaceholders(basePackage));
+        return ClassUtils.convertClassNameToResourcePath(this.environment.resolveRequiredPlaceholders(basePackage));
     }
 
     /**
@@ -257,22 +336,39 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
         }
         for (TypeFilter tf : this.includeFilters) {
             if (tf.match(metadataReader, this.metadataReaderFactory)) {
-                return true;
+                return isConditionMatch(metadataReader);
             }
         }
         return false;
     }
 
     /**
+     * Determine whether the given class is a candidate component based on any
+     * {@code @Conditional} annotations.
+     * @param metadataReader the ASM ClassReader for the class
+     * @return whether the class qualifies as a candidate component
+     */
+    private boolean isConditionMatch(MetadataReader metadataReader) {
+        if (this.conditionEvaluator == null) {
+            this.conditionEvaluator = new ConditionEvaluator(getRegistry(), getEnvironment(), getResourceLoader());
+        }
+        return !this.conditionEvaluator.shouldSkip(metadataReader.getAnnotationMetadata());
+    }
+
+    /**
      * Determine whether the given bean definition qualifies as candidate.
-     * <p>The default implementation checks whether the class is concrete
-     * (i.e. not abstract and not an interface). Can be overridden in subclasses.
+     * <p>The default implementation checks whether the class is not an interface
+     * and not dependent on an enclosing class.
+     * <p>Can be overridden in subclasses.
      * @param beanDefinition the bean definition to check
      * @return whether the bean definition qualifies as a candidate component
      */
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-        return (beanDefinition.getMetadata().isConcrete() && beanDefinition.getMetadata().isIndependent());
+        AnnotationMetadata metadata = beanDefinition.getMetadata();
+        return (metadata.isIndependent() && (metadata.isConcrete() ||
+                (metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
     }
+
 
     /**
      * Clear the underlying metadata cache, removing all cached class metadata.
@@ -284,4 +380,3 @@ public class ClassPathScanningCandidateComponentProvider implements ResourceLoad
     }
 
 }
-

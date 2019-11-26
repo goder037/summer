@@ -183,4 +183,3 @@ public class KeyValuePartTreeQuery implements RepositoryQuery {
         return queryMethod;
     }
 }
-
