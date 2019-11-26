@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.rocket.summer.framework.beans.BeansException;
+import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.beans.factory.InitializingBean;
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextAware;

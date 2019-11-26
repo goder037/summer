@@ -1,0 +1,82 @@
+package com.rocket.summer.framework.data.convert;
+
+import java.util.Collections;
+import java.util.Map;
+
+import com.rocket.summer.framework.data.mapping.PersistentEntity;
+import com.rocket.summer.framework.util.Assert;
+
+/**
+ * Simple value object allowing access to {@link EntityInstantiator} instances for a given type falling back to a
+ * default one.
+ *
+ * @author Oliver Gierke
+ * @author Thomas Darimont
+ */
+public class EntityInstantiators {
+
+    private final EntityInstantiator fallback;
+    private final Map<Class<?>, EntityInstantiator> customInstantiators;
+
+    /**
+     * Creates a new {@link EntityInstantiators} using the default fallback instantiator and no custom ones.
+     */
+    public EntityInstantiators() {
+        this(Collections.<Class<?>, EntityInstantiator> emptyMap());
+    }
+
+    /**
+     * Creates a new {@link EntityInstantiators} using the given {@link EntityInstantiator} as fallback.
+     *
+     * @param fallback must not be {@literal null}.
+     */
+    public EntityInstantiators(EntityInstantiator fallback) {
+        this(fallback, Collections.<Class<?>, EntityInstantiator> emptyMap());
+    }
+
+    /**
+     * Creates a new {@link EntityInstantiators} using the default fallback instantiator and the given custom ones.
+     *
+     * @param customInstantiators must not be {@literal null}.
+     */
+    public EntityInstantiators(Map<Class<?>, EntityInstantiator> customInstantiators) {
+        this(new ClassGeneratingEntityInstantiator(), customInstantiators);
+    }
+
+    /**
+     * Creates a new {@link EntityInstantiator} using the given fallback {@link EntityInstantiator} and the given custom
+     * ones.
+     *
+     * @param defaultInstantiator must not be {@literal null}.
+     * @param customInstantiators must not be {@literal null}.
+     */
+    public EntityInstantiators(EntityInstantiator defaultInstantiator,
+                               Map<Class<?>, EntityInstantiator> customInstantiators) {
+
+        Assert.notNull(defaultInstantiator, "DefaultInstantiator must not be null!");
+        Assert.notNull(customInstantiators, "CustomInstantiators must not be null!");
+
+        this.fallback = defaultInstantiator;
+        this.customInstantiators = customInstantiators;
+    }
+
+    /**
+     * Returns the {@link EntityInstantiator} to be used to create the given {@link PersistentEntity}.
+     *
+     * @param entity must not be {@literal null}.
+     * @return will never be {@literal null}.
+     */
+    public EntityInstantiator getInstantiatorFor(PersistentEntity<?, ?> entity) {
+
+        Assert.notNull(entity, "Entity must not be null!");
+        Class<?> type = entity.getType();
+
+        if (!customInstantiators.containsKey(type)) {
+            return fallback;
+        }
+
+        EntityInstantiator instantiator = customInstantiators.get(entity.getType());
+        return instantiator == null ? fallback : instantiator;
+    }
+}
+
