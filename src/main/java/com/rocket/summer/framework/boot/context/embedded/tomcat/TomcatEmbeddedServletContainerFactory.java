@@ -1,16 +1,39 @@
 package com.rocket.summer.framework.boot.context.embedded.tomcat;
 
-import com.rocket.summer.framework.boot.context.embedded.*;
-import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
-import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
-import com.rocket.summer.framework.context.ResourceLoaderAware;
-import com.rocket.summer.framework.core.io.ResourceLoader;
-import com.rocket.summer.framework.util.*;
-import org.apache.catalina.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+
+import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Manager;
+import org.apache.catalina.Valve;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.Tomcat.FixContextListener;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.ProtocolHandler;
@@ -19,15 +42,24 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.net.SSLHostConfig;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import com.rocket.summer.framework.boot.context.embedded.AbstractEmbeddedServletContainerFactory;
+import com.rocket.summer.framework.boot.context.embedded.Compression;
+import com.rocket.summer.framework.boot.context.embedded.EmbeddedServletContainer;
+import com.rocket.summer.framework.boot.context.embedded.EmbeddedServletContainerException;
+import com.rocket.summer.framework.boot.context.embedded.EmbeddedServletContainerFactory;
+import com.rocket.summer.framework.boot.context.embedded.MimeMappings;
+import com.rocket.summer.framework.boot.context.embedded.Ssl;
+import com.rocket.summer.framework.boot.context.embedded.Ssl.ClientAuth;
+import com.rocket.summer.framework.boot.context.embedded.SslStoreProvider;
+import com.rocket.summer.framework.boot.web.servlet.ErrorPage;
+import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
+import com.rocket.summer.framework.context.ResourceLoaderAware;
+import com.rocket.summer.framework.core.io.ResourceLoader;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.ResourceUtils;
+import com.rocket.summer.framework.util.StreamUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * {@link EmbeddedServletContainerFactory} that can be used to create
@@ -146,7 +178,7 @@ public class TomcatEmbeddedServletContainerFactory
         context.setDisplayName(getDisplayName());
         context.setPath(getContextPath());
         context.setDocBase(docBase.getAbsolutePath());
-        context.addLifecycleListener(new Tomcat.FixContextListener());
+        context.addLifecycleListener(new FixContextListener());
         context.setParentClassLoader(
                 (this.resourceLoader != null) ? this.resourceLoader.getClassLoader()
                         : ClassUtils.getDefaultClassLoader());
@@ -171,6 +203,11 @@ public class TomcatEmbeddedServletContainerFactory
         context.setLoader(loader);
         if (isRegisterDefaultServlet()) {
             addDefaultServlet(context);
+        }
+        if (shouldRegisterJspServlet()) {
+            addJspServlet(context);
+            addJasperInitializer(context);
+            context.addLifecycleListener(new StoreMergedWebXmlListener());
         }
         context.addLifecycleListener(new LifecycleListener() {
 
@@ -221,6 +258,21 @@ public class TomcatEmbeddedServletContainerFactory
         defaultServlet.setOverridable(true);
         context.addChild(defaultServlet);
         addServletMapping(context, "/", "default");
+    }
+
+    private void addJspServlet(Context context) {
+        Wrapper jspServlet = context.createWrapper();
+        jspServlet.setName("jsp");
+        jspServlet.setServletClass(getJspServlet().getClassName());
+        jspServlet.addInitParameter("fork", "false");
+        for (Entry<String, String> initParameter : getJspServlet().getInitParameters()
+                .entrySet()) {
+            jspServlet.addInitParameter(initParameter.getKey(), initParameter.getValue());
+        }
+        jspServlet.setLoadOnStartup(3);
+        context.addChild(jspServlet);
+        addServletMapping(context, "*.jsp", "jsp");
+        addServletMapping(context, "*.jspx", "jsp");
     }
 
     @SuppressWarnings("deprecation")
@@ -355,10 +407,10 @@ public class TomcatEmbeddedServletContainerFactory
     }
 
     private void configureSslClientAuth(AbstractHttp11JsseProtocol<?> protocol, Ssl ssl) {
-        if (ssl.getClientAuth() == Ssl.ClientAuth.NEED) {
+        if (ssl.getClientAuth() == ClientAuth.NEED) {
             protocol.setClientAuth(Boolean.TRUE.toString());
         }
-        else if (ssl.getClientAuth() == Ssl.ClientAuth.WANT) {
+        else if (ssl.getClientAuth() == ClientAuth.WANT) {
             protocol.setClientAuth("want");
         }
     }
@@ -820,4 +872,3 @@ public class TomcatEmbeddedServletContainerFactory
     }
 
 }
-

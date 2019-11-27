@@ -16,45 +16,9 @@ public enum CacheType {
     GENERIC,
 
     /**
-     * JCache (JSR-107) backed caching.
-     */
-    JCACHE,
-
-    /**
-     * EhCache backed caching.
-     */
-    EHCACHE,
-
-    /**
-     * Hazelcast backed caching.
-     */
-    HAZELCAST,
-
-    /**
-     * Infinispan backed caching.
-     */
-    INFINISPAN,
-
-    /**
-     * Couchbase backed caching.
-     */
-    COUCHBASE,
-
-    /**
      * Redis backed caching.
      */
     REDIS,
-
-    /**
-     * Caffeine backed caching.
-     */
-    CAFFEINE,
-
-    /**
-     * Guava backed caching.
-     */
-    @Deprecated
-    GUAVA,
 
     /**
      * Simple in-memory caching.
