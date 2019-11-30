@@ -1,14 +1,27 @@
 package com.rocket.summer.framework.context.annotation;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.rocket.summer.framework.aop.scope.ScopedProxyFactoryBean;
+import com.rocket.summer.framework.asm.Type;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.BeanFactoryAware;
-import com.rocket.summer.framework.beans.factory.FactoryBean;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
 import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
 import com.rocket.summer.framework.beans.factory.config.BeanFactoryPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
 import com.rocket.summer.framework.beans.factory.support.SimpleInstantiationStrategy;
+import com.rocket.summer.framework.cglib.core.ClassGenerator;
+import com.rocket.summer.framework.cglib.core.Constants;
+import com.rocket.summer.framework.cglib.core.DefaultGeneratorStrategy;
 import com.rocket.summer.framework.cglib.core.SpringNamingPolicy;
 import com.rocket.summer.framework.cglib.proxy.Callback;
 import com.rocket.summer.framework.cglib.proxy.CallbackFilter;
@@ -20,30 +33,21 @@ import com.rocket.summer.framework.cglib.proxy.NoOp;
 import com.rocket.summer.framework.cglib.transform.ClassEmitterTransformer;
 import com.rocket.summer.framework.cglib.transform.TransformingClassGenerator;
 import com.rocket.summer.framework.core.annotation.AnnotatedElementUtils;
+import com.rocket.summer.framework.objenesis.ObjenesisException;
 import com.rocket.summer.framework.objenesis.SpringObjenesis;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.ReflectionUtils;
-import com.rocket.summer.framework.cglib.core.ClassGenerator;
-import com.rocket.summer.framework.cglib.core.Constants;
-import com.rocket.summer.framework.cglib.core.DefaultGeneratorStrategy;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import com.rocket.summer.framework.asm.Type;
-import org.objenesis.ObjenesisException;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * Enhances {@link Configuration} classes by generating a CGLIB subclass capable of
- * interacting with the Spring container to respect bean semantics.
+ * Enhances {@link Configuration} classes by generating a CGLIB subclass which
+ * interacts with the Spring container to respect bean scoping semantics for
+ * {@code @Bean} methods. Each such {@code @Bean} method will be overridden in
+ * the generated subclass, only delegating to the actual {@code @Bean} method
+ * implementation if the container actually requests the construction of a new
+ * instance. Otherwise, a call to such an {@code @Bean} method serves as a
+ * reference back to the container, obtaining the corresponding bean by name.
  *
  * @author Chris Beams
  * @author Juergen Hoeller
@@ -52,10 +56,6 @@ import java.util.List;
  * @see ConfigurationClassPostProcessor
  */
 class ConfigurationClassEnhancer {
-
-    private static final Log logger = LogFactory.getLog(ConfigurationClassEnhancer.class);
-
-    private final List<Callback> callbackInstances = new ArrayList<Callback>();
 
     // The callbacks to use. Note that these callbacks must be stateless.
     private static final Callback[] CALLBACKS = new Callback[] {
@@ -68,7 +68,11 @@ class ConfigurationClassEnhancer {
 
     private static final String BEAN_FACTORY_FIELD = "$$beanFactory";
 
+
+    private static final Log logger = LogFactory.getLog(ConfigurationClassEnhancer.class);
+
     private static final SpringObjenesis objenesis = new SpringObjenesis();
+
 
     /**
      * Loads the specified class and generates a CGLIB subclass of it equipped with
@@ -111,38 +115,42 @@ class ConfigurationClassEnhancer {
     }
 
     /**
-     * Uses enhancer to generate a subclass of superclass, ensuring that
-     * {@link #callbackInstances} are registered for the new subclass.
+     * Uses enhancer to generate a subclass of superclass,
+     * ensuring that callbacks are registered for the new subclass.
      */
     private Class<?> createClass(Enhancer enhancer) {
         Class<?> subclass = enhancer.createClass();
-        // registering callbacks statically (as opposed to threadlocal) is critical for usage in an OSGi env (SPR-5932)
-        Enhancer.registerStaticCallbacks(subclass, this.callbackInstances.toArray(new Callback[this.callbackInstances.size()]));
+        // Registering callbacks statically (as opposed to thread-local)
+        // is critical for usage in an OSGi environment (SPR-5932)...
+        Enhancer.registerStaticCallbacks(subclass, CALLBACKS);
         return subclass;
     }
 
 
     /**
-     * Intercepts calls to {@link FactoryBean#getObject()}, delegating to calling
-     * {@link BeanFactory#getBean(String)} in order to respect caching / scoping.
-     * @see BeanMethodInterceptor#intercept(Object, Method, Object[], MethodProxy)
-     * @see BeanMethodInterceptor#enhanceFactoryBean(Class, String)
+     * Marker interface to be implemented by all @Configuration CGLIB subclasses.
+     * Facilitates idempotent behavior for {@link ConfigurationClassEnhancer#enhance}
+     * through checking to see if candidate classes are already assignable to it, e.g.
+     * have already been enhanced.
+     * <p>Also extends {@link BeanFactoryAware}, as all enhanced {@code @Configuration}
+     * classes require access to the {@link BeanFactory} that created them.
+     * <p>Note that this interface is intended for framework-internal use only, however
+     * must remain public in order to allow access to subclasses generated from other
+     * packages (i.e. user code).
      */
-    private static class GetObjectMethodInterceptor implements MethodInterceptor {
-
-        private final ConfigurableBeanFactory beanFactory;
-        private final String beanName;
-
-        public GetObjectMethodInterceptor(ConfigurableBeanFactory beanFactory, String beanName) {
-            this.beanFactory = beanFactory;
-            this.beanName = beanName;
-        }
-
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            return beanFactory.getBean(beanName);
-        }
-
+    public interface EnhancedConfiguration extends BeanFactoryAware {
     }
+
+
+    /**
+     * Conditional {@link Callback}.
+     * @see ConditionalCallbackFilter
+     */
+    private interface ConditionalCallback extends Callback {
+
+        boolean isMatch(Method candidateMethod);
+    }
+
 
     /**
      * A {@link CallbackFilter} that works by interrogating {@link Callback}s in the order
@@ -178,44 +186,6 @@ class ConfigurationClassEnhancer {
         }
     }
 
-    /**
-     * Conditional {@link Callback}.
-     * @see ConditionalCallbackFilter
-     */
-    private interface ConditionalCallback extends Callback {
-
-        boolean isMatch(Method candidateMethod);
-    }
-
-    /**
-     * Intercepts the invocation of any {@link BeanFactoryAware#setBeanFactory(BeanFactory)} on
-     * {@code @Configuration} class instances for the purpose of recording the {@link BeanFactory}.
-     * @see EnhancedConfiguration
-     */
-    private static class BeanFactoryAwareMethodInterceptor implements MethodInterceptor, ConditionalCallback {
-
-        @Override
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            Field field = ReflectionUtils.findField(obj.getClass(), BEAN_FACTORY_FIELD);
-            Assert.state(field != null, "Unable to find generated BeanFactory field");
-            field.set(obj, args[0]);
-
-            // Does the actual (non-CGLIB) superclass implement BeanFactoryAware?
-            // If so, call its setBeanFactory() method. If not, just exit.
-            if (BeanFactoryAware.class.isAssignableFrom(ClassUtils.getUserClass(obj.getClass().getSuperclass()))) {
-                return proxy.invokeSuper(obj, args);
-            }
-            return null;
-        }
-
-        @Override
-        public boolean isMatch(Method candidateMethod) {
-            return (candidateMethod.getName().equals("setBeanFactory") &&
-                    candidateMethod.getParameterTypes().length == 1 &&
-                    BeanFactory.class == candidateMethod.getParameterTypes()[0] &&
-                    BeanFactoryAware.class.isAssignableFrom(candidateMethod.getDeclaringClass()));
-        }
-    }
 
     /**
      * Custom extension of CGLIB's DefaultGeneratorStrategy, introducing a {@link BeanFactory} field.
@@ -271,6 +241,37 @@ class ConfigurationClassEnhancer {
                     currentThread.setContextClassLoader(threadContextClassLoader);
                 }
             }
+        }
+    }
+
+
+    /**
+     * Intercepts the invocation of any {@link BeanFactoryAware#setBeanFactory(BeanFactory)} on
+     * {@code @Configuration} class instances for the purpose of recording the {@link BeanFactory}.
+     * @see EnhancedConfiguration
+     */
+    private static class BeanFactoryAwareMethodInterceptor implements MethodInterceptor, ConditionalCallback {
+
+        @Override
+        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+            Field field = ReflectionUtils.findField(obj.getClass(), BEAN_FACTORY_FIELD);
+            Assert.state(field != null, "Unable to find generated BeanFactory field");
+            field.set(obj, args[0]);
+
+            // Does the actual (non-CGLIB) superclass implement BeanFactoryAware?
+            // If so, call its setBeanFactory() method. If not, just exit.
+            if (BeanFactoryAware.class.isAssignableFrom(ClassUtils.getUserClass(obj.getClass().getSuperclass()))) {
+                return proxy.invokeSuper(obj, args);
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isMatch(Method candidateMethod) {
+            return (candidateMethod.getName().equals("setBeanFactory") &&
+                    candidateMethod.getParameterTypes().length == 1 &&
+                    BeanFactory.class == candidateMethod.getParameterTypes()[0] &&
+                    BeanFactoryAware.class.isAssignableFrom(candidateMethod.getDeclaringClass()));
         }
     }
 
@@ -489,7 +490,7 @@ class ConfigurationClassEnhancer {
         private Object createInterfaceProxyForFactoryBean(final Object factoryBean, Class<?> interfaceType,
                                                           final ConfigurableBeanFactory beanFactory, final String beanName) {
 
-            return java.lang.reflect.Proxy.newProxyInstance(
+            return Proxy.newProxyInstance(
                     factoryBean.getClass().getClassLoader(), new Class<?>[] {interfaceType},
                     new InvocationHandler() {
                         @Override
@@ -549,18 +550,4 @@ class ConfigurationClassEnhancer {
         }
     }
 
-    /**
-     * Marker interface to be implemented by all @Configuration CGLIB subclasses.
-     * Facilitates idempotent behavior for {@link ConfigurationClassEnhancer#enhance}
-     * through checking to see if candidate classes are already assignable to it, e.g.
-     * have already been enhanced.
-     * <p>Also extends {@link BeanFactoryAware}, as all enhanced {@code @Configuration}
-     * classes require access to the {@link BeanFactory} that created them.
-     * <p>Note that this interface is intended for framework-internal use only, however
-     * must remain public in order to allow access to subclasses generated from other
-     * packages (i.e. user code).
-     */
-    public interface EnhancedConfiguration extends BeanFactoryAware {
-    }
 }
-

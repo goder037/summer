@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentMap;
 import com.rocket.summer.framework.beans.BeanUtils;
 import com.rocket.summer.framework.beans.BeanWrapper;
 import com.rocket.summer.framework.beans.BeanWrapperImpl;
+import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.beans.MutablePropertyValues;
 import com.rocket.summer.framework.beans.PropertyAccessorUtils;
 import com.rocket.summer.framework.beans.PropertyValue;
@@ -50,7 +51,6 @@ import com.rocket.summer.framework.beans.factory.config.DependencyDescriptor;
 import com.rocket.summer.framework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import com.rocket.summer.framework.beans.factory.config.TypedStringValue;
-import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.core.DefaultParameterNameDiscoverer;
 import com.rocket.summer.framework.core.GenericTypeResolver;
 import com.rocket.summer.framework.core.MethodParameter;
@@ -1093,7 +1093,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param beanClass the raw class of the bean
      * @param beanName the name of the bean
      * @return the candidate constructors, or {@code null} if none specified
-     * @throws com.rocket.summer.framework.context.BeansException in case of errors
+     * @throws com.rocket.summer.framework.beans.BeansException in case of errors
      * @see com.rocket.summer.framework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor#determineCandidateConstructors
      */
     protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(Class<?> beanClass, String beanName)

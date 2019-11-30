@@ -1,20 +1,5 @@
 package com.rocket.summer.framework.beans.factory.support;
 
-import com.rocket.summer.framework.beans.*;
-import com.rocket.summer.framework.beans.factory.BeanCreationException;
-import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
-import com.rocket.summer.framework.beans.factory.InjectionPoint;
-import com.rocket.summer.framework.beans.factory.UnsatisfiedDependencyException;
-import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues;
-import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
-import com.rocket.summer.framework.beans.factory.config.DependencyDescriptor;
-import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.GenericTypeResolver;
-import com.rocket.summer.framework.core.MethodParameter;
-import com.rocket.summer.framework.core.NamedThreadLocal;
-import com.rocket.summer.framework.core.ParameterNameDiscoverer;
-import com.rocket.summer.framework.util.*;
-
 import java.beans.ConstructorProperties;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
@@ -22,7 +7,37 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.rocket.summer.framework.beans.BeanMetadataElement;
+import com.rocket.summer.framework.beans.BeanWrapper;
+import com.rocket.summer.framework.beans.BeanWrapperImpl;
+import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.beans.TypeConverter;
+import com.rocket.summer.framework.beans.TypeMismatchException;
+import com.rocket.summer.framework.beans.factory.BeanCreationException;
+import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
+import com.rocket.summer.framework.beans.factory.InjectionPoint;
+import com.rocket.summer.framework.beans.factory.UnsatisfiedDependencyException;
+import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues;
+import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
+import com.rocket.summer.framework.beans.factory.config.DependencyDescriptor;
+import com.rocket.summer.framework.core.GenericTypeResolver;
+import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.core.NamedThreadLocal;
+import com.rocket.summer.framework.core.ParameterNameDiscoverer;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.MethodInvoker;
+import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.ReflectionUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * Delegate for resolving constructors and factory methods.
@@ -501,7 +516,7 @@ class ConstructorResolver {
                     }
                 }
                 else {
-                    Set<ConstructorArgumentValues.ValueHolder> valueHolders = new LinkedHashSet<ValueHolder>(resolvedValues.getArgumentCount());
+                    Set<ValueHolder> valueHolders = new LinkedHashSet<ValueHolder>(resolvedValues.getArgumentCount());
                     valueHolders.addAll(resolvedValues.getIndexedArgumentValues().values());
                     valueHolders.addAll(resolvedValues.getGenericArgumentValues());
                     for (ValueHolder value : valueHolders) {
