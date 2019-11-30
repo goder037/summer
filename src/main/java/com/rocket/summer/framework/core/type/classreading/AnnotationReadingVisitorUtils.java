@@ -4,7 +4,7 @@ import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.core.annotation.AnnotationUtils;
 import com.rocket.summer.framework.util.LinkedMultiValueMap;
 import com.rocket.summer.framework.util.ObjectUtils;
-import org.objectweb.asm.Type;
+import com.rocket.summer.framework.asm.Type;
 
 import java.util.*;
 

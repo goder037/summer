@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
 import com.rocket.summer.framework.expression.EvaluationException;
 import com.rocket.summer.framework.expression.Operation;
 import com.rocket.summer.framework.expression.TypedValue;

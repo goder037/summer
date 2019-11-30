@@ -1,26 +1,42 @@
 package com.rocket.summer.framework.aop.framework;
 
-import com.rocket.summer.framework.aop.*;
-import com.rocket.summer.framework.aop.support.AopUtils;
-import com.rocket.summer.framework.cglib.core.SpringNamingPolicy;
-import com.rocket.summer.framework.core.SmartClassLoader;
-import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.ClassUtils;
-import com.rocket.summer.framework.util.ObjectUtils;
-import net.sf.cglib.core.ClassGenerator;
-import net.sf.cglib.core.CodeGenerationException;
-import net.sf.cglib.proxy.*;
-import net.sf.cglib.transform.impl.UndeclaredThrowableStrategy;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.*;
+import com.rocket.summer.framework.aop.Advisor;
+import com.rocket.summer.framework.aop.AopInvocationException;
+import com.rocket.summer.framework.aop.PointcutAdvisor;
+import com.rocket.summer.framework.aop.RawTargetAccess;
+import com.rocket.summer.framework.aop.TargetSource;
+import com.rocket.summer.framework.aop.support.AopUtils;
+import com.rocket.summer.framework.cglib.core.ClassGenerator;
+import com.rocket.summer.framework.cglib.core.CodeGenerationException;
+import com.rocket.summer.framework.cglib.core.SpringNamingPolicy;
+import com.rocket.summer.framework.cglib.proxy.Callback;
+import com.rocket.summer.framework.cglib.proxy.CallbackFilter;
+import com.rocket.summer.framework.cglib.proxy.Dispatcher;
+import com.rocket.summer.framework.cglib.proxy.Enhancer;
+import com.rocket.summer.framework.cglib.proxy.Factory;
+import com.rocket.summer.framework.cglib.proxy.MethodInterceptor;
+import com.rocket.summer.framework.cglib.proxy.MethodProxy;
+import com.rocket.summer.framework.cglib.proxy.NoOp;
+import com.rocket.summer.framework.cglib.transform.impl.UndeclaredThrowableStrategy;
+import com.rocket.summer.framework.core.SmartClassLoader;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.ObjectUtils;
 
 /**
  * CGLIB-based {@link AopProxy} implementation for the Spring AOP framework.
@@ -42,7 +58,7 @@ import java.util.*;
  * @author Ramnivas Laddad
  * @author Chris Beams
  * @author Dave Syer
- * @see Enhancer
+ * @see com.rocket.summer.framework.cglib.proxy.Enhancer
  * @see AdvisedSupport#setProxyTargetClass
  * @see DefaultAopProxyFactory
  */
@@ -978,4 +994,3 @@ class CglibAopProxy implements AopProxy, Serializable {
     }
 
 }
-

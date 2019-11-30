@@ -1,9 +1,14 @@
 package com.rocket.summer.framework.core;
 
+import com.rocket.summer.framework.asm.ClassReader;
+import com.rocket.summer.framework.asm.ClassVisitor;
+import com.rocket.summer.framework.asm.Label;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
+import com.rocket.summer.framework.asm.Type;
 import com.rocket.summer.framework.util.ClassUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.objectweb.asm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -127,7 +132,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
         private final Map<Member, String[]> memberMap;
 
         public ParameterNameDiscoveringVisitor(Class<?> clazz, Map<Member, String[]> memberMap) {
-            super(Opcodes.ASM7);
+            super(Opcodes.ASM6);
             this.clazz = clazz;
             this.memberMap = memberMap;
         }
@@ -176,7 +181,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
         private final int[] lvtSlotIndex;
 
         public LocalVariableTableVisitor(Class<?> clazz, Map<Member, String[]> map, String name, String desc, boolean isStatic) {
-            super(Opcodes.ASM7);
+            super(Opcodes.ASM6);
             this.clazz = clazz;
             this.memberMap = map;
             this.name = name;

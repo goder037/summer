@@ -4,9 +4,9 @@ import com.rocket.summer.framework.core.annotation.AnnotationAttributes;
 import com.rocket.summer.framework.util.ReflectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import com.rocket.summer.framework.asm.AnnotationVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
+import com.rocket.summer.framework.asm.Type;
 
 import java.lang.reflect.Field;
 import java.security.AccessControlException;
@@ -28,7 +28,7 @@ abstract class AbstractRecursiveAnnotationVisitor extends AnnotationVisitor {
 
 
     public AbstractRecursiveAnnotationVisitor(ClassLoader classLoader, AnnotationAttributes attributes) {
-        super(Opcodes.ASM7);
+        super(Opcodes.ASM6);
         this.classLoader = classLoader;
         this.attributes = attributes;
     }

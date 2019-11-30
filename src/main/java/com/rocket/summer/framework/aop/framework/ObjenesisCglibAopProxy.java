@@ -1,11 +1,12 @@
 package com.rocket.summer.framework.aop.framework;
 
-import com.rocket.summer.framework.objenesis.SpringObjenesis;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.Factory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.rocket.summer.framework.cglib.proxy.Callback;
+import com.rocket.summer.framework.cglib.proxy.Enhancer;
+import com.rocket.summer.framework.cglib.proxy.Factory;
+import com.rocket.summer.framework.objenesis.SpringObjenesis;
 
 /**
  * Objenesis-based extension of {@link CglibAopProxy} to create proxy instances

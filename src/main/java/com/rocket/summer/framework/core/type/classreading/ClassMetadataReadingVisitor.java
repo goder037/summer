@@ -1,9 +1,14 @@
 package com.rocket.summer.framework.core.type.classreading;
 
+import com.rocket.summer.framework.asm.AnnotationVisitor;
+import com.rocket.summer.framework.asm.Attribute;
+import com.rocket.summer.framework.asm.ClassVisitor;
+import com.rocket.summer.framework.asm.FieldVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
 import com.rocket.summer.framework.core.type.ClassMetadata;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.StringUtils;
-import org.objectweb.asm.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -44,7 +49,7 @@ class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata 
 
 
     public ClassMetadataReadingVisitor() {
-        super(Opcodes.ASM7);
+        super(Opcodes.ASM6);
     }
 
 
@@ -187,7 +192,7 @@ class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata 
     private static class EmptyAnnotationVisitor extends AnnotationVisitor {
 
         public EmptyAnnotationVisitor() {
-            super(Opcodes.ASM7);
+            super(Opcodes.ASM6);
         }
 
         @Override
@@ -205,7 +210,7 @@ class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata 
     private static class EmptyMethodVisitor extends MethodVisitor {
 
         public EmptyMethodVisitor() {
-            super(Opcodes.ASM7);
+            super(Opcodes.ASM6);
         }
     }
 
@@ -213,7 +218,7 @@ class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata 
     private static class EmptyFieldVisitor extends FieldVisitor {
 
         public EmptyFieldVisitor() {
-            super(Opcodes.ASM7);
+            super(Opcodes.ASM6);
         }
     }
 

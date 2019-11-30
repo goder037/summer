@@ -14,8 +14,8 @@ import com.rocket.summer.framework.expression.spel.SpelMessage;
 import com.rocket.summer.framework.expression.spel.SpelNode;
 import com.rocket.summer.framework.expression.spel.support.StandardEvaluationContext;
 import com.rocket.summer.framework.util.ObjectUtils;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
 
 /**
  * The common supertype of all AST nodes in a parsed Spring Expression Language

@@ -7,7 +7,7 @@ import com.rocket.summer.framework.expression.EvaluationContext;
 import com.rocket.summer.framework.expression.TypedValue;
 import com.rocket.summer.framework.expression.spel.CodeFlow;
 import com.rocket.summer.framework.expression.spel.CompilablePropertyAccessor;
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
 
 /**
  * EL property accessor that knows how to traverse the keys

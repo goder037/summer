@@ -2,7 +2,7 @@ package com.rocket.summer.framework.expression.spel.ast;
 
 import com.rocket.summer.framework.expression.spel.CodeFlow;
 import com.rocket.summer.framework.expression.spel.support.BooleanTypedValue;
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
 
 /**
  * Represents the literal values {@code TRUE} and {@code FALSE}.

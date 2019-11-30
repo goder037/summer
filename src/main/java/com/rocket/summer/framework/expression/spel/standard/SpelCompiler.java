@@ -18,11 +18,9 @@ import com.rocket.summer.framework.expression.spel.SpelParserConfiguration;
 import com.rocket.summer.framework.expression.spel.ast.SpelNodeImpl;
 import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-import static jdk.internal.org.objectweb.asm.Opcodes.*;
+import com.rocket.summer.framework.asm.ClassWriter;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
 
 /**
  * A SpelCompiler will take a regular parsed expression and create (and load) a class

@@ -1,8 +1,9 @@
 package com.rocket.summer.framework.boot.context.embedded;
 
+import org.apache.catalina.core.ApplicationContext;
+
 import com.rocket.summer.framework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
-import org.apache.catalina.core.ApplicationContext;
 
 /**
  * Factory interface that can be used to create {@link EmbeddedServletContainer}s.
@@ -30,3 +31,4 @@ public interface EmbeddedServletContainerFactory {
             ServletContextInitializer... initializers);
 
 }
+

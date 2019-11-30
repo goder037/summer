@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * Caching implementation of the {@link MetadataReaderFactory} interface,
- * caching an ASM {@link org.objectweb.asm.ClassReader} per Spring Resource handle
+ * caching an ASM {@link com.rocket.summer.framework.asm.ClassReader} per Spring Resource handle
  * (i.e. per ".class" file).
  *
  * @author Juergen Hoeller

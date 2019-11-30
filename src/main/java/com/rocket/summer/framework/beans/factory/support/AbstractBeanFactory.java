@@ -215,6 +215,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      * @return an instance of the bean
      * @throws BeansException if the bean could not be created
      */
+    @SuppressWarnings("unchecked")
     protected <T> T doGetBean(
             final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
             throws BeansException {

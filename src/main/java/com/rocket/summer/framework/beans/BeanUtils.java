@@ -1,20 +1,32 @@
 package com.rocket.summer.framework.beans;
 
-import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.MethodParameter;
-import com.rocket.summer.framework.util.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import com.rocket.summer.framework.context.BeansException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
+import com.rocket.summer.framework.util.ReflectionUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * Static convenience methods for JavaBeans: for instantiating beans,
@@ -114,6 +126,9 @@ public abstract class BeanUtils {
         Assert.notNull(ctor, "Constructor must not be null");
         try {
             ReflectionUtils.makeAccessible(ctor);
+            if(ctor.getName().contains("EmbeddedServletContainerAutoConfiguration")){
+                System.out.println("hhee");
+            }
             return ctor.newInstance(args);
         }
         catch (InstantiationException ex) {

@@ -1,24 +1,66 @@
 package com.rocket.summer.framework.beans.factory.support;
 
-import com.rocket.summer.framework.beans.*;
-import com.rocket.summer.framework.beans.factory.*;
-import com.rocket.summer.framework.beans.factory.config.*;
-import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.*;
-import com.rocket.summer.framework.util.ClassUtils;
-import com.rocket.summer.framework.util.ObjectUtils;
-import com.rocket.summer.framework.util.ReflectionUtils;
-import com.rocket.summer.framework.util.StringUtils;
-
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.*;
-import java.util.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import com.rocket.summer.framework.beans.BeanUtils;
+import com.rocket.summer.framework.beans.BeanWrapper;
+import com.rocket.summer.framework.beans.BeanWrapperImpl;
+import com.rocket.summer.framework.beans.MutablePropertyValues;
+import com.rocket.summer.framework.beans.PropertyAccessorUtils;
+import com.rocket.summer.framework.beans.PropertyValue;
+import com.rocket.summer.framework.beans.PropertyValues;
+import com.rocket.summer.framework.beans.TypeConverter;
+import com.rocket.summer.framework.beans.factory.Aware;
+import com.rocket.summer.framework.beans.factory.BeanClassLoaderAware;
+import com.rocket.summer.framework.beans.factory.BeanCreationException;
+import com.rocket.summer.framework.beans.factory.BeanCurrentlyInCreationException;
+import com.rocket.summer.framework.beans.factory.BeanDefinitionStoreException;
+import com.rocket.summer.framework.beans.factory.BeanFactory;
+import com.rocket.summer.framework.beans.factory.BeanFactoryAware;
+import com.rocket.summer.framework.beans.factory.BeanNameAware;
+import com.rocket.summer.framework.beans.factory.FactoryBean;
+import com.rocket.summer.framework.beans.factory.InitializingBean;
+import com.rocket.summer.framework.beans.factory.ObjectFactory;
+import com.rocket.summer.framework.beans.factory.UnsatisfiedDependencyException;
+import com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory;
+import com.rocket.summer.framework.beans.factory.config.BeanDefinition;
+import com.rocket.summer.framework.beans.factory.config.BeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
+import com.rocket.summer.framework.beans.factory.config.ConstructorArgumentValues;
+import com.rocket.summer.framework.beans.factory.config.DependencyDescriptor;
+import com.rocket.summer.framework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
+import com.rocket.summer.framework.beans.factory.config.TypedStringValue;
+import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.core.DefaultParameterNameDiscoverer;
+import com.rocket.summer.framework.core.GenericTypeResolver;
+import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.core.ParameterNameDiscoverer;
+import com.rocket.summer.framework.core.PriorityOrdered;
+import com.rocket.summer.framework.core.ResolvableType;
+import com.rocket.summer.framework.util.ClassUtils;
+import com.rocket.summer.framework.util.ObjectUtils;
+import com.rocket.summer.framework.util.ReflectionUtils;
+import com.rocket.summer.framework.util.StringUtils;
 
 /**
  * Abstract bean factory superclass that implements default bean creation,
@@ -1468,7 +1510,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         for (PropertyValue pv : original) {
             if (pv.isConverted()) {
                 deepCopy.add(pv);
-            } else {
+            }
+            else {
                 String propertyName = pv.getName();
                 Object originalValue = pv.getValue();
                 Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
@@ -1505,7 +1548,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // Set our (possibly massaged) deep copy.
         try {
             bw.setPropertyValues(new MutablePropertyValues(deepCopy));
-        } catch (BeansException ex) {
+        }
+        catch (BeansException ex) {
             throw new BeanCreationException(
                     mbd.getResourceDescription(), beanName, "Error setting property values", ex);
         }
@@ -1743,6 +1787,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * Special DependencyDescriptor variant for Spring's good old autowire="byType" mode.
      * Always optional; never considering the parameter name for choosing a primary candidate.
      */
+    @SuppressWarnings("serial")
     private static class AutowireByTypeDependencyDescriptor extends DependencyDescriptor {
 
         public AutowireByTypeDependencyDescriptor(MethodParameter methodParameter, boolean eager) {

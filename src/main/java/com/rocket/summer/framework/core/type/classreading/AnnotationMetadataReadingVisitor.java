@@ -13,10 +13,10 @@ import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.MethodMetadata;
 import com.rocket.summer.framework.util.LinkedMultiValueMap;
 import com.rocket.summer.framework.util.MultiValueMap;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import com.rocket.summer.framework.asm.AnnotationVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
+import com.rocket.summer.framework.asm.Type;
 
 /**
  * ASM class visitor which looks for the class name and implemented types as

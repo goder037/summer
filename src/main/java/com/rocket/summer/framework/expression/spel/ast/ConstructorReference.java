@@ -7,7 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
 import com.rocket.summer.framework.core.convert.TypeDescriptor;
 import com.rocket.summer.framework.expression.AccessException;
 import com.rocket.summer.framework.expression.ConstructorExecutor;

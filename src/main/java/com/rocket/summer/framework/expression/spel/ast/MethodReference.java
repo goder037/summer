@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Label;
+import com.rocket.summer.framework.asm.MethodVisitor;
 import com.rocket.summer.framework.core.convert.TypeDescriptor;
 import com.rocket.summer.framework.expression.AccessException;
 import com.rocket.summer.framework.expression.EvaluationContext;

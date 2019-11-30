@@ -25,7 +25,7 @@ import com.rocket.summer.framework.expression.spel.CodeFlow;
 import com.rocket.summer.framework.expression.spel.CompilablePropertyAccessor;
 import com.rocket.summer.framework.util.ReflectionUtils;
 import com.rocket.summer.framework.util.StringUtils;
-import org.objectweb.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.MethodVisitor;
 
 /**
  * A powerful {@link PropertyAccessor} that uses reflection to access properties

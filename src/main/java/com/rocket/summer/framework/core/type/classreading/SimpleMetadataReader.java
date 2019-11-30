@@ -4,7 +4,7 @@ import com.rocket.summer.framework.core.NestedIOException;
 import com.rocket.summer.framework.core.io.Resource;
 import com.rocket.summer.framework.core.type.AnnotationMetadata;
 import com.rocket.summer.framework.core.type.ClassMetadata;
-import org.objectweb.asm.ClassReader;
+import com.rocket.summer.framework.asm.ClassReader;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 /**
  * {@link MetadataReader} implementation based on an ASM
- * {@link org.objectweb.asm.ClassReader}.
+ * {@link com.rocket.summer.framework.asm.ClassReader}.
  *
  * <p>Package-visible in order to allow for repackaging the ASM library
  * without effect on users of the <code>core.type</code> package.

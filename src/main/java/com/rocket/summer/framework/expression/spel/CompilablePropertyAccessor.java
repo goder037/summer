@@ -1,8 +1,8 @@
 package com.rocket.summer.framework.expression.spel;
 
 import com.rocket.summer.framework.expression.PropertyAccessor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import com.rocket.summer.framework.asm.MethodVisitor;
+import com.rocket.summer.framework.asm.Opcodes;
 
 /**
  * A compilable property accessor is able to generate bytecode that represents
