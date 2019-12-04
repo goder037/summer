@@ -1,10 +1,11 @@
 package com.rocket.summer.framework.core;
 
-import com.rocket.summer.framework.util.Assert;
-
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.ClassUtils;
 
 /**
  * Base class for decorating ClassLoaders such as {@link OverridingClassLoader}
@@ -17,11 +18,25 @@ import java.util.Set;
  */
 public abstract class DecoratingClassLoader extends ClassLoader {
 
-    private final Set excludedPackages = new HashSet();
+    /**
+     * Java 7+ {@code ClassLoader.registerAsParallelCapable()} available?
+     * @since 4.1.2
+     */
+    protected static final boolean parallelCapableClassLoaderAvailable =
+            ClassUtils.hasMethod(ClassLoader.class, "registerAsParallelCapable");
 
-    private final Set excludedClasses = new HashSet();
+    static {
+        if (parallelCapableClassLoaderAvailable) {
+            ClassLoader.registerAsParallelCapable();
+        }
+    }
 
-    private final Object exclusionMonitor = new Object();
+
+    private final Set<String> excludedPackages =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(8));
+
+    private final Set<String> excludedClasses =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(8));
 
 
     /**
@@ -38,29 +53,6 @@ public abstract class DecoratingClassLoader extends ClassLoader {
         super(parent);
     }
 
-    /**
-     * Determine whether the specified class is excluded from decoration
-     * by this class loader.
-     * <p>The default implementation checks against excluded packages and classes.
-     * @param className the class name to check
-     * @return whether the specified class is eligible
-     * @see #excludePackage
-     * @see #excludeClass
-     */
-    protected boolean isExcluded(String className) {
-        synchronized (this.exclusionMonitor) {
-            if (this.excludedClasses.contains(className)) {
-                return true;
-            }
-            for (Iterator it = this.excludedPackages.iterator(); it.hasNext();) {
-                String packageName = (String) it.next();
-                if (className.startsWith(packageName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Add a package name to exclude from decoration (e.g. overriding).
@@ -70,9 +62,7 @@ public abstract class DecoratingClassLoader extends ClassLoader {
      */
     public void excludePackage(String packageName) {
         Assert.notNull(packageName, "Package name must not be null");
-        synchronized (this.exclusionMonitor) {
-            this.excludedPackages.add(packageName);
-        }
+        this.excludedPackages.add(packageName);
     }
 
     /**
@@ -83,8 +73,28 @@ public abstract class DecoratingClassLoader extends ClassLoader {
      */
     public void excludeClass(String className) {
         Assert.notNull(className, "Class name must not be null");
-        synchronized (this.exclusionMonitor) {
-            this.excludedClasses.add(className);
-        }
+        this.excludedClasses.add(className);
     }
+
+    /**
+     * Determine whether the specified class is excluded from decoration
+     * by this class loader.
+     * <p>The default implementation checks against excluded packages and classes.
+     * @param className the class name to check
+     * @return whether the specified class is eligible
+     * @see #excludePackage
+     * @see #excludeClass
+     */
+    protected boolean isExcluded(String className) {
+        if (this.excludedClasses.contains(className)) {
+            return true;
+        }
+        for (String packageName : this.excludedPackages) {
+            if (className.startsWith(packageName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
