@@ -1,4 +1,4 @@
-package com.rocket.test;
+package com.rocket.summer.framework;
 
 public interface IUserService {
 

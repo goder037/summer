@@ -1,4 +1,4 @@
-package com.rocket.test;
+package com.rocket.summer.framework;
 
 import com.rocket.summer.framework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 

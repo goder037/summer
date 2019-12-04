@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.cglib.proxy;
 
 import com.rocket.summer.framework.cglib.core.AbstractClassGenerator;
+import com.rocket.summer.framework.cglib.core.CodeGenerationException;
 import com.rocket.summer.framework.cglib.core.GeneratorStrategy;
 import com.rocket.summer.framework.cglib.core.NamingPolicy;
 import com.rocket.summer.framework.cglib.core.Signature;

@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.cglib.proxy;
 
+import com.rocket.summer.framework.cglib.core.CodeGenerationException;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 

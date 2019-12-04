@@ -3,8 +3,6 @@ package com.rocket.summer.framework.cglib.core;
 import com.rocket.summer.framework.asm.ClassReader;
 import com.rocket.summer.framework.asm.ClassVisitor;
 import com.rocket.summer.framework.asm.ClassWriter;
-import com.rocket.summer.framework.cglib.core.CodeGenerationException;
-import com.rocket.summer.framework.cglib.core.Constants;
 
 
 import java.io.*;

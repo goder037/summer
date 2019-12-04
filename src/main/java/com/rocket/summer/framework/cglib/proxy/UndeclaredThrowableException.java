@@ -1,5 +1,7 @@
 package com.rocket.summer.framework.cglib.proxy;
 
+import com.rocket.summer.framework.cglib.core.CodeGenerationException;
+
 /**
  * Used by {@link Proxy} as a replacement for <code>java.lang.reflect.UndeclaredThrowableException</code>.
  * @author Juozas Baliuka

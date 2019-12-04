@@ -2,7 +2,6 @@ package com.rocket.summer.framework.aop.support;
 
 import com.rocket.summer.framework.aop.*;
 import com.rocket.summer.framework.core.BridgeMethodResolver;
-import com.rocket.summer.framework.core.JdkVersion;
 import com.rocket.summer.framework.core.MethodIntrospector;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
