@@ -6,7 +6,6 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
 import com.rocket.summer.framework.util.LinkedMultiValueMap;
 import com.rocket.summer.framework.util.MultiValueMap;
-import com.rocket.summer.framework.web.servlet.FilterRegistrationBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

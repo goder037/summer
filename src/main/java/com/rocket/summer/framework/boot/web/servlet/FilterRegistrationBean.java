@@ -1,6 +1,5 @@
-package com.rocket.summer.framework.web.servlet;
+package com.rocket.summer.framework.boot.web.servlet;
 
-import com.rocket.summer.framework.boot.web.servlet.ServletRegistrationBean;
 import com.rocket.summer.framework.util.Assert;
 
 import javax.servlet.Filter;
@@ -67,3 +66,4 @@ public class FilterRegistrationBean extends AbstractFilterRegistrationBean {
     }
 
 }
+

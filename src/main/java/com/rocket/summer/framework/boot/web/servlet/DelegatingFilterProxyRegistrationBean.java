@@ -6,7 +6,6 @@ import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.web.context.WebApplicationContext;
 import com.rocket.summer.framework.web.filter.DelegatingFilterProxy;
-import com.rocket.summer.framework.web.servlet.FilterRegistrationBean;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;

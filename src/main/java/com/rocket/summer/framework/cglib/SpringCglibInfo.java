@@ -17,11 +17,11 @@
 package com.rocket.summer.framework.cglib;
 
 /**
- * Empty class used to ensure that the {@code org.springframework.cglib}
+ * Empty class used to ensure that the {@code com.rocket.summer.framework.cglib}
  * package is processed during javadoc generation.
  *
  * <p>See <a href="package-summary.html">package-level javadocs</a> for more
- * information on {@code org.springframework.cglib}.
+ * information on {@code com.rocket.summer.framework.cglib}.
  *
  * @author Chris Beams
  * @since 3.2

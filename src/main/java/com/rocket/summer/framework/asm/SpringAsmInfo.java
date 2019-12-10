@@ -21,7 +21,7 @@ package com.rocket.summer.framework.asm;
  * of the ASM bytecode manipulation library (currently based on version 6.0).
  *
  * <p>See <a href="package-summary.html">package-level javadocs</a> for more
- * information on {@code org.springframework.asm}.
+ * information on {@code com.rocket.summer.framework.asm}.
  *
  * @author Chris Beams
  * @since 3.2

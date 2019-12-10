@@ -12,7 +12,6 @@ import com.rocket.summer.framework.beans.factory.support.BeanDefinitionBuilder;
 import com.rocket.summer.framework.beans.factory.support.BeanDefinitionRegistry;
 import com.rocket.summer.framework.context.annotation.ScannedGenericBeanDefinition;
 import com.rocket.summer.framework.util.StringUtils;
-import com.rocket.summer.framework.web.servlet.FilterRegistrationBean;
 
 /**
  * Handler for {@link WebFilter}-annotated classes.

@@ -1,7 +1,7 @@
 package com.rocket.summer.framework.web.filter;
 
+import com.rocket.summer.framework.boot.web.servlet.FilterRegistrationBean;
 import com.rocket.summer.framework.core.Ordered;
-import com.rocket.summer.framework.web.servlet.FilterRegistrationBean;
 
 /**
  * {@link HttpPutFormContentFilter} that also implements {@link Ordered}.

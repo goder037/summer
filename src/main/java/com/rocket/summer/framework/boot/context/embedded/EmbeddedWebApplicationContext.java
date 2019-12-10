@@ -2,6 +2,7 @@ package com.rocket.summer.framework.boot.context.embedded;
 
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.config.Scope;
+import com.rocket.summer.framework.boot.web.servlet.FilterRegistrationBean;
 import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializer;
 import com.rocket.summer.framework.boot.web.servlet.ServletContextInitializerBeans;
 import com.rocket.summer.framework.boot.web.servlet.ServletRegistrationBean;
@@ -19,7 +20,6 @@ import com.rocket.summer.framework.web.context.support.GenericWebApplicationCont
 import com.rocket.summer.framework.web.context.support.ServletContextAwareProcessor;
 import com.rocket.summer.framework.web.context.support.ServletContextResource;
 import com.rocket.summer.framework.web.context.support.WebApplicationContextUtils;
-import com.rocket.summer.framework.web.servlet.FilterRegistrationBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
