@@ -1,22 +1,21 @@
 package com.rocket.summer.framework.beans.factory.config;
 
-import com.rocket.summer.framework.beans.factory.BeanFactory;
-import com.rocket.summer.framework.beans.factory.InjectionPoint;
-import com.rocket.summer.framework.beans.factory.NoUniqueBeanDefinitionException;
-import com.rocket.summer.framework.context.BeansException;
-import com.rocket.summer.framework.core.*;
-import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.ClassUtils;
-import com.rocket.summer.framework.util.ReflectionUtils;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import com.rocket.summer.framework.context.BeansException;
+import com.rocket.summer.framework.beans.factory.BeanFactory;
+import com.rocket.summer.framework.beans.factory.InjectionPoint;
+import com.rocket.summer.framework.beans.factory.NoUniqueBeanDefinitionException;
+import com.rocket.summer.framework.core.GenericTypeResolver;
+import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.core.ParameterNameDiscoverer;
+import com.rocket.summer.framework.core.ResolvableType;
 
 /**
  * Descriptor for a specific dependency that is about to be injected.
@@ -26,6 +25,7 @@ import java.util.Map;
  * @author Juergen Hoeller
  * @since 2.5
  */
+@SuppressWarnings("serial")
 public class DependencyDescriptor extends InjectionPoint implements Serializable {
 
     private final Class<?> declaringClass;
@@ -311,42 +311,6 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
         else {
             return this.methodParameter.getNestedParameterType();
         }
-    }
-
-    /**
-     * Determine the generic element type of the wrapped Collection parameter/field, if any.
-     * @return the generic type, or {@code null} if none
-     * @deprecated as of 4.3.6, in favor of direct {@link ResolvableType} usage
-     */
-    @Deprecated
-    public Class<?> getCollectionType() {
-        return (this.field != null ?
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getCollectionFieldType(this.field, this.nestingLevel) :
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getCollectionParameterType(this.methodParameter));
-    }
-
-    /**
-     * Determine the generic key type of the wrapped Map parameter/field, if any.
-     * @return the generic type, or {@code null} if none
-     * @deprecated as of 4.3.6, in favor of direct {@link ResolvableType} usage
-     */
-    @Deprecated
-    public Class<?> getMapKeyType() {
-        return (this.field != null ?
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getMapKeyFieldType(this.field, this.nestingLevel) :
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getMapKeyParameterType(this.methodParameter));
-    }
-
-    /**
-     * Determine the generic value type of the wrapped Map parameter/field, if any.
-     * @return the generic type, or {@code null} if none
-     * @deprecated as of 4.3.6, in favor of direct {@link ResolvableType} usage
-     */
-    @Deprecated
-    public Class<?> getMapValueType() {
-        return (this.field != null ?
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getMapValueFieldType(this.field, this.nestingLevel) :
-                com.rocket.summer.framework.core.GenericCollectionTypeResolver.getMapValueParameterType(this.methodParameter));
     }
 
 

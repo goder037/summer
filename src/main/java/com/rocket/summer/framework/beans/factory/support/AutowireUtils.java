@@ -1,19 +1,25 @@
 package com.rocket.summer.framework.beans.factory.support;
 
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Set;
+
 import com.rocket.summer.framework.beans.BeanMetadataElement;
 import com.rocket.summer.framework.beans.factory.ObjectFactory;
 import com.rocket.summer.framework.beans.factory.config.TypedStringValue;
-import com.rocket.summer.framework.core.JdkVersion;
 import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
-
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Utility class that contains various methods useful for the implementation of
