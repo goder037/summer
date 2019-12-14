@@ -24,9 +24,9 @@ class BulkBeanEmitter extends ClassEmitter {
     private static final Signature CSTRUCT_EXCEPTION =
             TypeUtils.parseConstructor("Throwable, int");
     private static final Type BULK_BEAN =
-            TypeUtils.parseType("net.sf.cglib.beans.BulkBean");
+            TypeUtils.parseType("com.rocket.summer.framework.cglib.beans.BulkBean");
     private static final Type BULK_BEAN_EXCEPTION =
-            TypeUtils.parseType("net.sf.cglib.beans.BulkBeanException");
+            TypeUtils.parseType("com.rocket.summer.framework.cglib.beans.BulkBeanException");
 
     public BulkBeanEmitter(ClassVisitor v,
                            String className,

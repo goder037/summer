@@ -12,7 +12,7 @@ import com.rocket.summer.framework.cglib.core.TypeUtils;
 
 class ParallelSorterEmitter extends ClassEmitter {
     private static final Type PARALLEL_SORTER =
-            TypeUtils.parseType("net.sf.cglib.util.ParallelSorter");
+            TypeUtils.parseType("com.rocket.summer.framework.cglib.util.ParallelSorter");
     private static final Signature CSTRUCT_OBJECT_ARRAY =
             TypeUtils.parseConstructor("Object[]");
     private static final Signature NEW_INSTANCE =
