@@ -1,14 +1,10 @@
 package com.rocket.summer.framework.objenesis;
 
 import com.rocket.summer.framework.core.SpringProperties;
+import com.rocket.summer.framework.objenesis.instantiator.ObjectInstantiator;
+import com.rocket.summer.framework.objenesis.strategy.InstantiatorStrategy;
+import com.rocket.summer.framework.objenesis.strategy.StdInstantiatorStrategy;
 import com.rocket.summer.framework.util.ConcurrentReferenceHashMap;
-import org.objenesis.Objenesis;
-import org.objenesis.ObjenesisBase;
-import org.objenesis.ObjenesisException;
-import org.objenesis.ObjenesisStd;
-import org.objenesis.instantiator.ObjectInstantiator;
-import org.objenesis.strategy.InstantiatorStrategy;
-import org.objenesis.strategy.StdInstantiatorStrategy;
 
 /**
  * Spring-specific variant of {@link ObjenesisStd} / {@link ObjenesisBase},
@@ -94,7 +90,6 @@ public class SpringObjenesis implements Objenesis {
         return getInstantiatorOf(clazz).newInstance();
     }
 
-    @SuppressWarnings("unchecked")
     public <T> ObjectInstantiator<T> getInstantiatorOf(Class<T> clazz) {
         ObjectInstantiator<?> instantiator = this.cache.get(clazz);
         if (instantiator == null) {
@@ -139,4 +134,3 @@ public class SpringObjenesis implements Objenesis {
     }
 
 }
-
