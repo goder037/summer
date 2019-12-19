@@ -1,10 +1,10 @@
 package com.rocket.summer.framework.web.servlet.mvc.condition;
 
-import com.rocket.summer.framework.http.MediaType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.servlet.http.HttpServletRequest;
+import com.rocket.summer.framework.http.MediaType;
+import com.rocket.summer.framework.web.bind.annotation.RequestMapping;
 
 /**
  * Supports media type expressions as described in:
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
-abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTypeExpression>, MediaTypeExpression {
+abstract class AbstractMediaTypeExpression implements MediaTypeExpression, Comparable<AbstractMediaTypeExpression> {
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -22,45 +22,36 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
 
     private final boolean isNegated;
 
+
     AbstractMediaTypeExpression(String expression) {
         if (expression.startsWith("!")) {
-            isNegated = true;
+            this.isNegated = true;
             expression = expression.substring(1);
         }
         else {
-            isNegated = false;
+            this.isNegated = false;
         }
         this.mediaType = MediaType.parseMediaType(expression);
     }
 
     AbstractMediaTypeExpression(MediaType mediaType, boolean negated) {
         this.mediaType = mediaType;
-        isNegated = negated;
+        this.isNegated = negated;
     }
 
+
+    @Override
     public MediaType getMediaType() {
-        return mediaType;
+        return this.mediaType;
     }
 
+    @Override
     public boolean isNegated() {
-        return isNegated;
+        return this.isNegated;
     }
 
-    public final boolean match(HttpServletRequest request) {
-        try {
-            boolean match = matchMediaType(request);
-            return !isNegated ? match : !match;
-        }
-        catch (IllegalArgumentException ex) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Could not parse media type header: " + ex.getMessage());
-            }
-            return false;
-        }
-    }
 
-    protected abstract boolean matchMediaType(HttpServletRequest request);
-
+    @Override
     public int compareTo(AbstractMediaTypeExpression other) {
         return MediaType.SPECIFICITY_COMPARATOR.compare(this.getMediaType(), other.getMediaType());
     }
@@ -70,25 +61,25 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
         if (this == obj) {
             return true;
         }
-        if (obj != null && getClass().equals(obj.getClass())) {
+        if (obj != null && getClass() == obj.getClass()) {
             AbstractMediaTypeExpression other = (AbstractMediaTypeExpression) obj;
-            return (this.mediaType.equals(other.mediaType)) && (this.isNegated == other.isNegated);
+            return (this.mediaType.equals(other.mediaType) && this.isNegated == other.isNegated);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return mediaType.hashCode();
+        return this.mediaType.hashCode();
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        if (isNegated) {
+        if (this.isNegated) {
             builder.append('!');
         }
-        builder.append(mediaType.toString());
+        builder.append(this.mediaType.toString());
         return builder.toString();
     }
 

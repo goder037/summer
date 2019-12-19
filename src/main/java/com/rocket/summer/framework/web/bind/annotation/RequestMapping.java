@@ -1,6 +1,13 @@
 package com.rocket.summer.framework.web.bind.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.Callable;
+
+import com.rocket.summer.framework.core.annotation.AliasFor;
 
 /**
  * Annotation for mapping web requests onto specific handler classes and/or
@@ -17,8 +24,8 @@ import java.lang.annotation.*;
  * details see the note on the new support classes added in Spring MVC 3.1
  * further below.
  *
- * <p>Handler methods which are annotated with this annotation are allowed
- * to have very flexible signatures. They may have arguments of the following
+ * <p>Handler methods which are annotated with this annotation are allowed to
+ * have very flexible signatures. They may have parameters of the following
  * types, in arbitrary order (except for validation results, which need to
  * follow right after the corresponding command object, if desired):
  * <ul>
@@ -33,11 +40,12 @@ import java.lang.annotation.*;
  * <li>Session object (Servlet API or Portlet API): either
  * {@link javax.servlet.http.HttpSession} or {@link javax.portlet.PortletSession}.
  * An argument of this type will enforce the presence of a corresponding session.
- * As a consequence, such an argument will never be <code>null</code>.
+ * As a consequence, such an argument will never be {@code null}.
  * <i>Note that session access may not be thread-safe, in particular in a
  * Servlet environment: Consider switching the
- * {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter#setSynchronizeOnSession "synchronizeOnSession"}
- * flag to "true" if multiple requests are allowed to access a session concurrently.</i>
+ * {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter#setSynchronizeOnSession
+ * "synchronizeOnSession"} flag to "true" if multiple requests are allowed to
+ * access a session concurrently.</i>
  * <li>{@link com.rocket.summer.framework.web.context.request.WebRequest} or
  * {@link com.rocket.summer.framework.web.context.request.NativeWebRequest}.
  * Allows for generic request parameter access as well as request/session
@@ -52,12 +60,23 @@ import java.lang.annotation.*;
  * <li>{@link java.io.OutputStream} / {@link java.io.Writer} for generating
  * the response's content. This will be the raw OutputStream/Writer as
  * exposed by the Servlet/Portlet API.
+ * <li>{@link com.rocket.summer.framework.http.HttpMethod} for the HTTP request method</li>
  * <li>{@link PathVariable @PathVariable} annotated parameters (Servlet-only)
  * for access to URI template values (i.e. /hotels/{hotel}). Variable values will be
  * converted to the declared method argument type. By default, the URI template
  * will match against the regular expression {@code [^\.]*} (i.e. any character
  * other than period), but this can be changed by specifying another regular
  * expression, like so: /hotels/{hotel:\d+}.
+ * Additionally, {@code @PathVariable} can be used on a
+ * {@link java.util.Map Map&lt;String, String&gt;} to gain access to all
+ * URI template variables.
+ * <li>{@link MatrixVariable @MatrixVariable} annotated parameters (Servlet-only)
+ * for access to name-value pairs located in URI path segments. Matrix variables
+ * must be represented with a URI template variable. For example /hotels/{hotel}
+ * where the incoming URL may be "/hotels/42;q=1".
+ * Additionally, {@code @MatrixVariable} can be used on a
+ * {@link java.util.Map Map&lt;String, String&gt;} to gain access to all
+ * matrix variables in the URL or to those in a specific path variable.
  * <li>{@link RequestParam @RequestParam} annotated parameters for access to
  * specific Servlet/Portlet request parameters. Parameter values will be
  * converted to the declared method argument type. Additionally,
@@ -76,10 +95,9 @@ import java.lang.annotation.*;
  * converted to the declared method argument type using
  * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}. Such parameters may optionally be annotated with {@code @Valid}
- * but do not support access to validation results through a
- * {@link com.rocket.summer.framework.validation.Errors} /
- * {@link com.rocket.summer.framework.validation.BindingResult} argument.
- * Instead a {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
+ * and also support access to validation results through an
+ * {@link com.rocket.summer.framework.validation.Errors} argument.
+ * Instead a {@link com.rocket.summer.framework.web.bind.MethodArgumentNotValidException}
  * exception is raised.
  * <li>{@link RequestPart @RequestPart} annotated parameters
  * (Servlet-only, {@literal @MVC 3.1-only})
@@ -88,11 +106,16 @@ import java.lang.annotation.*;
  * converted to the declared method argument type using
  * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}. Such parameters may optionally be annotated with {@code @Valid}
- * but do not support access to validation results through a
- * {@link com.rocket.summer.framework.validation.Errors} /
- * {@link com.rocket.summer.framework.validation.BindingResult} argument.
- * Instead a {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.MethodArgumentNotValidException}
+ * and support access to validation results through a
+ * {@link com.rocket.summer.framework.validation.Errors} argument.
+ * Instead a {@link com.rocket.summer.framework.web.bind.MethodArgumentNotValidException}
  * exception is raised.
+ * <li>{@link SessionAttribute @SessionAttribute} annotated parameters for access
+ * to existing, permanent session attributes (e.g. user authentication object)
+ * as opposed to model attributes temporarily stored in the session as part of
+ * a controller workflow via {@link SessionAttributes}.
+ * <li>{@link RequestAttribute @RequestAttribute} annotated parameters for access
+ * to request attributes.
  * <li>{@link com.rocket.summer.framework.http.HttpEntity HttpEntity&lt;?&gt;} parameters
  * (Servlet-only) for access to the Servlet request HTTP headers and contents.
  * The request stream will be converted to the entity body using
@@ -115,43 +138,49 @@ import java.lang.annotation.*;
  * Such command objects along with their validation results will be exposed
  * as model attributes, by default using the non-qualified command class name
  * in property notation (e.g. "orderAddress" for type "mypackage.OrderAddress").
- * Specify a parameter-level {@link ModelAttribute} annotation for declaring
- * a specific model attribute name.
+ * Specify a parameter-level {@link ModelAttribute @ModelAttribute} annotation for
+ * declaring a specific model attribute name.
  * <li>{@link com.rocket.summer.framework.validation.Errors} /
  * {@link com.rocket.summer.framework.validation.BindingResult} validation results
  * for a preceding command/form object (the immediate preceding argument).
  * <li>{@link com.rocket.summer.framework.web.bind.support.SessionStatus} status handle
  * for marking form processing as complete (triggering the cleanup of session
- * attributes that have been indicated by the {@link SessionAttributes} annotation
- * at the handler type level).
+ * attributes that have been indicated by the {@link SessionAttributes @SessionAttributes}
+ * annotation at the handler type level).
  * <li>{@link com.rocket.summer.framework.web.util.UriComponentsBuilder}
  * (Servlet-only, {@literal @MVC 3.1-only})
  * for preparing a URL relative to the current request's host, port, scheme,
  * context path, and the literal part of the servlet mapping.
  * </ul>
  *
+ * <p><strong>Note:</strong> Java 8's {@code java.util.Optional} is supported
+ * as a method parameter type with annotations that provide a {@code required}
+ * attribute (e.g. {@code @RequestParam}, {@code @RequestHeader}, etc.). The use
+ * of {@code java.util.Optional} in those cases is equivalent to having
+ * {@code required=false}.
+ *
  * <p>The following return types are supported for handler methods:
  * <ul>
- * <li>A <code>ModelAndView</code> object (Servlet MVC or Portlet MVC),
+ * <li>A {@code ModelAndView} object (Servlet MVC or Portlet MVC),
  * with the model implicitly enriched with command objects and the results
- * of {@link ModelAttribute} annotated reference data accessor methods.
- * <li>A {@link com.rocket.summer.framework.ui.Model Model} object, with the view name
- * implicitly determined through a {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
+ * of {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
+ * <li>A {@link com.rocket.summer.framework.ui.Model Model} object, with the view name implicitly
+ * determined through a {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * and the model implicitly enriched with command objects and the results
- * of {@link ModelAttribute} annotated reference data accessor methods.
+ * of {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
  * <li>A {@link java.util.Map} object for exposing a model,
  * with the view name implicitly determined through a
  * {@link com.rocket.summer.framework.web.servlet.RequestToViewNameTranslator}
  * and the model implicitly enriched with command objects and the results
- * of {@link ModelAttribute} annotated reference data accessor methods.
+ * of {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
  * <li>A {@link com.rocket.summer.framework.web.servlet.View} object, with the
  * model implicitly determined through command objects and
- * {@link ModelAttribute} annotated reference data accessor methods.
+ * {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
  * The handler method may also programmatically enrich the model by
  * declaring a {@link com.rocket.summer.framework.ui.Model} argument (see above).
- * <li>A {@link java.lang.String} value which is interpreted as view name,
+ * <li>A {@link String} value which is interpreted as view name,
  * with the model implicitly determined through command objects and
- * {@link ModelAttribute} annotated reference data accessor methods.
+ * {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
  * The handler method may also programmatically enrich the model by
  * declaring a {@link com.rocket.summer.framework.ui.ModelMap} argument
  * (see above).
@@ -160,13 +189,37 @@ import java.lang.annotation.*;
  * be converted to the response stream using
  * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}.
- * <li>A {@link com.rocket.summer.framework.http.HttpEntity HttpEntity&lt;?&gt;} or
+ * <li>An {@link com.rocket.summer.framework.http.HttpEntity HttpEntity&lt;?&gt;} or
  * {@link com.rocket.summer.framework.http.ResponseEntity ResponseEntity&lt;?&gt;} object
  * (Servlet-only) to access to the Servlet response HTTP headers and contents.
  * The entity body will be converted to the response stream using
  * {@linkplain com.rocket.summer.framework.http.converter.HttpMessageConverter message
  * converters}.
- * <li><code>void</code> if the method handles the response itself (by
+ * <li>An {@link com.rocket.summer.framework.http.HttpHeaders HttpHeaders} object to
+ * return a response with no body.</li>
+ * <li>A {@link Callable} which is used by Spring MVC to obtain the return
+ * value asynchronously in a separate thread transparently managed by Spring MVC
+ * on behalf of the application.
+ * <li>A {@link com.rocket.summer.framework.web.context.request.async.DeferredResult}
+ * which the application uses to produce a return value in a separate
+ * thread of its own choosing, as an alternative to returning a Callable.
+ * <li>A {@link com.rocket.summer.framework.util.concurrent.ListenableFuture}
+ * which the application uses to produce a return value in a separate
+ * thread of its own choosing, as an alternative to returning a Callable.
+ * <li>A {@link java.util.concurrent.CompletionStage} (implemented by
+ * {@link java.util.concurrent.CompletableFuture} for example)
+ * which the application uses to produce a return value in a separate
+ * thread of its own choosing, as an alternative to returning a Callable.
+ * <li>A {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.ResponseBodyEmitter}
+ * can be used to write multiple objects to the response asynchronously;
+ * also supported as the body within {@code ResponseEntity}.</li>
+ * <li>An {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.SseEmitter}
+ * can be used to write Server-Sent Events to the response asynchronously;
+ * also supported as the body within {@code ResponseEntity}.</li>
+ * <li>A {@link com.rocket.summer.framework.web.servlet.mvc.method.annotation.StreamingResponseBody}
+ * can be used to write to the response asynchronously;
+ * also supported as the body within {@code ResponseEntity}.</li>
+ * <li>{@code void} if the method handles the response itself (by
  * writing the response content directly, declaring an argument of type
  * {@link javax.servlet.ServletResponse} / {@link javax.servlet.http.HttpServletResponse}
  * / {@link javax.portlet.RenderResponse} for that purpose)
@@ -176,47 +229,54 @@ import java.lang.annotation.*;
  * only applicable in a Servlet environment).
  * <li>Any other return type will be considered as single model attribute
  * to be exposed to the view, using the attribute name specified through
- * {@link ModelAttribute} at the method level (or the default attribute name
- * based on the return type's class name otherwise). The model will be
+ * {@link ModelAttribute @ModelAttribute} at the method level (or the default attribute
+ * name based on the return type's class name otherwise). The model will be
  * implicitly enriched with command objects and the results of
- * {@link ModelAttribute} annotated reference data accessor methods.
+ * {@link ModelAttribute @ModelAttribute} annotated reference data accessor methods.
  * </ul>
  *
- * <p><b>NOTE:</b> <code>@RequestMapping</code> will only be processed if an
- * an appropriate <code>HandlerMapping</code>-<code>HandlerAdapter</code> pair
+ * <p><b>NOTE:</b> {@code @RequestMapping} will only be processed if an
+ * an appropriate {@code HandlerMapping}-{@code HandlerAdapter} pair
  * is configured. This is the case by default in both the
- * <code>DispatcherServlet</code> and the <code>DispatcherPortlet</code>.
- * However, if you are defining custom <code>HandlerMappings</code> or
- * <code>HandlerAdapters</code>, then you need to add
- * <code>DefaultAnnotationHandlerMapping</code> and
- * <code>AnnotationMethodHandlerAdapter</code> to your configuration.</code>.
+ * {@code DispatcherServlet} and the {@code DispatcherPortlet}.
+ * However, if you are defining custom {@code HandlerMappings} or
+ * {@code HandlerAdapters}, then you need to add
+ * {@code DefaultAnnotationHandlerMapping} and
+ * {@code AnnotationMethodHandlerAdapter} to your configuration.</code>.
  *
  * <p><b>NOTE:</b> Spring 3.1 introduced a new set of support classes for
- * <code>@RequestMapping</code> methods in Servlet environments called
- * <code>RequestMappingHandlerMapping</code> and
- * <code>RequestMappingHandlerAdapter</code>. They are recommended for use and
+ * {@code @RequestMapping} methods in Servlet environments called
+ * {@code RequestMappingHandlerMapping} and
+ * {@code RequestMappingHandlerAdapter}. They are recommended for use and
  * even required to take advantage of new features in Spring MVC 3.1 (search
  * {@literal "@MVC 3.1-only"} in this source file) and going forward.
  * The new support classes are enabled by default from the MVC namespace and
- * with use of the MVC Java config (<code>@EnableWebMvc</code>) but must be
+ * with use of the MVC Java config ({@code @EnableWebMvc}) but must be
  * configured explicitly if using neither.
  *
  * <p><b>NOTE:</b> When using controller interfaces (e.g. for AOP proxying),
  * make sure to consistently put <i>all</i> your mapping annotations - such as
- * <code>@RequestMapping</code> and <code>@SessionAttributes</code> - on
+ * {@code @RequestMapping} and {@code @SessionAttributes} - on
  * the controller <i>interface</i> rather than on the implementation class.
  *
  * @author Juergen Hoeller
  * @author Arjen Poutsma
  * @author Sam Brannen
  * @since 2.5
+ * @see GetMapping
+ * @see PostMapping
+ * @see PutMapping
+ * @see DeleteMapping
+ * @see PatchMapping
  * @see RequestParam
+ * @see RequestAttribute
+ * @see PathVariable
  * @see ModelAttribute
+ * @see SessionAttribute
  * @see SessionAttributes
  * @see InitBinder
  * @see com.rocket.summer.framework.web.context.request.WebRequest
- * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodMapping
- * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerMethodAdapter
+ * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
  * @see com.rocket.summer.framework.web.portlet.mvc.annotation.DefaultAnnotationHandlerMapping
  * @see com.rocket.summer.framework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter
  */
@@ -227,22 +287,47 @@ import java.lang.annotation.*;
 public @interface RequestMapping {
 
     /**
+     * Assign a name to this mapping.
+     * <p><b>Supported at the type level as well as at the method level!</b>
+     * When used on both levels, a combined name is derived by concatenation
+     * with "#" as separator.
+     * @see com.rocket.summer.framework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
+     * @see com.rocket.summer.framework.web.servlet.handler.HandlerMethodMappingNamingStrategy
+     */
+    String name() default "";
+
+    /**
      * The primary mapping expressed by this annotation.
-     * <p>In a Servlet environment: the path mapping URIs (e.g. "/myPath.do").
-     * Ant-style path patterns are also supported (e.g. "/myPath/*.do").
-     * At the method level, relative paths (e.g. "edit.do") are supported
-     * within the primary mapping expressed at the type level.
-     * <p>In a Portlet environment: the mapped portlet modes
+     * <p>In a Servlet environment this is an alias for {@link #path}.
+     * For example {@code @RequestMapping("/foo")} is equivalent to
+     * {@code @RequestMapping(path="/foo")}.
+     * <p>In a Portlet environment this is the mapped portlet modes
      * (i.e. "EDIT", "VIEW", "HELP" or any custom modes).
      * <p><b>Supported at the type level as well as at the method level!</b>
      * When used at the type level, all method-level mappings inherit
      * this primary mapping, narrowing it for a specific handler method.
      */
+    @AliasFor("path")
     String[] value() default {};
 
     /**
+     * In a Servlet environment only: the path mapping URIs (e.g. "/myPath.do").
+     * Ant-style path patterns are also supported (e.g. "/myPath/*.do").
+     * At the method level, relative paths (e.g. "edit.do") are supported
+     * within the primary mapping expressed at the type level.
+     * Path mapping URIs may contain placeholders (e.g. "/${connect}").
+     * <p><b>Supported at the type level as well as at the method level!</b>
+     * When used at the type level, all method-level mappings inherit
+     * this primary mapping, narrowing it for a specific handler method.
+     * @see com.rocket.summer.framework.web.bind.annotation.ValueConstants#DEFAULT_NONE
+     * @since 4.2
+     */
+    @AliasFor("value")
+    String[] path() default {};
+
+    /**
      * The HTTP request methods to map to, narrowing the primary mapping:
-     * GET, POST, HEAD, OPTIONS, PUT, DELETE, TRACE.
+     * GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE, TRACE.
      * <p><b>Supported at the type level as well as at the method level!</b>
      * When used at the type level, all method-level mappings inherit
      * this HTTP method restriction (i.e. the type-level restriction
@@ -286,7 +371,7 @@ public @interface RequestMapping {
      * specified header is <i>not</i> supposed to be present in the request.
      * <p>Also supports media type wildcards (*), for headers such as Accept
      * and Content-Type. For instance,
-     * <pre>
+     * <pre class="code">
      * &#064;RequestMapping(value = "/something", headers = "content-type=text/*")
      * </pre>
      * will match requests with a Content-Type of "text/html", "text/plain", etc.
@@ -302,8 +387,13 @@ public @interface RequestMapping {
 
     /**
      * The consumable media types of the mapped request, narrowing the primary mapping.
-     * <p>The format is a sequence of media types ("text/plain", "application/*),
+     * <p>The format is a single media type or a sequence of media types,
      * with a request only mapped if the {@code Content-Type} matches one of these media types.
+     * Examples:
+     * <pre class="code">
+     * consumes = "text/plain"
+     * consumes = {"text/plain", "application/*"}
+     * </pre>
      * Expressions can be negated by using the "!" operator, as in "!text/plain", which matches
      * all requests with a {@code Content-Type} other than "text/plain".
      * <p><b>Supported at the type level as well as at the method level!</b>
@@ -316,13 +406,21 @@ public @interface RequestMapping {
 
     /**
      * The producible media types of the mapped request, narrowing the primary mapping.
-     * <p>The format is a sequence of media types ("text/plain", "application/*),
+     * <p>The format is a single media type or a sequence of media types,
      * with a request only mapped if the {@code Accept} matches one of these media types.
-     * Expressions can be negated by using the "!" operator, as in "!text/plain", which matches
+     * Examples:
+     * <pre class="code">
+     * produces = "text/plain"
+     * produces = {"text/plain", "application/*"}
+     * produces = "application/json; charset=UTF-8"
+     * </pre>
+     * <p>It affects the actual content type written, for example to produce a JSON response
+     * with UTF-8 encoding, {@code "application/json; charset=UTF-8"} should be used.
+     * <p>Expressions can be negated by using the "!" operator, as in "!text/plain", which matches
      * all requests with a {@code Accept} other than "text/plain".
      * <p><b>Supported at the type level as well as at the method level!</b>
      * When used at the type level, all method-level mappings override
-     * this consumes restriction.
+     * this produces restriction.
      * @see com.rocket.summer.framework.http.MediaType
      */
     String[] produces() default {};

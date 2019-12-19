@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.rocket.summer.framework.aop.aspectj.autoproxy.ProxyCreationContext;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +30,7 @@ import com.rocket.summer.framework.aop.ClassFilter;
 import com.rocket.summer.framework.aop.IntroductionAwareMethodMatcher;
 import com.rocket.summer.framework.aop.MethodMatcher;
 import com.rocket.summer.framework.aop.ProxyMethodInvocation;
+import com.rocket.summer.framework.aop.framework.autoproxy.ProxyCreationContext;
 import com.rocket.summer.framework.aop.interceptor.ExposeInvocationInterceptor;
 import com.rocket.summer.framework.aop.support.AbstractExpressionPointcut;
 import com.rocket.summer.framework.aop.support.AopUtils;
@@ -61,6 +61,7 @@ import com.rocket.summer.framework.util.StringUtils;
  * @author Dave Syer
  * @since 2.0
  */
+@SuppressWarnings("serial")
 public class AspectJExpressionPointcut extends AbstractExpressionPointcut
         implements ClassFilter, IntroductionAwareMethodMatcher, BeanFactoryAware {
 
@@ -675,4 +676,3 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
     }
 
 }
-

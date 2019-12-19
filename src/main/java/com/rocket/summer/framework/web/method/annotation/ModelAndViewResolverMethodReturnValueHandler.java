@@ -1,15 +1,16 @@
 package com.rocket.summer.framework.web.method.annotation;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import com.rocket.summer.framework.core.MethodParameter;
+import com.rocket.summer.framework.ui.ExtendedModelMap;
 import com.rocket.summer.framework.web.context.request.NativeWebRequest;
+import com.rocket.summer.framework.web.method.annotation.ModelAttributeMethodProcessor;
 import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandler;
 import com.rocket.summer.framework.web.method.support.ModelAndViewContainer;
 import com.rocket.summer.framework.web.servlet.ModelAndView;
 import com.rocket.summer.framework.web.servlet.mvc.annotation.ModelAndViewResolver;
-import com.rocket.summer.framework.web.ui.ExtendedModelMap;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * This return value handler is intended to be ordered after all others as it
@@ -40,6 +41,7 @@ public class ModelAndViewResolverMethodReturnValueHandler implements HandlerMeth
 
     private final ModelAttributeMethodProcessor modelAttributeProcessor = new ModelAttributeMethodProcessor(true);
 
+
     /**
      * Create a new instance.
      */
@@ -47,24 +49,25 @@ public class ModelAndViewResolverMethodReturnValueHandler implements HandlerMeth
         this.mavResolvers = mavResolvers;
     }
 
+
     /**
      * Always returns {@code true}. See class-level note.
      */
+    @Override
     public boolean supportsReturnType(MethodParameter returnType) {
         return true;
     }
 
-    public void handleReturnValue(
-            Object returnValue, MethodParameter returnType,
-            ModelAndViewContainer mavContainer, NativeWebRequest request)
-            throws Exception {
+    @Override
+    public void handleReturnValue(Object returnValue, MethodParameter returnType,
+                                  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
         if (this.mavResolvers != null) {
             for (ModelAndViewResolver mavResolver : this.mavResolvers) {
-                Class<?> handlerType = returnType.getDeclaringClass();
+                Class<?> handlerType = returnType.getContainingClass();
                 Method method = returnType.getMethod();
                 ExtendedModelMap model = (ExtendedModelMap) mavContainer.getModel();
-                ModelAndView mav = mavResolver.resolveModelAndView(method, handlerType, returnValue, model, request);
+                ModelAndView mav = mavResolver.resolveModelAndView(method, handlerType, returnValue, model, webRequest);
                 if (mav != ModelAndViewResolver.UNRESOLVED) {
                     mavContainer.addAllAttributes(mav.getModel());
                     mavContainer.setViewName(mav.getViewName());
@@ -76,16 +79,14 @@ public class ModelAndViewResolverMethodReturnValueHandler implements HandlerMeth
             }
         }
 
-        // No suitable ModelAndViewResolver..
-
+        // No suitable ModelAndViewResolver...
         if (this.modelAttributeProcessor.supportsReturnType(returnType)) {
-            this.modelAttributeProcessor.handleReturnValue(returnValue, returnType, mavContainer, request);
+            this.modelAttributeProcessor.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
         }
         else {
-            throw new UnsupportedOperationException("Unexpected return type: "
-                    + returnType.getParameterType().getName() + " in method: " + returnType.getMethod());
+            throw new UnsupportedOperationException("Unexpected return type: " +
+                    returnType.getParameterType().getName() + " in method: " + returnType.getMethod());
         }
     }
 
 }
-

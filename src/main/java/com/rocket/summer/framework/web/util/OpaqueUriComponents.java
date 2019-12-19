@@ -1,22 +1,24 @@
 package com.rocket.summer.framework.web.util;
 
-import com.rocket.summer.framework.util.LinkedMultiValueMap;
-import com.rocket.summer.framework.util.MultiValueMap;
-import com.rocket.summer.framework.util.ObjectUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
+import com.rocket.summer.framework.util.LinkedMultiValueMap;
+import com.rocket.summer.framework.util.MultiValueMap;
+import com.rocket.summer.framework.util.ObjectUtils;
+
 /**
  * Extension of {@link UriComponents} for opaque URIs.
  *
  * @author Arjen Poutsma
+ * @author Phillip Webb
  * @since 3.2
- * @see <a href="http://tools.ietf.org/html/rfc3986#section-1.2.3">Hierarchical vs Opaque URIs</a>
+ * @see <a href="https://tools.ietf.org/html/rfc3986#section-1.2.3">Hierarchical vs Opaque URIs</a>
  */
+@SuppressWarnings("serial")
 final class OpaqueUriComponents extends UriComponents {
 
     private static final MultiValueMap<String, String> QUERY_PARAMS_NONE = new LinkedMultiValueMap<String, String>(0);
@@ -77,11 +79,15 @@ final class OpaqueUriComponents extends UriComponents {
 
     @Override
     protected UriComponents expandInternal(UriTemplateVariables uriVariables) {
-        String expandedScheme = expandUriComponent(this.getScheme(), uriVariables);
-        String expandedSSp = expandUriComponent(this.ssp, uriVariables);
-        String expandedFragment = expandUriComponent(this.getFragment(), uriVariables);
+        String expandedScheme = expandUriComponent(getScheme(), uriVariables);
+        String expandedSsp = expandUriComponent(getSchemeSpecificPart(), uriVariables);
+        String expandedFragment = expandUriComponent(getFragment(), uriVariables);
+        return new OpaqueUriComponents(expandedScheme, expandedSsp, expandedFragment);
+    }
 
-        return new OpaqueUriComponents(expandedScheme, expandedSSp, expandedFragment);
+    @Override
+    public UriComponents normalize() {
+        return this;
     }
 
     @Override
@@ -114,9 +120,12 @@ final class OpaqueUriComponents extends UriComponents {
     }
 
     @Override
-    public UriComponents normalize() {
-        return this;
+    protected void copyToUriComponentsBuilder(UriComponentsBuilder builder) {
+        builder.scheme(getScheme());
+        builder.schemeSpecificPart(getSchemeSpecificPart());
+        builder.fragment(getFragment());
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -128,18 +137,10 @@ final class OpaqueUriComponents extends UriComponents {
         }
 
         OpaqueUriComponents other = (OpaqueUriComponents) obj;
+        return ObjectUtils.nullSafeEquals(getScheme(), other.getScheme()) &&
+                ObjectUtils.nullSafeEquals(this.ssp, other.ssp) &&
+                ObjectUtils.nullSafeEquals(getFragment(), other.getFragment());
 
-        if (ObjectUtils.nullSafeEquals(getScheme(), other.getScheme())) {
-            return false;
-        }
-        if (ObjectUtils.nullSafeEquals(this.ssp, other.ssp)) {
-            return false;
-        }
-        if (ObjectUtils.nullSafeEquals(getFragment(), other.getFragment())) {
-            return false;
-        }
-
-        return true;
     }
 
     @Override

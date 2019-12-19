@@ -1,28 +1,48 @@
 package com.rocket.summer.framework.web.servlet.mvc.method.annotation;
 
-import com.rocket.summer.framework.beans.factory.InitializingBean;
-import com.rocket.summer.framework.http.converter.ByteArrayHttpMessageConverter;
-import com.rocket.summer.framework.http.converter.HttpMessageConverter;
-import com.rocket.summer.framework.http.converter.StringHttpMessageConverter;
-import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter;
-import com.rocket.summer.framework.http.converter.xml.XmlAwareFormHttpMessageConverter;
-import com.rocket.summer.framework.web.bind.annotation.ExceptionHandler;
-import com.rocket.summer.framework.web.context.request.ServletWebRequest;
-import com.rocket.summer.framework.web.method.HandlerMethod;
-import com.rocket.summer.framework.web.method.annotation.*;
-import com.rocket.summer.framework.web.method.support.*;
-import com.rocket.summer.framework.web.servlet.ModelAndView;
-import com.rocket.summer.framework.web.servlet.View;
-import com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMethodExceptionResolver;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Source;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Source;
+
+import com.rocket.summer.framework.aop.support.AopUtils;
+import com.rocket.summer.framework.beans.factory.InitializingBean;
+import com.rocket.summer.framework.context.ApplicationContext;
+import com.rocket.summer.framework.context.ApplicationContextAware;
+import com.rocket.summer.framework.core.annotation.AnnotationAwareOrderComparator;
+import com.rocket.summer.framework.http.HttpStatus;
+import com.rocket.summer.framework.http.converter.ByteArrayHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.HttpMessageConverter;
+import com.rocket.summer.framework.http.converter.StringHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import com.rocket.summer.framework.http.converter.xml.SourceHttpMessageConverter;
+import com.rocket.summer.framework.ui.ModelMap;
+import com.rocket.summer.framework.web.accept.ContentNegotiationManager;
+import com.rocket.summer.framework.web.bind.annotation.ControllerAdvice;
+import com.rocket.summer.framework.web.context.request.ServletWebRequest;
+import com.rocket.summer.framework.web.method.ControllerAdviceBean;
+import com.rocket.summer.framework.web.method.HandlerMethod;
+import com.rocket.summer.framework.web.method.annotation.ExceptionHandlerMethodResolver;
+import com.rocket.summer.framework.web.method.annotation.MapMethodProcessor;
+import com.rocket.summer.framework.web.method.annotation.ModelAttributeMethodProcessor;
+import com.rocket.summer.framework.web.method.annotation.ModelMethodProcessor;
+import com.rocket.summer.framework.web.method.support.HandlerMethodArgumentResolver;
+import com.rocket.summer.framework.web.method.support.HandlerMethodArgumentResolverComposite;
+import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandler;
+import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandlerComposite;
+import com.rocket.summer.framework.web.method.support.ModelAndViewContainer;
+import com.rocket.summer.framework.web.servlet.ModelAndView;
+import com.rocket.summer.framework.web.servlet.View;
+import com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMethodExceptionResolver;
+import com.rocket.summer.framework.web.servlet.mvc.support.RedirectAttributes;
+import com.rocket.summer.framework.web.servlet.support.RequestContextUtils;
 
 /**
  * An {@link AbstractHandlerMethodExceptionResolver} that resolves exceptions
@@ -34,38 +54,46 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link #setArgumentResolvers} and {@link #setReturnValueHandlers(List)}.
  *
  * @author Rossen Stoyanchev
+ * @author Juergen Hoeller
  * @since 3.1
  */
-public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExceptionResolver implements
-        InitializingBean {
+public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExceptionResolver
+        implements ApplicationContextAware, InitializingBean {
 
     private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
-    private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
-
-    private List<HttpMessageConverter<?>> messageConverters;
-
-    private final Map<Class<?>, ExceptionHandlerMethodResolver> exceptionHandlerMethodResolvers =
-            new ConcurrentHashMap<Class<?>, ExceptionHandlerMethodResolver>();
-
     private HandlerMethodArgumentResolverComposite argumentResolvers;
+
+    private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
 
     private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
-    /**
-     * Default constructor.
-     */
-    public ExceptionHandlerExceptionResolver() {
+    private List<HttpMessageConverter<?>> messageConverters;
 
+    private ContentNegotiationManager contentNegotiationManager = new ContentNegotiationManager();
+
+    private final List<Object> responseBodyAdvice = new ArrayList<Object>();
+
+    private ApplicationContext applicationContext;
+
+    private final Map<Class<?>, ExceptionHandlerMethodResolver> exceptionHandlerCache =
+            new ConcurrentHashMap<Class<?>, ExceptionHandlerMethodResolver>(64);
+
+    private final Map<ControllerAdviceBean, ExceptionHandlerMethodResolver> exceptionHandlerAdviceCache =
+            new LinkedHashMap<ControllerAdviceBean, ExceptionHandlerMethodResolver>();
+
+
+    public ExceptionHandlerExceptionResolver() {
         StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
-        stringHttpMessageConverter.setWriteAcceptCharset(false); // See SPR-7316
+        stringHttpMessageConverter.setWriteAcceptCharset(false);  // see SPR-7316
 
         this.messageConverters = new ArrayList<HttpMessageConverter<?>>();
         this.messageConverters.add(new ByteArrayHttpMessageConverter());
         this.messageConverters.add(stringHttpMessageConverter);
         this.messageConverters.add(new SourceHttpMessageConverter<Source>());
-        this.messageConverters.add(new XmlAwareFormHttpMessageConverter());
+        this.messageConverters.add(new AllEncompassingFormHttpMessageConverter());
     }
+
 
     /**
      * Provide resolvers for custom argument types. Custom resolvers are ordered
@@ -73,7 +101,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
      * resolution use {@link #setArgumentResolvers} instead.
      */
     public void setCustomArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        this.customArgumentResolvers= argumentResolvers;
+        this.customArgumentResolvers = argumentResolvers;
     }
 
     /**
@@ -155,10 +183,52 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
      * Return the configured message body converters.
      */
     public List<HttpMessageConverter<?>> getMessageConverters() {
-        return messageConverters;
+        return this.messageConverters;
     }
 
+    /**
+     * Set the {@link ContentNegotiationManager} to use to determine requested media types.
+     * If not set, the default constructor is used.
+     */
+    public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
+        this.contentNegotiationManager = contentNegotiationManager;
+    }
+
+    /**
+     * Return the configured {@link ContentNegotiationManager}.
+     */
+    public ContentNegotiationManager getContentNegotiationManager() {
+        return this.contentNegotiationManager;
+    }
+
+    /**
+     * Add one or more components to be invoked after the execution of a controller
+     * method annotated with {@code @ResponseBody} or returning {@code ResponseEntity}
+     * but before the body is written to the response with the selected
+     * {@code HttpMessageConverter}.
+     */
+    public void setResponseBodyAdvice(List<ResponseBodyAdvice<?>> responseBodyAdvice) {
+        this.responseBodyAdvice.clear();
+        if (responseBodyAdvice != null) {
+            this.responseBodyAdvice.addAll(responseBodyAdvice);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return this.applicationContext;
+    }
+
+
+    @Override
     public void afterPropertiesSet() {
+        // Do this first, it may add ResponseBodyAdvice beans
+        initExceptionHandlerAdviceCache();
+
         if (this.argumentResolvers == null) {
             List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
             this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
@@ -169,6 +239,44 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
         }
     }
 
+    private void initExceptionHandlerAdviceCache() {
+        if (getApplicationContext() == null) {
+            return;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Looking for exception mappings: " + getApplicationContext());
+        }
+
+        List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
+        AnnotationAwareOrderComparator.sort(adviceBeans);
+
+        for (ControllerAdviceBean adviceBean : adviceBeans) {
+            ExceptionHandlerMethodResolver resolver = new ExceptionHandlerMethodResolver(adviceBean.getBeanType());
+            if (resolver.hasExceptionMappings()) {
+                this.exceptionHandlerAdviceCache.put(adviceBean, resolver);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Detected @ExceptionHandler methods in " + adviceBean);
+                }
+            }
+            if (ResponseBodyAdvice.class.isAssignableFrom(adviceBean.getBeanType())) {
+                this.responseBodyAdvice.add(adviceBean);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Detected ResponseBodyAdvice implementation in " + adviceBean);
+                }
+            }
+        }
+    }
+
+    /**
+     * Return an unmodifiable Map with the {@link ControllerAdvice @ControllerAdvice}
+     * beans discovered in the ApplicationContext. The returned map will be empty if
+     * the method is invoked before the bean has been initialized via
+     * {@link #afterPropertiesSet()}.
+     */
+    public Map<ControllerAdviceBean, ExceptionHandlerMethodResolver> getExceptionHandlerAdviceCache() {
+        return Collections.unmodifiableMap(this.exceptionHandlerAdviceCache);
+    }
+
     /**
      * Return the list of argument resolvers to use including built-in resolvers
      * and custom resolvers provided via {@link #setCustomArgumentResolvers}.
@@ -176,9 +284,15 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
     protected List<HandlerMethodArgumentResolver> getDefaultArgumentResolvers() {
         List<HandlerMethodArgumentResolver> resolvers = new ArrayList<HandlerMethodArgumentResolver>();
 
+        // Annotation-based argument resolution
+        resolvers.add(new SessionAttributeMethodArgumentResolver());
+        resolvers.add(new RequestAttributeMethodArgumentResolver());
+
         // Type-based argument resolution
         resolvers.add(new ServletRequestMethodArgumentResolver());
         resolvers.add(new ServletResponseMethodArgumentResolver());
+        resolvers.add(new RedirectAttributesMethodArgumentResolver());
+        resolvers.add(new ModelMethodProcessor());
 
         // Custom arguments
         if (getCustomArgumentResolvers() != null) {
@@ -199,11 +313,13 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
         handlers.add(new ModelAndViewMethodReturnValueHandler());
         handlers.add(new ModelMethodProcessor());
         handlers.add(new ViewMethodReturnValueHandler());
-        handlers.add(new HttpEntityMethodProcessor(getMessageConverters()));
+        handlers.add(new HttpEntityMethodProcessor(
+                getMessageConverters(), this.contentNegotiationManager, this.responseBodyAdvice));
 
         // Annotation-based return value types
         handlers.add(new ModelAttributeMethodProcessor(false));
-        handlers.add(new RequestResponseBodyMethodProcessor(getMessageConverters()));
+        handlers.add(new RequestResponseBodyMethodProcessor(
+                getMessageConverters(), this.contentNegotiationManager, this.responseBodyAdvice));
 
         // Multi-purpose return value types
         handlers.add(new ViewNameMethodReturnValueHandler());
@@ -220,18 +336,13 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
         return handlers;
     }
 
+
     /**
-     * Find an @{@link ExceptionHandler} method and invoke it to handle the
-     * raised exception.
+     * Find an {@code @ExceptionHandler} method and invoke it to handle the raised exception.
      */
     @Override
     protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request,
-                                                           HttpServletResponse response,
-                                                           HandlerMethod handlerMethod,
-                                                           Exception exception) {
-        if (handlerMethod == null) {
-            return null;
-        }
+                                                           HttpServletResponse response, HandlerMethod handlerMethod, Exception exception) {
 
         ServletInvocableHandlerMethod exceptionHandlerMethod = getExceptionHandlerMethod(handlerMethod, exception);
         if (exceptionHandlerMethod == null) {
@@ -248,10 +359,23 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
             if (logger.isDebugEnabled()) {
                 logger.debug("Invoking @ExceptionHandler method: " + exceptionHandlerMethod);
             }
-            exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception);
+            Throwable cause = exception.getCause();
+            if (cause != null) {
+                // Expose cause as provided argument as well
+                exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception, cause, handlerMethod);
+            }
+            else {
+                // Otherwise, just the given exception as-is
+                exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception, handlerMethod);
+            }
         }
-        catch (Exception invocationEx) {
-            logger.error("Failed to invoke @ExceptionHandler method: " + exceptionHandlerMethod, invocationEx);
+        catch (Throwable invocationEx) {
+            // Any other than the original exception is unintended here,
+            // probably an accident (e.g. failed assertion or the like).
+            if (invocationEx != exception && logger.isWarnEnabled()) {
+                logger.warn("Failed to invoke @ExceptionHandler method: " + exceptionHandlerMethod, invocationEx);
+            }
+            // Continue with default processing of the original exception...
             return null;
         }
 
@@ -259,40 +383,66 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
             return new ModelAndView();
         }
         else {
-            ModelAndView mav = new ModelAndView().addAllObjects(mavContainer.getModel());
+            ModelMap model = mavContainer.getModel();
+            HttpStatus status = mavContainer.getStatus();
+            ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model, status);
             mav.setViewName(mavContainer.getViewName());
             if (!mavContainer.isViewReference()) {
                 mav.setView((View) mavContainer.getView());
+            }
+            if (model instanceof RedirectAttributes) {
+                Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
+                RequestContextUtils.getOutputFlashMap(request).putAll(flashAttributes);
             }
             return mav;
         }
     }
 
     /**
-     * Find the @{@link ExceptionHandler} method for the given exception.
-     * The default implementation searches @{@link ExceptionHandler} methods
-     * in the class hierarchy of the method that raised the exception.
-     * @param handlerMethod the method where the exception was raised
+     * Find an {@code @ExceptionHandler} method for the given exception. The default
+     * implementation searches methods in the class hierarchy of the controller first
+     * and if not found, it continues searching for additional {@code @ExceptionHandler}
+     * methods assuming some {@linkplain ControllerAdvice @ControllerAdvice}
+     * Spring-managed beans were detected.
+     * @param handlerMethod the method where the exception was raised (may be {@code null})
      * @param exception the raised exception
-     * @return a method to handle the exception, or {@code null}
+     * @return a method to handle the exception, or {@code null} if none
      */
     protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod, Exception exception) {
-        Class<?> handlerType = handlerMethod.getBeanType();
-        Method method = getExceptionHandlerMethodResolver(handlerType).resolveMethod(exception);
-        return (method != null ? new ServletInvocableHandlerMethod(handlerMethod.getBean(), method) : null);
-    }
+        Class<?> handlerType = null;
 
-    /**
-     * Return a method resolver for the given handler type, never {@code null}.
-     */
-    private ExceptionHandlerMethodResolver getExceptionHandlerMethodResolver(Class<?> handlerType) {
-        ExceptionHandlerMethodResolver resolver = this.exceptionHandlerMethodResolvers.get(handlerType);
-        if (resolver == null) {
-            resolver = new ExceptionHandlerMethodResolver(handlerType);
-            this.exceptionHandlerMethodResolvers.put(handlerType, resolver);
+        if (handlerMethod != null) {
+            // Local exception handler methods on the controller class itself.
+            // To be invoked through the proxy, even in case of an interface-based proxy.
+            handlerType = handlerMethod.getBeanType();
+            ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType);
+            if (resolver == null) {
+                resolver = new ExceptionHandlerMethodResolver(handlerType);
+                this.exceptionHandlerCache.put(handlerType, resolver);
+            }
+            Method method = resolver.resolveMethod(exception);
+            if (method != null) {
+                return new ServletInvocableHandlerMethod(handlerMethod.getBean(), method);
+            }
+            // For advice applicability check below (involving base packages, assignable types
+            // and annotation presence), use target class instead of interface-based proxy.
+            if (Proxy.isProxyClass(handlerType)) {
+                handlerType = AopUtils.getTargetClass(handlerMethod.getBean());
+            }
         }
-        return resolver;
+
+        for (Map.Entry<ControllerAdviceBean, ExceptionHandlerMethodResolver> entry : this.exceptionHandlerAdviceCache.entrySet()) {
+            ControllerAdviceBean advice = entry.getKey();
+            if (advice.isApplicableToBeanType(handlerType)) {
+                ExceptionHandlerMethodResolver resolver = entry.getValue();
+                Method method = resolver.resolveMethod(exception);
+                if (method != null) {
+                    return new ServletInvocableHandlerMethod(advice.resolveBean(), method);
+                }
+            }
+        }
+
+        return null;
     }
 
 }
-

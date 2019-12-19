@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.aop.aspectj.autoproxy;
+package com.rocket.summer.framework.aop.framework.autoproxy;
 
 import com.rocket.summer.framework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator;
 import com.rocket.summer.framework.core.NamedThreadLocal;

@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.rocket.summer.framework.aop.Advisor;
 import com.rocket.summer.framework.aop.TargetSource;
-import com.rocket.summer.framework.aop.aspectj.autoproxy.ProxyCreationContext;
 import com.rocket.summer.framework.aop.support.AopUtils;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -170,4 +169,3 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
     }
 
 }
-

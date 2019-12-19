@@ -1,5 +1,12 @@
 package com.rocket.summer.framework.beans.factory.support;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.rocket.summer.framework.beans.BeanMetadataAttributeAccessor;
 import com.rocket.summer.framework.beans.MutablePropertyValues;
 import com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory;
@@ -12,11 +19,32 @@ import com.rocket.summer.framework.util.ClassUtils;
 import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.StringUtils;
 
-import java.lang.reflect.Constructor;
-import java.util.*;
-
+/**
+ * Base class for concrete, full-fledged {@link BeanDefinition} classes,
+ * factoring out common properties of {@link GenericBeanDefinition},
+ * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
+ *
+ * <p>The autowire constants match the ones defined in the
+ * {@link com.rocket.summer.framework.beans.factory.config.AutowireCapableBeanFactory}
+ * interface.
+ *
+ * @author Rod Johnson
+ * @author Juergen Hoeller
+ * @author Rob Harrop
+ * @author Mark Fisher
+ * @see GenericBeanDefinition
+ * @see RootBeanDefinition
+ * @see ChildBeanDefinition
+ */
+@SuppressWarnings("serial")
 public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor
         implements BeanDefinition, Cloneable {
+
+    /**
+     * Constant for the default scope name: {@code ""}, equivalent to singleton
+     * status unless overridden from a parent bean definition (if applicable).
+     */
+    public static final String SCOPE_DEFAULT = "";
 
     /**
      * Constant that indicates no autowiring at all.
@@ -46,33 +74,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      * Constant that indicates determining an appropriate autowire strategy
      * through introspection of the bean class.
      * @see #setAutowireMode
+     * @deprecated as of Spring 3.0: If you are using mixed autowiring strategies,
+     * use annotation-based autowiring for clearer demarcation of autowiring needs.
      */
+    @Deprecated
     public static final int AUTOWIRE_AUTODETECT = AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT;
-
-    /**
-     * Constant that indicates the container should attempt to infer the
-     * {@link #setDestroyMethodName destroy method name} for a bean as opposed to
-     * explicit specification of a method name. The value {@value} is specifically
-     * designed to include characters otherwise illegal in a method name, ensuring
-     * no possibility of collisions with legitimately named methods having the same
-     * name.
-     * <p>Currently, the method names detected during destroy method inference
-     * are "close" and "shutdown", if present on the specific bean class.
-     */
-    public static final String INFER_METHOD = "(inferred)";
-
-    /**
-     * Set the names of the beans that this bean depends on being initialized.
-     * The bean factory will guarantee that these beans get initialized first.
-     * <p>Note that dependencies are normally expressed through bean properties or
-     * constructor arguments. This property should just be necessary for other kinds
-     * of dependencies like statics (*ugh*) or database preparation on startup.
-     */
-    @Override
-    public void setDependsOn(String... dependsOn) {
-        this.dependsOn = dependsOn;
-    }
-
 
     /**
      * Constant that indicates no dependency check at all.
@@ -100,19 +106,22 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      */
     public static final int DEPENDENCY_CHECK_ALL = 3;
 
-    private ConstructorArgumentValues constructorArgumentValues;
+    /**
+     * Constant that indicates the container should attempt to infer the
+     * {@link #setDestroyMethodName destroy method name} for a bean as opposed to
+     * explicit specification of a method name. The value {@value} is specifically
+     * designed to include characters otherwise illegal in a method name, ensuring
+     * no possibility of collisions with legitimately named methods having the same
+     * name.
+     * <p>Currently, the method names detected during destroy method inference
+     * are "close" and "shutdown", if present on the specific bean class.
+     */
+    public static final String INFER_METHOD = "(inferred)";
 
-    private MutablePropertyValues propertyValues;
 
     private volatile Object beanClass;
 
-    private String scope = SCOPE_SINGLETON;
-
-    private boolean singleton = true;
-
-    private boolean prototype = false;
-
-    private boolean nonPublicAccessAllowed = true;
+    private String scope = SCOPE_DEFAULT;
 
     private boolean abstractFlag = false;
 
@@ -126,15 +135,24 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     private boolean autowireCandidate = true;
 
-    private final Map qualifiers = new LinkedHashMap();
-
     private boolean primary = false;
 
-    private MethodOverrides methodOverrides = new MethodOverrides();
+    private final Map<String, AutowireCandidateQualifier> qualifiers =
+            new LinkedHashMap<String, AutowireCandidateQualifier>(0);
+
+    private boolean nonPublicAccessAllowed = true;
+
+    private boolean lenientConstructorResolution = true;
 
     private String factoryBeanName;
 
     private String factoryMethodName;
+
+    private ConstructorArgumentValues constructorArgumentValues;
+
+    private MutablePropertyValues propertyValues;
+
+    private MethodOverrides methodOverrides = new MethodOverrides();
 
     private String initMethodName;
 
@@ -152,7 +170,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     private Resource resource;
 
-    private boolean lenientConstructorResolution = true;
 
     /**
      * Create a new AbstractBeanDefinition with default settings.
@@ -160,7 +177,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     protected AbstractBeanDefinition() {
         this(null, null);
     }
-
 
     /**
      * Create a new AbstractBeanDefinition with the given
@@ -172,21 +188,21 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
-     * Create a new AbstractBeanDefinition as deep copy of the given
+     * Create a new AbstractBeanDefinition as a deep copy of the given
      * bean definition.
      * @param original the original bean definition to copy from
      */
     protected AbstractBeanDefinition(BeanDefinition original) {
         setParentName(original.getParentName());
         setBeanClassName(original.getBeanClassName());
-        setFactoryBeanName(original.getFactoryBeanName());
-        setFactoryMethodName(original.getFactoryMethodName());
         setScope(original.getScope());
         setAbstract(original.isAbstract());
         setLazyInit(original.isLazyInit());
-        setRole(original.getRole());
+        setFactoryBeanName(original.getFactoryBeanName());
+        setFactoryMethodName(original.getFactoryMethodName());
         setConstructorArgumentValues(new ConstructorArgumentValues(original.getConstructorArgumentValues()));
         setPropertyValues(new MutablePropertyValues(original.getPropertyValues()));
+        setRole(original.getRole());
         setSource(original.getSource());
         copyAttributesFrom(original);
 
@@ -199,13 +215,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
             setDependencyCheck(originalAbd.getDependencyCheck());
             setDependsOn(originalAbd.getDependsOn());
             setAutowireCandidate(originalAbd.isAutowireCandidate());
-            copyQualifiersFrom(originalAbd);
             setPrimary(originalAbd.isPrimary());
+            copyQualifiersFrom(originalAbd);
+            setNonPublicAccessAllowed(originalAbd.isNonPublicAccessAllowed());
+            setLenientConstructorResolution(originalAbd.isLenientConstructorResolution());
+            setMethodOverrides(new MethodOverrides(originalAbd.getMethodOverrides()));
             setInitMethodName(originalAbd.getInitMethodName());
             setEnforceInitMethod(originalAbd.isEnforceInitMethod());
             setDestroyMethodName(originalAbd.getDestroyMethodName());
             setEnforceDestroyMethod(originalAbd.isEnforceDestroyMethod());
-            setMethodOverrides(new MethodOverrides(originalAbd.getMethodOverrides()));
             setSynthetic(originalAbd.isSynthetic());
             setResource(originalAbd.getResource());
         }
@@ -214,12 +232,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         }
     }
 
-    /**
-     * Return whether to allow access to non-public constructors and methods.
-     */
-    public boolean isNonPublicAccessAllowed() {
-        return this.nonPublicAccessAllowed;
-    }
 
     /**
      * Override settings in this bean definition (presumably a copied parent
@@ -289,189 +301,180 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
-     * Return whether to resolve constructors in lenient mode or in strict mode.
-     */
-    public boolean isLenientConstructorResolution() {
-        return this.lenientConstructorResolution;
-    }
-
-    /**
-     * Specify whether to resolve constructors in lenient mode ({@code true},
-     * which is the default) or to switch to strict resolution (throwing an exception
-     * in case of ambiguous constructors that all match when converting the arguments,
-     * whereas lenient mode would use the one with the 'closest' type matches).
-     */
-    public void setLenientConstructorResolution(boolean lenientConstructorResolution) {
-        this.lenientConstructorResolution = lenientConstructorResolution;
-    }
-
-    /**
-     * Specify whether to allow access to non-public constructors and methods,
-     * for the case of externalized metadata pointing to those. The default is
-     * {@code true}; switch this to {@code false} for public access only.
-     * <p>This applies to constructor resolution, factory method resolution,
-     * and also init/destroy methods. Bean property accessors have to be public
-     * in any case and are not affected by this setting.
-     * <p>Note that annotation-driven configuration will still access non-public
-     * members as far as they have been annotated. This setting applies to
-     * externalized metadata in this bean definition only.
-     */
-    public void setNonPublicAccessAllowed(boolean nonPublicAccessAllowed) {
-        this.nonPublicAccessAllowed = nonPublicAccessAllowed;
-    }
-
-    /**
-     * Clone this bean definition.
-     * To be implemented by concrete subclasses.
-     * @return the cloned bean definition object
-     */
-    public abstract AbstractBeanDefinition cloneBeanDefinition();
-
-    public void setBeanClassName(String beanClassName) {
-        this.beanClass = beanClassName;
-    }
-
-    /**
-     * Indicate whether the configured destroy method is the default.
-     * @see #getDestroyMethodName
-     */
-    public boolean isEnforceDestroyMethod() {
-        return this.enforceDestroyMethod;
-    }
-
-    /**
      * Apply the provided default values to this bean.
-     * @param defaults the defaults to apply
+     * @param defaults the default settings to apply
+     * @since 2.5
      */
     public void applyDefaults(BeanDefinitionDefaults defaults) {
         setLazyInit(defaults.isLazyInit());
-        setDependencyCheck(defaults.getDependencyCheck());
         setAutowireMode(defaults.getAutowireMode());
+        setDependencyCheck(defaults.getDependencyCheck());
         setInitMethodName(defaults.getInitMethodName());
         setEnforceInitMethod(false);
         setDestroyMethodName(defaults.getDestroyMethodName());
         setEnforceDestroyMethod(false);
     }
 
+
+    /**
+     * Specify the bean class name of this bean definition.
+     */
+    @Override
+    public void setBeanClassName(String beanClassName) {
+        this.beanClass = beanClassName;
+    }
+
+    /**
+     * Return the current bean class name of this bean definition.
+     */
+    @Override
     public String getBeanClassName() {
         Object beanClassObject = this.beanClass;
         if (beanClassObject instanceof Class) {
-            return ((Class) beanClassObject).getName();
+            return ((Class<?>) beanClassObject).getName();
         }
         else {
             return (String) beanClassObject;
         }
     }
+
     /**
-     * Specify method overrides for the bean, if any.
+     * Specify the class for this bean.
      */
-    public void setMethodOverrides(MethodOverrides methodOverrides) {
-        this.methodOverrides = (methodOverrides != null ? methodOverrides : new MethodOverrides());
+    public void setBeanClass(Class<?> beanClass) {
+        this.beanClass = beanClass;
     }
 
     /**
-     * Return if there are constructor argument values defined for this bean.
+     * Return the class of the wrapped bean, if already resolved.
+     * @return the bean class, or {@code null} if none defined
+     * @throws IllegalStateException if the bean definition does not define a bean class,
+     * or a specified bean class name has not been resolved into an actual Class
      */
-    public boolean hasConstructorArgumentValues() {
-        return !this.constructorArgumentValues.isEmpty();
+    public Class<?> getBeanClass() throws IllegalStateException {
+        Object beanClassObject = this.beanClass;
+        if (beanClassObject == null) {
+            throw new IllegalStateException("No bean class specified on bean definition");
+        }
+        if (!(beanClassObject instanceof Class)) {
+            throw new IllegalStateException(
+                    "Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
+        }
+        return (Class<?>) beanClassObject;
     }
 
     /**
-     * Return information about methods to be overridden by the IoC
-     * container. This will be empty if there are no method overrides.
-     * Never returns null.
+     * Return whether this definition specifies a bean class.
      */
-    public MethodOverrides getMethodOverrides() {
-        return this.methodOverrides;
+    public boolean hasBeanClass() {
+        return (this.beanClass instanceof Class);
     }
 
     /**
-     * Return property values for this bean (never <code>null</code>).
+     * Determine the class of the wrapped bean, resolving it from a
+     * specified class name if necessary. Will also reload a specified
+     * Class from its name when called with the bean class already resolved.
+     * @param classLoader the ClassLoader to use for resolving a (potential) class name
+     * @return the resolved bean class
+     * @throws ClassNotFoundException if the class name could be resolved
      */
-    public MutablePropertyValues getPropertyValues() {
-        return this.propertyValues;
-    }
-
-    /**
-     * Set the name of the destroy method. The default is <code>null</code>
-     * in which case there is no destroy method.
-     */
-    public void setDestroyMethodName(String destroyMethodName) {
-        this.destroyMethodName = destroyMethodName;
-    }
-
-    /**
-     * Return the name of the destroy method.
-     */
-    public String getDestroyMethodName() {
-        return this.destroyMethodName;
+    public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+        String className = getBeanClassName();
+        if (className == null) {
+            return null;
+        }
+        Class<?> resolvedClass = ClassUtils.forName(className, classLoader);
+        this.beanClass = resolvedClass;
+        return resolvedClass;
     }
 
     /**
      * Set the name of the target scope for the bean.
-     * <p>Default is "singleton"; the out-of-the-box alternative is "prototype".
-     * Extended bean factories might support further scopes.
+     * <p>The default is singleton status, although this is only applied once
+     * a bean definition becomes active in the containing factory. A bean
+     * definition may eventually inherit its scope from a parent bean definition.
+     * For this reason, the default scope name is an empty string (i.e., {@code ""}),
+     * with singleton status being assumed until a resolved scope is set.
      * @see #SCOPE_SINGLETON
      * @see #SCOPE_PROTOTYPE
      */
+    @Override
     public void setScope(String scope) {
-        Assert.notNull(scope, "Scope must not be null");
         this.scope = scope;
-        this.singleton = SCOPE_SINGLETON.equals(scope);
-        this.prototype = SCOPE_PROTOTYPE.equals(scope);
     }
 
     /**
      * Return the name of the target scope for the bean.
      */
+    @Override
     public String getScope() {
         return this.scope;
     }
+
     /**
-     * Specify whether or not the configured destroy method is the default.
-     * Default value is <code>false</code>.
-     * @see #setDestroyMethodName
+     * Return whether this a <b>Singleton</b>, with a single shared instance
+     * returned from all calls.
+     * @see #SCOPE_SINGLETON
      */
-    public void setEnforceDestroyMethod(boolean enforceDestroyMethod) {
-        this.enforceDestroyMethod = enforceDestroyMethod;
+    @Override
+    public boolean isSingleton() {
+        return SCOPE_SINGLETON.equals(this.scope) || SCOPE_DEFAULT.equals(this.scope);
     }
 
     /**
-     * Specify whether or not the configured init method is the default.
-     * Default value is <code>false</code>.
-     * @see #setInitMethodName
+     * Return whether this a <b>Prototype</b>, with an independent instance
+     * returned for each call.
+     * @see #SCOPE_PROTOTYPE
      */
-    public void setEnforceInitMethod(boolean enforceInitMethod) {
-        this.enforceInitMethod = enforceInitMethod;
+    @Override
+    public boolean isPrototype() {
+        return SCOPE_PROTOTYPE.equals(this.scope);
     }
 
     /**
-     * Indicate whether the configured init method is the default.
-     * @see #getInitMethodName()
+     * Set if this bean is "abstract", i.e. not meant to be instantiated itself but
+     * rather just serving as parent for concrete child bean definitions.
+     * <p>Default is "false". Specify true to tell the bean factory to not try to
+     * instantiate that particular bean in any case.
      */
-    public boolean isEnforceInitMethod() {
-        return this.enforceInitMethod;
+    public void setAbstract(boolean abstractFlag) {
+        this.abstractFlag = abstractFlag;
     }
 
     /**
-     * Set the name of the initializer method. The default is <code>null</code>
-     * in which case there is no initializer method.
+     * Return whether this bean is "abstract", i.e. not meant to be instantiated
+     * itself but rather just serving as parent for concrete child bean definitions.
      */
-    public void setInitMethodName(String initMethodName) {
-        this.initMethodName = initMethodName;
+    @Override
+    public boolean isAbstract() {
+        return this.abstractFlag;
     }
 
     /**
-     * Return the name of the initializer method.
+     * Set whether this bean should be lazily initialized.
+     * <p>If {@code false}, the bean will get instantiated on startup by bean
+     * factories that perform eager initialization of singletons.
      */
-    public String getInitMethodName() {
-        return this.initMethodName;
+    @Override
+    public void setLazyInit(boolean lazyInit) {
+        this.lazyInit = lazyInit;
+    }
+
+    /**
+     * Return whether this bean should be lazily initialized, i.e. not
+     * eagerly instantiated on startup. Only applicable to a singleton bean.
+     * @return whether to apply lazy-init semantics ({@code false} by default)
+     */
+    @Override
+    public boolean isLazyInit() {
+        return this.lazyInit;
     }
 
     /**
      * Set the autowire mode. This determines whether any automagical detection
-     * and setting of bean references will happen. Default is AUTOWIRE_NO,
-     * which means there's no autowire.
+     * and setting of bean references will happen. Default is AUTOWIRE_NO
+     * which means there won't be convention-based autowiring by name or type
+     * (however, there may still be explicit annotation-driven autowiring).
      * @param autowireMode the autowire mode to set.
      * Must be one of the constants defined in this class.
      * @see #AUTOWIRE_NO
@@ -503,8 +506,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
             // Work out whether to apply setter autowiring or constructor autowiring.
             // If it has a no-arg constructor it's deemed to be setter autowiring,
             // otherwise we'll try constructor autowiring.
-            Constructor[] constructors = getBeanClass().getConstructors();
-            for (Constructor constructor : constructors) {
+            Constructor<?>[] constructors = getBeanClass().getConstructors();
+            for (Constructor<?> constructor : constructors) {
                 if (constructor.getParameterTypes().length == 0) {
                     return AUTOWIRE_BY_TYPE;
                 }
@@ -537,15 +540,35 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
+     * Set the names of the beans that this bean depends on being initialized.
+     * The bean factory will guarantee that these beans get initialized first.
+     * <p>Note that dependencies are normally expressed through bean properties or
+     * constructor arguments. This property should just be necessary for other kinds
+     * of dependencies like statics (*ugh*) or database preparation on startup.
+     */
+    @Override
+    public void setDependsOn(String... dependsOn) {
+        this.dependsOn = dependsOn;
+    }
+
+    /**
      * Return the bean names that this bean depends on.
      */
+    @Override
     public String[] getDependsOn() {
         return this.dependsOn;
     }
 
     /**
      * Set whether this bean is a candidate for getting autowired into some other bean.
+     * <p>Note that this flag is designed to only affect type-based autowiring.
+     * It does not affect explicit references by name, which will get resolved even
+     * if the specified bean is not marked as an autowire candidate. As a consequence,
+     * autowiring by name will nevertheless inject a bean if the name matches.
+     * @see #AUTOWIRE_BY_TYPE
+     * @see #AUTOWIRE_BY_NAME
      */
+    @Override
     public void setAutowireCandidate(boolean autowireCandidate) {
         this.autowireCandidate = autowireCandidate;
     }
@@ -553,8 +576,27 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     /**
      * Return whether this bean is a candidate for getting autowired into some other bean.
      */
+    @Override
     public boolean isAutowireCandidate() {
         return this.autowireCandidate;
+    }
+
+    /**
+     * Set whether this bean is a primary autowire candidate.
+     * <p>If this value is {@code true} for exactly one bean among multiple
+     * matching candidates, it will serve as a tie-breaker.
+     */
+    @Override
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
+    }
+
+    /**
+     * Return whether this bean is a primary autowire candidate.
+     */
+    @Override
+    public boolean isPrimary() {
+        return this.primary;
     }
 
     /**
@@ -567,135 +609,135 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
-     * Return constructor argument values for this bean (never <code>null</code>).
-     */
-    public ConstructorArgumentValues getConstructorArgumentValues() {
-        return this.constructorArgumentValues;
-    }
-
-    /**
      * Return whether this bean has the specified qualifier.
      */
     public boolean hasQualifier(String typeName) {
-        return this.qualifiers.keySet().contains(typeName);
+        return this.qualifiers.containsKey(typeName);
     }
 
     /**
      * Return the qualifier mapped to the provided type name.
      */
     public AutowireCandidateQualifier getQualifier(String typeName) {
-        return (AutowireCandidateQualifier) this.qualifiers.get(typeName);
+        return this.qualifiers.get(typeName);
     }
 
     /**
      * Return all registered qualifiers.
      * @return the Set of {@link AutowireCandidateQualifier} objects.
      */
-    public Set getQualifiers() {
-        return new LinkedHashSet(this.qualifiers.values());
+    public Set<AutowireCandidateQualifier> getQualifiers() {
+        return new LinkedHashSet<AutowireCandidateQualifier>(this.qualifiers.values());
     }
 
     /**
      * Copy the qualifiers from the supplied AbstractBeanDefinition to this bean definition.
      * @param source the AbstractBeanDefinition to copy from
      */
-    protected void copyQualifiersFrom(AbstractBeanDefinition source) {
+    public void copyQualifiersFrom(AbstractBeanDefinition source) {
         Assert.notNull(source, "Source must not be null");
         this.qualifiers.putAll(source.qualifiers);
     }
 
     /**
-     * Set whether this bean is a primary autowire candidate.
-     * If this value is true for exactly one bean among multiple
-     * matching candidates, it will serve as a tie-breaker.
+     * Specify whether to allow access to non-public constructors and methods,
+     * for the case of externalized metadata pointing to those. The default is
+     * {@code true}; switch this to {@code false} for public access only.
+     * <p>This applies to constructor resolution, factory method resolution,
+     * and also init/destroy methods. Bean property accessors have to be public
+     * in any case and are not affected by this setting.
+     * <p>Note that annotation-driven configuration will still access non-public
+     * members as far as they have been annotated. This setting applies to
+     * externalized metadata in this bean definition only.
      */
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
+    public void setNonPublicAccessAllowed(boolean nonPublicAccessAllowed) {
+        this.nonPublicAccessAllowed = nonPublicAccessAllowed;
     }
 
     /**
-     * Return whether this bean is a primary autowire candidate.
-     * If this value is true for exactly one bean among multiple
-     * matching candidates, it will serve as a tie-breaker.
+     * Return whether to allow access to non-public constructors and methods.
      */
-    public boolean isPrimary() {
-        return this.primary;
-    }
-    /**
-     * Return the class of the wrapped bean, if already resolved.
-     * @return the bean class, or <code>null</code> if none defined
-     * @throws IllegalStateException if the bean definition does not define a bean class,
-     * or a specified bean class name has not been resolved into an actual Class
-     */
-    public Class getBeanClass() throws IllegalStateException {
-        Object beanClassObject = this.beanClass;
-        if (beanClassObject == null) {
-            throw new IllegalStateException("No bean class specified on bean definition");
-        }
-        if (!(beanClassObject instanceof Class)) {
-            throw new IllegalStateException(
-                    "Bean class name [" + beanClassObject + "] has not been resolved into an actual Class");
-        }
-        return (Class) beanClassObject;
-    }
-    /**
-     * Return whether this a <b>Singleton</b>, with a single shared instance
-     * returned from all calls.
-     * @see #SCOPE_SINGLETON
-     */
-    public boolean isSingleton() {
-        return this.singleton;
+    public boolean isNonPublicAccessAllowed() {
+        return this.nonPublicAccessAllowed;
     }
 
     /**
-     * Return whether this a <b>Prototype</b>, with an independent instance
-     * returned for each call.
-     * @see #SCOPE_PROTOTYPE
+     * Specify whether to resolve constructors in lenient mode ({@code true},
+     * which is the default) or to switch to strict resolution (throwing an exception
+     * in case of ambiguous constructors that all match when converting the arguments,
+     * whereas lenient mode would use the one with the 'closest' type matches).
      */
-    public boolean isPrototype() {
-        return this.prototype;
+    public void setLenientConstructorResolution(boolean lenientConstructorResolution) {
+        this.lenientConstructorResolution = lenientConstructorResolution;
     }
 
     /**
-     * Set if this bean is "abstract", i.e. not meant to be instantiated itself but
-     * rather just serving as parent for concrete child bean definitions.
-     * <p>Default is "false". Specify true to tell the bean factory to not try to
-     * instantiate that particular bean in any case.
+     * Return whether to resolve constructors in lenient mode or in strict mode.
      */
-    public void setAbstract(boolean abstractFlag) {
-        this.abstractFlag = abstractFlag;
+    public boolean isLenientConstructorResolution() {
+        return this.lenientConstructorResolution;
     }
 
     /**
-     * Return whether this bean is "abstract", i.e. not meant to be instantiated
-     * itself but rather just serving as parent for concrete child bean definitions.
+     * Specify the factory bean to use, if any.
+     * This the name of the bean to call the specified factory method on.
+     * @see #setFactoryMethodName
      */
-    public boolean isAbstract() {
-        return this.abstractFlag;
+    @Override
+    public void setFactoryBeanName(String factoryBeanName) {
+        this.factoryBeanName = factoryBeanName;
     }
 
     /**
-     * Set whether this bean should be lazily initialized.
-     * <p>If <code>false</code>, the bean will get instantiated on startup by bean
-     * factories that perform eager initialization of singletons.
+     * Return the factory bean name, if any.
      */
-    public void setLazyInit(boolean lazyInit) {
-        this.lazyInit = lazyInit;
+    @Override
+    public String getFactoryBeanName() {
+        return this.factoryBeanName;
     }
 
     /**
-     * Return whether this bean should be lazily initialized, i.e. not
-     * eagerly instantiated on startup. Only applicable to a singleton bean.
+     * Specify a factory method, if any. This method will be invoked with
+     * constructor arguments, or with no arguments if none are specified.
+     * The method will be invoked on the specified factory bean, if any,
+     * or otherwise as a static method on the local bean class.
+     * @see #setFactoryBeanName
+     * @see #setBeanClassName
      */
-    public boolean isLazyInit() {
-        return this.lazyInit;
+    @Override
+    public void setFactoryMethodName(String factoryMethodName) {
+        this.factoryMethodName = factoryMethodName;
     }
+
+    /**
+     * Return a factory method, if any.
+     */
+    @Override
+    public String getFactoryMethodName() {
+        return this.factoryMethodName;
+    }
+
     /**
      * Specify constructor argument values for this bean.
      */
     public void setConstructorArgumentValues(ConstructorArgumentValues constructorArgumentValues) {
         this.constructorArgumentValues =
                 (constructorArgumentValues != null ? constructorArgumentValues : new ConstructorArgumentValues());
+    }
+
+    /**
+     * Return constructor argument values for this bean (never {@code null}).
+     */
+    @Override
+    public ConstructorArgumentValues getConstructorArgumentValues() {
+        return this.constructorArgumentValues;
+    }
+
+    /**
+     * Return if there are constructor argument values defined for this bean.
+     */
+    public boolean hasConstructorArgumentValues() {
+        return !this.constructorArgumentValues.isEmpty();
     }
 
     /**
@@ -706,93 +748,97 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
-     * Return whether this definition specifies a bean class.
+     * Return property values for this bean (never {@code null}).
      */
-    public boolean hasBeanClass() {
-        return (this.beanClass instanceof Class);
+    @Override
+    public MutablePropertyValues getPropertyValues() {
+        return this.propertyValues;
     }
 
     /**
-     * Specify the class for this bean.
+     * Specify method overrides for the bean, if any.
      */
-    public void setBeanClass(Class beanClass) {
-        this.beanClass = beanClass;
+    public void setMethodOverrides(MethodOverrides methodOverrides) {
+        this.methodOverrides = (methodOverrides != null ? methodOverrides : new MethodOverrides());
     }
 
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (!(other instanceof AbstractBeanDefinition)) {
-            return false;
-        }
-
-        AbstractBeanDefinition that = (AbstractBeanDefinition) other;
-
-        if (!ObjectUtils.nullSafeEquals(getBeanClassName(), that.getBeanClassName())) return false;
-        if (!ObjectUtils.nullSafeEquals(this.scope, that.scope)) return false;
-        if (this.abstractFlag != that.abstractFlag) return false;
-        if (this.lazyInit != that.lazyInit) return false;
-
-        if (this.autowireMode != that.autowireMode) return false;
-        if (this.dependencyCheck != that.dependencyCheck) return false;
-        if (!Arrays.equals(this.dependsOn, that.dependsOn)) return false;
-        if (this.autowireCandidate != that.autowireCandidate) return false;
-        if (!ObjectUtils.nullSafeEquals(this.qualifiers, that.qualifiers)) return false;
-        if (this.primary != that.primary) return false;
-
-        if (!ObjectUtils.nullSafeEquals(this.constructorArgumentValues, that.constructorArgumentValues)) return false;
-        if (!ObjectUtils.nullSafeEquals(this.propertyValues, that.propertyValues)) return false;
-        if (!ObjectUtils.nullSafeEquals(this.methodOverrides, that.methodOverrides)) return false;
-
-        if (!ObjectUtils.nullSafeEquals(this.factoryBeanName, that.factoryBeanName)) return false;
-        if (!ObjectUtils.nullSafeEquals(this.factoryMethodName, that.factoryMethodName)) return false;
-        if (!ObjectUtils.nullSafeEquals(this.initMethodName, that.initMethodName)) return false;
-        if (this.enforceInitMethod != that.enforceInitMethod) return false;
-        if (!ObjectUtils.nullSafeEquals(this.destroyMethodName, that.destroyMethodName)) return false;
-        if (this.enforceDestroyMethod != that.enforceDestroyMethod) return false;
-
-        if (this.synthetic != that.synthetic) return false;
-        if (this.role != that.role) return false;
-
-        return super.equals(other);
+    /**
+     * Return information about methods to be overridden by the IoC
+     * container. This will be empty if there are no method overrides.
+     * <p>Never returns {@code null}.
+     */
+    public MethodOverrides getMethodOverrides() {
+        return this.methodOverrides;
     }
 
-    public int hashCode() {
-        int hashCode = ObjectUtils.nullSafeHashCode(getBeanClassName());
-        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.scope);
-        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.constructorArgumentValues);
-        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.propertyValues);
-        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.factoryBeanName);
-        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.factoryMethodName);
-        hashCode = 29 * hashCode + super.hashCode();
-        return hashCode;
+    /**
+     * Set the name of the initializer method.
+     * <p>The default is {@code null} in which case there is no initializer method.
+     */
+    public void setInitMethodName(String initMethodName) {
+        this.initMethodName = initMethodName;
     }
 
-    public String toString() {
-        StringBuffer sb = new StringBuffer("class [");
-        sb.append(getBeanClassName()).append("]");
-        sb.append("; scope=").append(this.scope);
-        sb.append("; abstract=").append(this.abstractFlag);
-        sb.append("; lazyInit=").append(this.lazyInit);
-        sb.append("; autowireMode=").append(this.autowireMode);
-        sb.append("; dependencyCheck=").append(this.dependencyCheck);
-        sb.append("; autowireCandidate=").append(this.autowireCandidate);
-        sb.append("; primary=").append(this.primary);
-        sb.append("; factoryBeanName=").append(this.factoryBeanName);
-        sb.append("; factoryMethodName=").append(this.factoryMethodName);
-        sb.append("; initMethodName=").append(this.initMethodName);
-        sb.append("; destroyMethodName=").append(this.destroyMethodName);
-        if (this.resource != null) {
-            sb.append("; defined in ").append(this.resource.getDescription());
-        }
-        return sb.toString();
+    /**
+     * Return the name of the initializer method.
+     */
+    public String getInitMethodName() {
+        return this.initMethodName;
+    }
+
+    /**
+     * Specify whether or not the configured init method is the default.
+     * <p>The default value is {@code false}.
+     * @see #setInitMethodName
+     */
+    public void setEnforceInitMethod(boolean enforceInitMethod) {
+        this.enforceInitMethod = enforceInitMethod;
+    }
+
+    /**
+     * Indicate whether the configured init method is the default.
+     * @see #getInitMethodName()
+     */
+    public boolean isEnforceInitMethod() {
+        return this.enforceInitMethod;
+    }
+
+    /**
+     * Set the name of the destroy method.
+     * <p>The default is {@code null} in which case there is no destroy method.
+     */
+    public void setDestroyMethodName(String destroyMethodName) {
+        this.destroyMethodName = destroyMethodName;
+    }
+
+    /**
+     * Return the name of the destroy method.
+     */
+    public String getDestroyMethodName() {
+        return this.destroyMethodName;
+    }
+
+    /**
+     * Specify whether or not the configured destroy method is the default.
+     * <p>The default value is {@code false}.
+     * @see #setDestroyMethodName
+     */
+    public void setEnforceDestroyMethod(boolean enforceDestroyMethod) {
+        this.enforceDestroyMethod = enforceDestroyMethod;
+    }
+
+    /**
+     * Indicate whether the configured destroy method is the default.
+     * @see #getDestroyMethodName
+     */
+    public boolean isEnforceDestroyMethod() {
+        return this.enforceDestroyMethod;
     }
 
     /**
      * Set whether this bean definition is 'synthetic', that is, not defined
      * by the application itself (for example, an infrastructure bean such
-     * as a helper for auto-proxying, created through <code>&ltaop:config&gt;</code>).
+     * as a helper for auto-proxying, created through {@code <aop:config>}).
      */
     public void setSynthetic(boolean synthetic) {
         this.synthetic = synthetic;
@@ -807,19 +853,19 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     }
 
     /**
-     * Set the role hint for this <code>BeanDefinition</code>.
+     * Set the role hint for this {@code BeanDefinition}.
      */
     public void setRole(int role) {
         this.role = role;
     }
 
     /**
-     * Return the role hint for this <code>BeanDefinition</code>.
+     * Return the role hint for this {@code BeanDefinition}.
      */
+    @Override
     public int getRole() {
         return this.role;
     }
-
 
     /**
      * Set a human-readable description of this bean definition.
@@ -828,6 +874,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         this.description = description;
     }
 
+    /**
+     * Return a human-readable description of this bean definition.
+     */
+    @Override
     public String getDescription() {
         return this.description;
     }
@@ -855,6 +905,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         this.resource = new DescriptiveResource(resourceDescription);
     }
 
+    /**
+     * Return a description of the resource that this bean definition
+     * came from (for the purpose of showing context in case of errors).
+     */
+    @Override
     public String getResourceDescription() {
         return (this.resource != null ? this.resource.getDescription() : null);
     }
@@ -866,44 +921,16 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         this.resource = new BeanDefinitionResource(originatingBd);
     }
 
+    /**
+     * Return the originating BeanDefinition, or {@code null} if none.
+     * Allows for retrieving the decorated bean definition, if any.
+     * <p>Note that this method returns the immediate originator. Iterate through the
+     * originator chain to find the original BeanDefinition as defined by the user.
+     */
+    @Override
     public BeanDefinition getOriginatingBeanDefinition() {
         return (this.resource instanceof BeanDefinitionResource ?
                 ((BeanDefinitionResource) this.resource).getBeanDefinition() : null);
-    }
-
-    public void setFactoryBeanName(String factoryBeanName) {
-        this.factoryBeanName = factoryBeanName;
-    }
-
-    public String getFactoryBeanName() {
-        return this.factoryBeanName;
-    }
-
-    public void setFactoryMethodName(String factoryMethodName) {
-        this.factoryMethodName = factoryMethodName;
-    }
-
-    public String getFactoryMethodName() {
-        return this.factoryMethodName;
-    }
-
-    /**
-     * Set if this a <b>Singleton</b>, with a single, shared instance returned
-     * on all calls. In case of "false", the BeanFactory will apply the <b>Prototype</b>
-     * design pattern, with each caller requesting an instance getting an independent
-     * instance. How this is exactly defined will depend on the BeanFactory.
-     * <p>"Singletons" are the commoner type, so the default is "true".
-     * Note that as of Spring 2.0, this flag is just an alternative way to
-     * specify scope="singleton" or scope="prototype".
-     * @deprecated since Spring 2.5, in favor of {@link #setScope}
-     * @see #setScope
-     * @see #SCOPE_SINGLETON
-     * @see #SCOPE_PROTOTYPE
-     */
-    public void setSingleton(boolean singleton) {
-        this.scope = (singleton ? SCOPE_SINGLETON : SCOPE_PROTOTYPE);
-        this.singleton = singleton;
-        this.prototype = !singleton;
     }
 
     /**
@@ -931,9 +958,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         // Check that lookup methods exists.
         MethodOverrides methodOverrides = getMethodOverrides();
         if (!methodOverrides.isEmpty()) {
-            for (Object o : methodOverrides.getOverrides()) {
-                MethodOverride mo = (MethodOverride) o;
-                prepareMethodOverride(mo);
+            Set<MethodOverride> overrides = methodOverrides.getOverrides();
+            synchronized (overrides) {
+                for (MethodOverride mo : overrides) {
+                    prepareMethodOverride(mo);
+                }
             }
         }
     }
@@ -958,21 +987,97 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
         }
     }
 
+
     /**
-     * Determine the class of the wrapped bean, resolving it from a
-     * specified class name if necessary. Will also reload a specified
-     * Class from its name when called with the bean class already resolved.
-     * @param classLoader the ClassLoader to use for resolving a (potential) class name
-     * @return the resolved bean class
-     * @throws ClassNotFoundException if the class name could be resolved
+     * Public declaration of Object's {@code clone()} method.
+     * Delegates to {@link #cloneBeanDefinition()}.
+     * @see Object#clone()
      */
-    public Class resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
-        String className = getBeanClassName();
-        if (className == null) {
-            return null;
-        }
-        Class resolvedClass = ClassUtils.forName(className, classLoader);
-        this.beanClass = resolvedClass;
-        return resolvedClass;
+    @Override
+    public Object clone() {
+        return cloneBeanDefinition();
     }
+
+    /**
+     * Clone this bean definition.
+     * To be implemented by concrete subclasses.
+     * @return the cloned bean definition object
+     */
+    public abstract AbstractBeanDefinition cloneBeanDefinition();
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof AbstractBeanDefinition)) {
+            return false;
+        }
+
+        AbstractBeanDefinition that = (AbstractBeanDefinition) other;
+
+        if (!ObjectUtils.nullSafeEquals(getBeanClassName(), that.getBeanClassName())) return false;
+        if (!ObjectUtils.nullSafeEquals(this.scope, that.scope)) return false;
+        if (this.abstractFlag != that.abstractFlag) return false;
+        if (this.lazyInit != that.lazyInit) return false;
+
+        if (this.autowireMode != that.autowireMode) return false;
+        if (this.dependencyCheck != that.dependencyCheck) return false;
+        if (!Arrays.equals(this.dependsOn, that.dependsOn)) return false;
+        if (this.autowireCandidate != that.autowireCandidate) return false;
+        if (!ObjectUtils.nullSafeEquals(this.qualifiers, that.qualifiers)) return false;
+        if (this.primary != that.primary) return false;
+
+        if (this.nonPublicAccessAllowed != that.nonPublicAccessAllowed) return false;
+        if (this.lenientConstructorResolution != that.lenientConstructorResolution) return false;
+        if (!ObjectUtils.nullSafeEquals(this.constructorArgumentValues, that.constructorArgumentValues)) return false;
+        if (!ObjectUtils.nullSafeEquals(this.propertyValues, that.propertyValues)) return false;
+        if (!ObjectUtils.nullSafeEquals(this.methodOverrides, that.methodOverrides)) return false;
+
+        if (!ObjectUtils.nullSafeEquals(this.factoryBeanName, that.factoryBeanName)) return false;
+        if (!ObjectUtils.nullSafeEquals(this.factoryMethodName, that.factoryMethodName)) return false;
+        if (!ObjectUtils.nullSafeEquals(this.initMethodName, that.initMethodName)) return false;
+        if (this.enforceInitMethod != that.enforceInitMethod) return false;
+        if (!ObjectUtils.nullSafeEquals(this.destroyMethodName, that.destroyMethodName)) return false;
+        if (this.enforceDestroyMethod != that.enforceDestroyMethod) return false;
+
+        if (this.synthetic != that.synthetic) return false;
+        if (this.role != that.role) return false;
+
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = ObjectUtils.nullSafeHashCode(getBeanClassName());
+        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.scope);
+        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.constructorArgumentValues);
+        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.propertyValues);
+        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.factoryBeanName);
+        hashCode = 29 * hashCode + ObjectUtils.nullSafeHashCode(this.factoryMethodName);
+        hashCode = 29 * hashCode + super.hashCode();
+        return hashCode;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("class [");
+        sb.append(getBeanClassName()).append("]");
+        sb.append("; scope=").append(this.scope);
+        sb.append("; abstract=").append(this.abstractFlag);
+        sb.append("; lazyInit=").append(this.lazyInit);
+        sb.append("; autowireMode=").append(this.autowireMode);
+        sb.append("; dependencyCheck=").append(this.dependencyCheck);
+        sb.append("; autowireCandidate=").append(this.autowireCandidate);
+        sb.append("; primary=").append(this.primary);
+        sb.append("; factoryBeanName=").append(this.factoryBeanName);
+        sb.append("; factoryMethodName=").append(this.factoryMethodName);
+        sb.append("; initMethodName=").append(this.initMethodName);
+        sb.append("; destroyMethodName=").append(this.destroyMethodName);
+        if (this.resource != null) {
+            sb.append("; defined in ").append(this.resource.getDescription());
+        }
+        return sb.toString();
+    }
+
 }

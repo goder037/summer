@@ -1,17 +1,5 @@
 package com.rocket.summer.framework.aop.framework.autoproxy;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.rocket.summer.framework.aop.aspectj.autoproxy.BeanNameAutoProxyCreator;
-import com.rocket.summer.framework.aop.aspectj.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +22,16 @@ import com.rocket.summer.framework.beans.factory.config.ConfigurableBeanFactory;
 import com.rocket.summer.framework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.rocket.summer.framework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import com.rocket.summer.framework.util.StringUtils;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link com.rocket.summer.framework.beans.factory.config.BeanPostProcessor} implementation
@@ -564,4 +562,3 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
             Class<?> beanClass, String beanName, TargetSource customTargetSource) throws BeansException;
 
 }
-

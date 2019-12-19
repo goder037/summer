@@ -1,11 +1,20 @@
 package com.rocket.summer.framework.web.servlet.mvc.condition;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+
+import com.rocket.summer.framework.http.InvalidMediaTypeException;
 import com.rocket.summer.framework.http.MediaType;
 import com.rocket.summer.framework.util.StringUtils;
 import com.rocket.summer.framework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import com.rocket.summer.framework.web.cors.CorsUtils;
+import com.rocket.summer.framework.web.servlet.mvc.condition.HeadersRequestCondition.HeaderExpression;
 
 /**
  * A logical disjunction (' || ') request condition to match a request's
@@ -21,13 +30,16 @@ import java.util.*;
  */
 public final class ConsumesRequestCondition extends AbstractRequestCondition<ConsumesRequestCondition> {
 
+    private final static ConsumesRequestCondition PRE_FLIGHT_MATCH = new ConsumesRequestCondition();
+
     private final List<ConsumeMediaTypeExpression> expressions;
+
 
     /**
      * Creates a new instance from 0 or more "consumes" expressions.
      * @param consumes expressions with the syntax described in
      * {@link RequestMapping#consumes()}; if 0 expressions are provided,
-     * the condition will match to every request.
+     * the condition will match to every request
      */
     public ConsumesRequestCondition(String... consumes) {
         this(consumes, null);
@@ -53,11 +65,12 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
         Collections.sort(this.expressions);
     }
 
+
     private static Set<ConsumeMediaTypeExpression> parseExpressions(String[] consumes, String[] headers) {
         Set<ConsumeMediaTypeExpression> result = new LinkedHashSet<ConsumeMediaTypeExpression>();
         if (headers != null) {
             for (String header : headers) {
-                HeadersRequestCondition.HeaderExpression expr = new HeadersRequestCondition.HeaderExpression(header);
+                HeaderExpression expr = new HeaderExpression(header);
                 if ("Content-Type".equalsIgnoreCase(expr.name)) {
                     for (MediaType mediaType : MediaType.parseMediaTypes(expr.value)) {
                         result.add(new ConsumeMediaTypeExpression(mediaType, expr.isNegated));
@@ -72,6 +85,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
         }
         return result;
     }
+
 
     /**
      * Return the contained MediaType expressions.
@@ -96,6 +110,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
     /**
      * Whether the condition has any media type expressions.
      */
+    @Override
     public boolean isEmpty() {
         return this.expressions.isEmpty();
     }
@@ -115,6 +130,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
      * instance otherwise. Practically that means a method-level "consumes"
      * overrides a type-level "consumes" condition.
      */
+    @Override
     public ConsumesRequestCondition combine(ConsumesRequestCondition other) {
         return !other.expressions.isEmpty() ? other : this;
     }
@@ -124,39 +140,52 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
      * request 'Content-Type' header and returns an instance that is guaranteed
      * to contain matching expressions only. The match is performed via
      * {@link MediaType#includes(MediaType)}.
-     *
      * @param request the current request
-     *
      * @return the same instance if the condition contains no expressions;
-     * 		or a new condition with matching expressions only;
-     * 		or {@code null} if no expressions match.
+     * or a new condition with matching expressions only;
+     * or {@code null} if no expressions match
      */
+    @Override
     public ConsumesRequestCondition getMatchingCondition(HttpServletRequest request) {
+        if (CorsUtils.isPreFlightRequest(request)) {
+            return PRE_FLIGHT_MATCH;
+        }
         if (isEmpty()) {
             return this;
         }
-        Set<ConsumeMediaTypeExpression> result = new LinkedHashSet<ConsumeMediaTypeExpression>(expressions);
+
+        MediaType contentType;
+        try {
+            contentType = (StringUtils.hasLength(request.getContentType()) ?
+                    MediaType.parseMediaType(request.getContentType()) :
+                    MediaType.APPLICATION_OCTET_STREAM);
+        }
+        catch (InvalidMediaTypeException ex) {
+            return null;
+        }
+
+        Set<ConsumeMediaTypeExpression> result = new LinkedHashSet<ConsumeMediaTypeExpression>(this.expressions);
         for (Iterator<ConsumeMediaTypeExpression> iterator = result.iterator(); iterator.hasNext();) {
             ConsumeMediaTypeExpression expression = iterator.next();
-            if (!expression.match(request)) {
+            if (!expression.match(contentType)) {
                 iterator.remove();
             }
         }
-        return (result.isEmpty()) ? null : new ConsumesRequestCondition(result);
+        return (!result.isEmpty() ? new ConsumesRequestCondition(result) : null);
     }
 
     /**
      * Returns:
      * <ul>
-     * 	<li>0 if the two conditions have the same number of expressions
-     * 	<li>Less than 0 if "this" has more or more specific media type expressions
-     * 	<li>Greater than 0 if "other" has more or more specific media type expressions
+     * <li>0 if the two conditions have the same number of expressions
+     * <li>Less than 0 if "this" has more or more specific media type expressions
+     * <li>Greater than 0 if "other" has more or more specific media type expressions
      * </ul>
-     *
      * <p>It is assumed that both instances have been obtained via
      * {@link #getMatchingCondition(HttpServletRequest)} and each instance contains
      * the matching consumable media type expression only or is otherwise empty.
      */
+    @Override
     public int compareTo(ConsumesRequestCondition other, HttpServletRequest request) {
         if (this.expressions.isEmpty() && other.expressions.isEmpty()) {
             return 0;
@@ -172,6 +201,7 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
         }
     }
 
+
     /**
      * Parses and matches a single media type expression to a request's 'Content-Type' header.
      */
@@ -185,14 +215,10 @@ public final class ConsumesRequestCondition extends AbstractRequestCondition<Con
             super(mediaType, negated);
         }
 
-        @Override
-        protected boolean matchMediaType(HttpServletRequest request) {
-            MediaType contentType = StringUtils.hasLength(request.getContentType()) ?
-                    MediaType.parseMediaType(request.getContentType()) :
-                    MediaType.APPLICATION_OCTET_STREAM	;
-            return getMediaType().includes(contentType);
+        public final boolean match(MediaType contentType) {
+            boolean match = getMediaType().includes(contentType);
+            return (!isNegated() ? match : !match);
         }
     }
 
 }
-

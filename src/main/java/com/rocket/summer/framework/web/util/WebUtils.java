@@ -1,6 +1,12 @@
 package com.rocket.summer.framework.web.util;
 
+import com.rocket.summer.framework.http.HttpRequest;
+import com.rocket.summer.framework.http.server.ServletServerHttpRequest;
 import com.rocket.summer.framework.util.Assert;
+import com.rocket.summer.framework.util.CollectionUtils;
+import com.rocket.summer.framework.util.LinkedMultiValueMap;
+import com.rocket.summer.framework.util.MultiValueMap;
+import com.rocket.summer.framework.util.ObjectUtils;
 import com.rocket.summer.framework.util.StringUtils;
 
 import javax.servlet.*;
@@ -10,8 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 /**
@@ -20,6 +28,7 @@ import java.util.TreeMap;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * @author Sebastien Deleuze
  */
 public abstract class WebUtils {
 
@@ -65,17 +74,23 @@ public abstract class WebUtils {
     public static final String CONTENT_TYPE_CHARSET_PREFIX = ";charset=";
 
     /**
-     * Default character encoding to use when <code>request.getCharacterEncoding</code>
-     * returns <code>null</code>, according to the Servlet spec.
+     * Default character encoding to use when {@code request.getCharacterEncoding}
+     * returns {@code null}, according to the Servlet spec.
      * @see ServletRequest#getCharacterEncoding
      */
     public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
 
     /**
      * Standard Servlet spec context attribute that specifies a temporary
-     * directory for the current web application, of type <code>java.io.File</code>.
+     * directory for the current web application, of type {@code java.io.File}.
      */
     public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
+
+    /**
+     * HTML escape parameter at the servlet context level
+     * (i.e. a context-param in {@code web.xml}): "defaultHtmlEscape".
+     */
+    public static final String HTML_ESCAPE_CONTEXT_PARAM = "defaultHtmlEscape";
 
     /**
      * Use of response encoding for HTML escaping parameter at the servlet context level
@@ -85,14 +100,8 @@ public abstract class WebUtils {
     public static final String RESPONSE_ENCODED_HTML_ESCAPE_CONTEXT_PARAM = "responseEncodedHtmlEscape";
 
     /**
-     * HTML escape parameter at the servlet context level
-     * (i.e. a context-param in <code>web.xml</code>): "defaultHtmlEscape".
-     */
-    public static final String HTML_ESCAPE_CONTEXT_PARAM = "defaultHtmlEscape";
-
-    /**
      * Web app root key parameter at the servlet context level
-     * (i.e. a context-param in <code>web.xml</code>): "webAppRootKey".
+     * (i.e. a context-param in {@code web.xml}): "webAppRootKey".
      */
     public static final String WEB_APP_ROOT_KEY_PARAM = "webAppRootKey";
 
@@ -109,8 +118,8 @@ public abstract class WebUtils {
     /**
      * Set a system property to the web application root directory.
      * The key of the system property can be defined with the "webAppRootKey"
-     * context-param in <code>web.xml</code>. Default is "webapp.root".
-     * <p>Can be used for tools that support substition with <code>System.getProperty</code>
+     * context-param in {@code web.xml}. Default is "webapp.root".
+     * <p>Can be used for tools that support substitution with {@code System.getProperty}
      * values, like log4j's "${key}" syntax within log file locations.
      * @param servletContext the servlet context of the web application
      * @throws IllegalStateException if the system property is already set,
@@ -131,13 +140,61 @@ public abstract class WebUtils {
         String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
         String oldValue = System.getProperty(key);
         if (oldValue != null && !StringUtils.pathEquals(oldValue, root)) {
-            throw new IllegalStateException(
-                    "Web app root system property already set to different value: '" +
-                            key + "' = [" + oldValue + "] instead of [" + root + "] - " +
-                            "Choose unique values for the 'webAppRootKey' context-param in your web.xml files!");
+            throw new IllegalStateException("Web app root system property already set to different value: '" +
+                    key + "' = [" + oldValue + "] instead of [" + root + "] - " +
+                    "Choose unique values for the 'webAppRootKey' context-param in your web.xml files!");
         }
         System.setProperty(key, root);
         servletContext.log("Set web app root system property: '" + key + "' = [" + root + "]");
+    }
+
+    /**
+     * Remove the system property that points to the web app root directory.
+     * To be called on shutdown of the web application.
+     * @param servletContext the servlet context of the web application
+     * @see #setWebAppRootSystemProperty
+     */
+    public static void removeWebAppRootSystemProperty(ServletContext servletContext) {
+        Assert.notNull(servletContext, "ServletContext must not be null");
+        String param = servletContext.getInitParameter(WEB_APP_ROOT_KEY_PARAM);
+        String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
+        System.getProperties().remove(key);
+    }
+
+    /**
+     * Return whether default HTML escaping is enabled for the web application,
+     * i.e. the value of the "defaultHtmlEscape" context-param in {@code web.xml}
+     * (if any). Falls back to {@code false} in case of no explicit default given.
+     * @param servletContext the servlet context of the web application
+     * @return whether default HTML escaping is enabled (default is {@code false})
+     * @deprecated as of Spring 4.1, in favor of {@link #getDefaultHtmlEscape}
+     */
+    @Deprecated
+    public static boolean isDefaultHtmlEscape(ServletContext servletContext) {
+        if (servletContext == null) {
+            return false;
+        }
+        String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
+        return Boolean.valueOf(param);
+    }
+
+    /**
+     * Return whether default HTML escaping is enabled for the web application,
+     * i.e. the value of the "defaultHtmlEscape" context-param in {@code web.xml}
+     * (if any).
+     * <p>This method differentiates between no param specified at all and
+     * an actual boolean value specified, allowing to have a context-specific
+     * default in case of no setting at the global level.
+     * @param servletContext the servlet context of the web application
+     * @return whether default HTML escaping is enabled for the given application
+     * ({@code null} = no explicit default)
+     */
+    public static Boolean getDefaultHtmlEscape(ServletContext servletContext) {
+        if (servletContext == null) {
+            return null;
+        }
+        String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
+        return (StringUtils.hasText(param) ? Boolean.valueOf(param) : null);
     }
 
     /**
@@ -163,53 +220,6 @@ public abstract class WebUtils {
     }
 
     /**
-     * Remove the system property that points to the web app root directory.
-     * To be called on shutdown of the web application.
-     * @param servletContext the servlet context of the web application
-     * @see #setWebAppRootSystemProperty
-     */
-    public static void removeWebAppRootSystemProperty(ServletContext servletContext) {
-        Assert.notNull(servletContext, "ServletContext must not be null");
-        String param = servletContext.getInitParameter(WEB_APP_ROOT_KEY_PARAM);
-        String key = (param != null ? param : DEFAULT_WEB_APP_ROOT_KEY);
-        System.getProperties().remove(key);
-    }
-
-    /**
-     * Return whether default HTML escaping is enabled for the web application,
-     * i.e. the value of the "defaultHtmlEscape" context-param in <code>web.xml</code>
-     * (if any). Falls back to <code>false</code> in case of no explicit default given.
-     * @param servletContext the servlet context of the web application
-     * @return whether default HTML escaping is enabled (default is false)
-     */
-    public static boolean isDefaultHtmlEscape(ServletContext servletContext) {
-        if (servletContext == null) {
-            return false;
-        }
-        String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
-        return Boolean.valueOf(param);
-    }
-
-    /**
-     * Return whether default HTML escaping is enabled for the web application,
-     * i.e. the value of the "defaultHtmlEscape" context-param in <code>web.xml</code>
-     * (if any).
-     * <p>This method differentiates between no param specified at all and
-     * an actual boolean value specified, allowing to have a context-specific
-     * default in case of no setting at the global level.
-     * @param servletContext the servlet context of the web application
-     * @return whether default HTML escaping is enabled (null = no explicit default)
-     */
-    public static Boolean getDefaultHtmlEscape(ServletContext servletContext) {
-        if (servletContext == null) {
-            return null;
-        }
-        Assert.notNull(servletContext, "ServletContext must not be null");
-        String param = servletContext.getInitParameter(HTML_ESCAPE_CONTEXT_PARAM);
-        return (StringUtils.hasText(param)? Boolean.valueOf(param) : null);
-    }
-
-    /**
      * Return the temporary directory for the current web application,
      * as provided by the servlet container.
      * @param servletContext the servlet context of the web application
@@ -225,7 +235,7 @@ public abstract class WebUtils {
      * as provided by the servlet container.
      * <p>Prepends a slash if the path does not already start with a slash,
      * and throws a FileNotFoundException if the path cannot be resolved to
-     * a resource (in contrast to ServletContext's <code>getRealPath</code>,
+     * a resource (in contrast to ServletContext's {@code getRealPath},
      * which returns null).
      * @param servletContext the servlet context of the web application
      * @param path the path within the web application
@@ -248,11 +258,10 @@ public abstract class WebUtils {
         return realPath;
     }
 
-
     /**
      * Determine the session id of the given request, if any.
      * @param request current HTTP request
-     * @return the session id, or <code>null</code> if none
+     * @return the session id, or {@code null} if none
      */
     public static String getSessionId(HttpServletRequest request) {
         Assert.notNull(request, "Request must not be null");
@@ -266,7 +275,7 @@ public abstract class WebUtils {
      * Does not create a new session if none has existed before!
      * @param request current HTTP request
      * @param name the name of the session attribute
-     * @return the value of the session attribute, or <code>null</code> if not found
+     * @return the value of the session attribute, or {@code null} if not found
      */
     public static Object getSessionAttribute(HttpServletRequest request, String name) {
         Assert.notNull(request, "Request must not be null");
@@ -280,7 +289,7 @@ public abstract class WebUtils {
      * attribute. Does not create a new session if none has existed before!
      * @param request current HTTP request
      * @param name the name of the session attribute
-     * @return the value of the session attribute, or <code>null</code> if not found
+     * @return the value of the session attribute, or {@code null} if not found
      * @throws IllegalStateException if the session attribute could not be found
      */
     public static Object getRequiredSessionAttribute(HttpServletRequest request, String name)
@@ -323,8 +332,10 @@ public abstract class WebUtils {
      * @param clazz the class to instantiate for a new attribute
      * @return the value of the session attribute, newly created if not found
      * @throws IllegalArgumentException if the session attribute could not be instantiated
+     * @deprecated as of Spring 4.3.2, in favor of custom code for such purposes
      */
-    public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class clazz)
+    @Deprecated
+    public static Object getOrCreateSessionAttribute(HttpSession session, String name, Class<?> clazz)
             throws IllegalArgumentException {
 
         Assert.notNull(session, "Session must not be null");
@@ -353,18 +364,18 @@ public abstract class WebUtils {
      * that is, an object to synchronize on for the given session.
      * <p>Returns the session mutex attribute if available; usually,
      * this means that the HttpSessionMutexListener needs to be defined
-     * in <code>web.xml</code>. Falls back to the HttpSession itself
+     * in {@code web.xml}. Falls back to the HttpSession itself
      * if no mutex attribute found.
      * <p>The session mutex is guaranteed to be the same object during
      * the entire lifetime of the session, available under the key defined
-     * by the <code>SESSION_MUTEX_ATTRIBUTE</code> constant. It serves as a
+     * by the {@code SESSION_MUTEX_ATTRIBUTE} constant. It serves as a
      * safe reference to synchronize on for locking on the current session.
      * <p>In many cases, the HttpSession reference itself is a safe mutex
      * as well, since it will always be the same object reference for the
      * same active logical session. However, this is not guaranteed across
      * different servlet containers; the only 100% safe way is a session mutex.
      * @param session the HttpSession to find a mutex for
-     * @return the mutex object (never <code>null</code>)
+     * @return the mutex object (never {@code null})
      * @see #SESSION_MUTEX_ATTRIBUTE
      * @see HttpSessionMutexListener
      */
@@ -383,7 +394,7 @@ public abstract class WebUtils {
      * unwrapping the given request as far as necessary.
      * @param request the servlet request to introspect
      * @param requiredType the desired type of request object
-     * @return the matching request object, or <code>null</code> if none
+     * @return the matching request object, or {@code null} if none
      * of that type is available
      */
     @SuppressWarnings("unchecked")
@@ -404,7 +415,7 @@ public abstract class WebUtils {
      * unwrapping the given response as far as necessary.
      * @param response the servlet response to introspect
      * @param requiredType the desired type of response object
-     * @return the matching response object, or <code>null</code> if none
+     * @return the matching response object, or {@code null} if none
      * of that type is available
      */
     @SuppressWarnings("unchecked")
@@ -434,36 +445,15 @@ public abstract class WebUtils {
     }
 
     /**
-     * Expose the current request URI and paths as {@link javax.servlet.http.HttpServletRequest}
-     * attributes under the keys defined in the Servlet 2.4 specification,
-     * for containers that implement 2.3 or an earlier version of the Servlet API:
-     * <code>javax.servlet.forward.request_uri</code>,
-     * <code>javax.servlet.forward.context_path</code>,
-     * <code>javax.servlet.forward.servlet_path</code>,
-     * <code>javax.servlet.forward.path_info</code>,
-     * <code>javax.servlet.forward.query_string</code>.
-     * <p>Does not override values if already present, to not cause conflicts
-     * with the attributes exposed by Servlet 2.4+ containers themselves.
-     * @param request current servlet request
-     */
-    public static void exposeForwardRequestAttributes(HttpServletRequest request) {
-        exposeRequestAttributeIfNotPresent(request, FORWARD_REQUEST_URI_ATTRIBUTE, request.getRequestURI());
-        exposeRequestAttributeIfNotPresent(request, FORWARD_CONTEXT_PATH_ATTRIBUTE, request.getContextPath());
-        exposeRequestAttributeIfNotPresent(request, FORWARD_SERVLET_PATH_ATTRIBUTE, request.getServletPath());
-        exposeRequestAttributeIfNotPresent(request, FORWARD_PATH_INFO_ATTRIBUTE, request.getPathInfo());
-        exposeRequestAttributeIfNotPresent(request, FORWARD_QUERY_STRING_ATTRIBUTE, request.getQueryString());
-    }
-
-    /**
      * Expose the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
      * attributes under the keys defined in the Servlet 2.3 specification, for error pages that
      * are rendered directly rather than through the Servlet container's error page resolution:
-     * <code>javax.servlet.error.status_code</code>,
-     * <code>javax.servlet.error.exception_type</code>,
-     * <code>javax.servlet.error.message</code>,
-     * <code>javax.servlet.error.exception</code>,
-     * <code>javax.servlet.error.request_uri</code>,
-     * <code>javax.servlet.error.servlet_name</code>.
+     * {@code javax.servlet.error.status_code},
+     * {@code javax.servlet.error.exception_type},
+     * {@code javax.servlet.error.message},
+     * {@code javax.servlet.error.exception},
+     * {@code javax.servlet.error.request_uri},
+     * {@code javax.servlet.error.servlet_name}.
      * <p>Does not override values if already present, to respect attribute values
      * that have been exposed explicitly before.
      * <p>Exposes status code 200 by default. Set the "javax.servlet.error.status_code"
@@ -496,12 +486,12 @@ public abstract class WebUtils {
     /**
      * Clear the Servlet spec's error attributes as {@link javax.servlet.http.HttpServletRequest}
      * attributes under the keys defined in the Servlet 2.3 specification:
-     * <code>javax.servlet.error.status_code</code>,
-     * <code>javax.servlet.error.exception_type</code>,
-     * <code>javax.servlet.error.message</code>,
-     * <code>javax.servlet.error.exception</code>,
-     * <code>javax.servlet.error.request_uri</code>,
-     * <code>javax.servlet.error.servlet_name</code>.
+     * {@code javax.servlet.error.status_code},
+     * {@code javax.servlet.error.exception_type},
+     * {@code javax.servlet.error.message},
+     * {@code javax.servlet.error.exception},
+     * {@code javax.servlet.error.request_uri},
+     * {@code javax.servlet.error.servlet_name}.
      * @param request current servlet request
      */
     public static void clearErrorRequestAttributes(HttpServletRequest request) {
@@ -518,7 +508,9 @@ public abstract class WebUtils {
      * and the values as corresponding attribute values. Keys need to be Strings.
      * @param request current HTTP request
      * @param attributes the attributes Map
+     * @deprecated as of Spring 4.3.2, in favor of custom code for such purposes
      */
+    @Deprecated
     public static void exposeRequestAttributes(ServletRequest request, Map<String, ?> attributes) {
         Assert.notNull(request, "Request must not be null");
         Assert.notNull(attributes, "Attributes Map must not be null");
@@ -532,7 +524,7 @@ public abstract class WebUtils {
      * cookies can have the same name but different paths or domains.
      * @param request current servlet request
      * @param name cookie name
-     * @return the first cookie with the given name, or <code>null</code> if none is found
+     * @return the first cookie with the given name, or {@code null} if none is found
      */
     public static Cookie getCookie(HttpServletRequest request, String name) {
         Assert.notNull(request, "Request must not be null");
@@ -575,10 +567,9 @@ public abstract class WebUtils {
      * for a description of the lookup algorithm.
      * @param request current HTTP request
      * @param name the <i>logical</i> name of the request parameter
-     * @return the value of the parameter, or <code>null</code>
+     * @return the value of the parameter, or {@code null}
      * if the parameter does not exist in given request
      */
-    @SuppressWarnings("unchecked")
     public static String findParameterValue(ServletRequest request, String name) {
         return findParameterValue(request.getParameterMap(), name);
     }
@@ -603,7 +594,7 @@ public abstract class WebUtils {
      * </ol>
      * @param parameters the available parameter map
      * @param name the <i>logical</i> name of the request parameter
-     * @return the value of the parameter, or <code>null</code>
+     * @return the value of the parameter, or {@code null}
      * if the parameter does not exist in given request
      */
     public static String findParameterValue(Map<String, ?> parameters, String name) {
@@ -649,13 +640,13 @@ public abstract class WebUtils {
      */
     public static Map<String, Object> getParametersStartingWith(ServletRequest request, String prefix) {
         Assert.notNull(request, "Request must not be null");
-        Enumeration paramNames = request.getParameterNames();
+        Enumeration<String> paramNames = request.getParameterNames();
         Map<String, Object> params = new TreeMap<String, Object>();
         if (prefix == null) {
             prefix = "";
         }
         while (paramNames != null && paramNames.hasMoreElements()) {
-            String paramName = (String) paramNames.nextElement();
+            String paramName = paramNames.nextElement();
             if ("".equals(prefix) || paramName.startsWith(prefix)) {
                 String unprefixed = paramName.substring(prefix.length());
                 String[] values = request.getParameterValues(paramName);
@@ -681,11 +672,13 @@ public abstract class WebUtils {
      * @param currentPage the current page, to be returned as fallback
      * if no target page specified
      * @return the page specified in the request, or current page if not found
+     * @deprecated as of Spring 4.3.2, in favor of custom code for such purposes
      */
+    @Deprecated
     public static int getTargetPage(ServletRequest request, String paramPrefix, int currentPage) {
-        Enumeration paramNames = request.getParameterNames();
+        Enumeration<String> paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
-            String paramName = (String) paramNames.nextElement();
+            String paramName = paramNames.nextElement();
             if (paramName.startsWith(paramPrefix)) {
                 for (int i = 0; i < WebUtils.SUBMIT_IMAGE_SUFFIXES.length; i++) {
                     String suffix = WebUtils.SUBMIT_IMAGE_SUFFIXES[i];
@@ -705,7 +698,9 @@ public abstract class WebUtils {
      * Correctly resolves nested paths such as "/products/view.html" as well.
      * @param urlPath the request URL path (e.g. "/index.html")
      * @return the extracted URI filename (e.g. "index")
+     * @deprecated as of Spring 4.3.2, in favor of custom code for such purposes
      */
+    @Deprecated
     public static String extractFilenameFromUrlPath(String urlPath) {
         String filename = extractFullFilenameFromUrlPath(urlPath);
         int dotIndex = filename.lastIndexOf('.');
@@ -714,23 +709,144 @@ public abstract class WebUtils {
         }
         return filename;
     }
+
     /**
-     * Extract the full URL filename (including file extension) from the given request URL path.
-     * Correctly resolves nested paths such as "/products/view.html" as well.
+     * Extract the full URL filename (including file extension) from the given
+     * request URL path. Correctly resolve nested paths such as
+     * "/products/view.html" and remove any path and or query parameters.
      * @param urlPath the request URL path (e.g. "/products/index.html")
      * @return the extracted URI filename (e.g. "index.html")
+     * @deprecated as of Spring 4.3.2, in favor of custom code for such purposes
+     * (or {@link UriUtils#extractFileExtension} for the file extension use case)
      */
+    @Deprecated
     public static String extractFullFilenameFromUrlPath(String urlPath) {
-        int end = urlPath.indexOf(';');
+        int end = urlPath.indexOf('?');
         if (end == -1) {
-            end = urlPath.indexOf('?');
+            end = urlPath.indexOf('#');
             if (end == -1) {
                 end = urlPath.length();
             }
         }
         int begin = urlPath.lastIndexOf('/', end) + 1;
+        int paramIndex = urlPath.indexOf(';', begin);
+        end = (paramIndex != -1 && paramIndex < end ? paramIndex : end);
         return urlPath.substring(begin, end);
     }
 
-}
+    /**
+     * Parse the given string with matrix variables. An example string would look
+     * like this {@code "q1=a;q1=b;q2=a,b,c"}. The resulting map would contain
+     * keys {@code "q1"} and {@code "q2"} with values {@code ["a","b"]} and
+     * {@code ["a","b","c"]} respectively.
+     * @param matrixVariables the unparsed matrix variables string
+     * @return a map with matrix variable names and values (never {@code null})
+     * @since 3.2
+     */
+    public static MultiValueMap<String, String> parseMatrixVariables(String matrixVariables) {
+        MultiValueMap<String, String> result = new LinkedMultiValueMap<String, String>();
+        if (!StringUtils.hasText(matrixVariables)) {
+            return result;
+        }
+        StringTokenizer pairs = new StringTokenizer(matrixVariables, ";");
+        while (pairs.hasMoreTokens()) {
+            String pair = pairs.nextToken();
+            int index = pair.indexOf('=');
+            if (index != -1) {
+                String name = pair.substring(0, index);
+                String rawValue = pair.substring(index + 1);
+                for (String value : StringUtils.commaDelimitedListToStringArray(rawValue)) {
+                    result.add(name, value);
+                }
+            }
+            else {
+                result.add(pair, "");
+            }
+        }
+        return result;
+    }
 
+    /**
+     * Check the given request origin against a list of allowed origins.
+     * A list containing "*" means that all origins are allowed.
+     * An empty list means only same origin is allowed.
+     * <p><strong>Note:</strong> this method may use values from "Forwarded"
+     * (<a href="https://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+     * "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" headers,
+     * if present, in order to reflect the client-originated address.
+     * Consider using the {@code ForwardedHeaderFilter} in order to choose from a
+     * central place whether to extract and use, or to discard such headers.
+     * See the Spring Framework reference for more on this filter.
+     * @return {@code true} if the request origin is valid, {@code false} otherwise
+     * @since 4.1.5
+     * @see <a href="https://tools.ietf.org/html/rfc6454">RFC 6454: The Web Origin Concept</a>
+     */
+    public static boolean isValidOrigin(HttpRequest request, Collection<String> allowedOrigins) {
+        Assert.notNull(request, "Request must not be null");
+        Assert.notNull(allowedOrigins, "Allowed origins must not be null");
+
+        String origin = request.getHeaders().getOrigin();
+        if (origin == null || allowedOrigins.contains("*")) {
+            return true;
+        }
+        else if (CollectionUtils.isEmpty(allowedOrigins)) {
+            return isSameOrigin(request);
+        }
+        else {
+            return allowedOrigins.contains(origin);
+        }
+    }
+
+    /**
+     * Check if the request is a same-origin one, based on {@code Origin}, {@code Host},
+     * {@code Forwarded}, {@code X-Forwarded-Proto}, {@code X-Forwarded-Host} and
+     * @code X-Forwarded-Port} headers.
+     * <p><strong>Note:</strong> this method uses values from "Forwarded"
+     * (<a href="https://tools.ietf.org/html/rfc7239">RFC 7239</a>),
+     * "X-Forwarded-Host", "X-Forwarded-Port", and "X-Forwarded-Proto" headers,
+     * if present, in order to reflect the client-originated address.
+     * Consider using the {@code ForwardedHeaderFilter} in order to choose from a
+     * central place whether to extract and use, or to discard such headers.
+     * See the Spring Framework reference for more on this filter.
+     * @return {@code true} if the request is a same-origin one, {@code false} in case
+     * of cross-origin request
+     * @since 4.2
+     */
+    public static boolean isSameOrigin(HttpRequest request) {
+        String origin = request.getHeaders().getOrigin();
+        if (origin == null) {
+            return true;
+        }
+        UriComponentsBuilder urlBuilder;
+        if (request instanceof ServletServerHttpRequest) {
+            // Build more efficiently if we can: we only need scheme, host, port for origin comparison
+            HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
+            urlBuilder = new UriComponentsBuilder().
+                    scheme(servletRequest.getScheme()).
+                    host(servletRequest.getServerName()).
+                    port(servletRequest.getServerPort()).
+                    adaptFromForwardedHeaders(request.getHeaders());
+        }
+        else {
+            urlBuilder = UriComponentsBuilder.fromHttpRequest(request);
+        }
+        UriComponents actualUrl = urlBuilder.build();
+        UriComponents originUrl = UriComponentsBuilder.fromOriginHeader(origin).build();
+        return (ObjectUtils.nullSafeEquals(actualUrl.getHost(), originUrl.getHost()) &&
+                getPort(actualUrl) == getPort(originUrl));
+    }
+
+    private static int getPort(UriComponents uri) {
+        int port = uri.getPort();
+        if (port == -1) {
+            if ("http".equals(uri.getScheme()) || "ws".equals(uri.getScheme())) {
+                port = 80;
+            }
+            else if ("https".equals(uri.getScheme()) || "wss".equals(uri.getScheme())) {
+                port = 443;
+            }
+        }
+        return port;
+    }
+
+}

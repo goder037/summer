@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.aop.aspectj.autoproxy;
+package com.rocket.summer.framework.aop.framework.autoproxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import com.rocket.summer.framework.util.StringUtils;
  * @see #setInterceptorNames
  * @see AbstractAutoProxyCreator
  */
+@SuppressWarnings("serial")
 public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 
     private List<String> beanNames;

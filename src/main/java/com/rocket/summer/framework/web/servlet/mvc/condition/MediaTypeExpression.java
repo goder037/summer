@@ -1,6 +1,7 @@
 package com.rocket.summer.framework.web.servlet.mvc.condition;
 
 import com.rocket.summer.framework.http.MediaType;
+import com.rocket.summer.framework.web.bind.annotation.RequestMapping;
 
 /**
  * A contract for media type expressions (e.g. "text/plain", "!text/plain") as

@@ -1,59 +1,91 @@
 package com.rocket.summer.framework.web.servlet.config.annotation;
 
-import com.rocket.summer.framework.core.io.Resource;
-import com.rocket.summer.framework.core.io.ResourceLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.rocket.summer.framework.cache.Cache;
+import com.rocket.summer.framework.http.CacheControl;
 import com.rocket.summer.framework.util.Assert;
-import com.rocket.summer.framework.util.CollectionUtils;
 import com.rocket.summer.framework.web.servlet.resource.PathResourceResolver;
 import com.rocket.summer.framework.web.servlet.resource.ResourceHttpRequestHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Encapsulates information required to create a resource handlers.
+ * Encapsulates information required to create a resource handler.
  *
  * @author Rossen Stoyanchev
  * @author Keith Donald
- *
+ * @author Brian Clozel
  * @since 3.1
  */
 public class ResourceHandlerRegistration {
 
-    private final ResourceLoader resourceLoader;
-
     private final String[] pathPatterns;
 
-    private final List<Resource> locations = new ArrayList<Resource>();
+    private final List<String> locationValues = new ArrayList<String>();
 
     private Integer cachePeriod;
 
+    private CacheControl cacheControl;
+
     private ResourceChainRegistration resourceChainRegistration;
+
 
     /**
      * Create a {@link ResourceHandlerRegistration} instance.
-     * @param resourceLoader a resource loader for turning a String location into a {@link Resource}
      * @param pathPatterns one or more resource URL path patterns
      */
-    public ResourceHandlerRegistration(ResourceLoader resourceLoader, String... pathPatterns) {
+    public ResourceHandlerRegistration(String... pathPatterns) {
         Assert.notEmpty(pathPatterns, "At least one path pattern is required for resource handling.");
-        this.resourceLoader = resourceLoader;
         this.pathPatterns = pathPatterns;
     }
 
+
     /**
-     * Add one or more resource locations from which to serve static content. Each location must point to a valid
-     * directory. Multiple locations may be specified as a comma-separated list, and the locations will be checked
+     * Add one or more resource locations from which to serve static content.
+     * Each location must point to a valid directory. Multiple locations may
+     * be specified as a comma-separated list, and the locations will be checked
      * for a given resource in the order specified.
-     * <p>For example, {{@code "/"}, {@code "classpath:/META-INF/public-web-resources/"}} allows resources to
-     * be served both from the web application root and from any JAR on the classpath that contains a
-     * {@code /META-INF/public-web-resources/} directory, with resources in the web application root taking precedence.
-     * @return the same {@link ResourceHandlerRegistration} instance for chained method invocation
+     * <p>For example, {{@code "/"}, {@code "classpath:/META-INF/public-web-resources/"}}
+     * allows resources to be served both from the web application root and
+     * from any JAR on the classpath that contains a
+     * {@code /META-INF/public-web-resources/} directory, with resources in the
+     * web application root taking precedence.
+     * <p>For {@link com.rocket.summer.framework.core.io.UrlResource URL-based resources}
+     * (e.g. files, HTTP URLs, etc) this method supports a special prefix to
+     * indicate the charset associated with the URL so that relative paths
+     * appended to it can be encoded correctly, e.g.
+     * {@code [charset=Windows-31J]https://example.org/path}.
+     * @return the same {@link ResourceHandlerRegistration} instance, for
+     * chained method invocation
      */
-    public ResourceHandlerRegistration addResourceLocations(String...resourceLocations) {
-        for (String location : resourceLocations) {
-            this.locations.add(resourceLoader.getResource(location));
-        }
+    public ResourceHandlerRegistration addResourceLocations(String... resourceLocations) {
+        this.locationValues.addAll(Arrays.asList(resourceLocations));
+        return this;
+    }
+
+    /**
+     * Specify the cache period for the resources served by the resource handler, in seconds. The default is to not
+     * send any cache headers but to rely on last-modified timestamps only. Set to 0 in order to send cache headers
+     * that prevent caching, or to a positive number of seconds to send cache headers with the given max-age value.
+     * @param cachePeriod the time to cache resources in seconds
+     * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
+     */
+    public ResourceHandlerRegistration setCachePeriod(Integer cachePeriod) {
+        this.cachePeriod = cachePeriod;
+        return this;
+    }
+
+    /**
+     * Specify the {@link com.rocket.summer.framework.http.CacheControl} which should be used
+     * by the resource handler.
+     * <p>Setting a custom value here will override the configuration set with {@link #setCachePeriod}.
+     * @param cacheControl the CacheControl configuration to use
+     * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
+     * @since 4.2
+     */
+    public ResourceHandlerRegistration setCacheControl(CacheControl cacheControl) {
+        this.cacheControl = cacheControl;
         return this;
     }
 
@@ -75,37 +107,52 @@ public class ResourceHandlerRegistration {
     }
 
     /**
-     * Specify the cache period for the resources served by the resource handler, in seconds. The default is to not
-     * send any cache headers but to rely on last-modified timestamps only. Set to 0 in order to send cache headers
-     * that prevent caching, or to a positive number of seconds to send cache headers with the given max-age value.
-     * @param cachePeriod the time to cache resources in seconds
-     * @return the same {@link ResourceHandlerRegistration} instance for chained method invocation
+     * Configure a chain of resource resolvers and transformers to use. This
+     * can be useful, for example, to apply a version strategy to resource URLs.
+     * <p>If this method is not invoked, by default only a simple
+     * {@link PathResourceResolver} is used in order to match URL paths to
+     * resources under the configured locations.
+     * @param cacheResources whether to cache the result of resource resolution;
+     * setting this to "true" is recommended for production (and "false" for
+     * development, especially when applying a version strategy
+     * @param cache the cache to use for storing resolved and transformed resources;
+     * by default a {@link com.rocket.summer.framework.cache.concurrent.ConcurrentMapCache}
+     * is used. Since Resources aren't serializable and can be dependent on the
+     * application host, one should not use a distributed cache but rather an
+     * in-memory cache.
+     * @return the same {@link ResourceHandlerRegistration} instance, for chained method invocation
+     * @since 4.1
      */
-    public ResourceHandlerRegistration setCachePeriod(Integer cachePeriod) {
-        this.cachePeriod = cachePeriod;
-        return this;
+    public ResourceChainRegistration resourceChain(boolean cacheResources, Cache cache) {
+        this.resourceChainRegistration = new ResourceChainRegistration(cacheResources, cache);
+        return this.resourceChainRegistration;
     }
 
+
     /**
-     * Returns the URL path patterns for the resource handler.
+     * Return the URL path patterns for the resource handler.
      */
     protected String[] getPathPatterns() {
-        return pathPatterns;
+        return this.pathPatterns;
     }
 
     /**
-     * Returns a {@link ResourceHttpRequestHandler} instance.
+     * Return a {@link ResourceHttpRequestHandler} instance.
      */
     protected ResourceHttpRequestHandler getRequestHandler() {
-        Assert.isTrue(!CollectionUtils.isEmpty(locations), "At least one location is required for resource handling.");
-        ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-        requestHandler.setLocations(locations);
-        if (cachePeriod != null) {
-            requestHandler.setCacheSeconds(cachePeriod);
+        ResourceHttpRequestHandler handler = new ResourceHttpRequestHandler();
+        if (this.resourceChainRegistration != null) {
+            handler.setResourceResolvers(this.resourceChainRegistration.getResourceResolvers());
+            handler.setResourceTransformers(this.resourceChainRegistration.getResourceTransformers());
         }
-        return requestHandler;
+        handler.setLocationValues(this.locationValues);
+        if (this.cacheControl != null) {
+            handler.setCacheControl(this.cacheControl);
+        }
+        else if (this.cachePeriod != null) {
+            handler.setCacheSeconds(this.cachePeriod);
+        }
+        return handler;
     }
 
 }
-
-

@@ -1,4 +1,4 @@
-package com.rocket.summer.framework.web.method.annotation;
+package com.rocket.summer.framework.web.servlet.mvc.method.annotation;
 
 import com.rocket.summer.framework.core.MethodParameter;
 import com.rocket.summer.framework.web.bind.support.WebDataBinderFactory;

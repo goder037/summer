@@ -1,6 +1,6 @@
 package com.rocket.summer.framework.web.context.request;
 
-import com.rocket.summer.framework.web.ui.ModelMap;
+import com.rocket.summer.framework.ui.ModelMap;
 
 /**
  * Interface for general web request interception. Allows for being applied
@@ -11,6 +11,14 @@ import com.rocket.summer.framework.web.ui.ModelMap;
  * exposes a set of model objects, then a view gets rendered based on that model.
  * Alternatively, a handler may also process the request completely, with no
  * view to be rendered.
+ *
+ * <p>In an async processing scenario, the handler may be executed in a separate
+ * thread while the main thread exits without rendering or invoking the
+ * {@code postHandle} and {@code afterCompletion} callbacks. When concurrent
+ * handler execution completes, the request is dispatched back in order to
+ * proceed with rendering the model and all methods of this contract are invoked
+ * again. For further options and comments see
+ * {@code com.rocket.summer.framework.web.context.request.async.AsyncWebRequestInterceptor}
  *
  * <p>This interface is deliberately minimalistic to keep the dependencies of
  * generic request interceptors as minimal as feasible.
@@ -28,6 +36,11 @@ import com.rocket.summer.framework.web.ui.ModelMap;
  * @see com.rocket.summer.framework.web.servlet.DispatcherServlet
  * @see com.rocket.summer.framework.web.servlet.handler.AbstractHandlerMapping#setInterceptors
  * @see com.rocket.summer.framework.web.servlet.HandlerInterceptor
+ * @see com.rocket.summer.framework.web.portlet.context.PortletWebRequest
+ * @see com.rocket.summer.framework.web.portlet.DispatcherPortlet
+ * @see com.rocket.summer.framework.web.portlet.handler.AbstractHandlerMapping#setInterceptors
+ * @see com.rocket.summer.framework.web.portlet.handler.AbstractHandlerMapping#setApplyWebRequestInterceptorsToRenderPhaseOnly
+ * @see com.rocket.summer.framework.web.portlet.HandlerInterceptor
  */
 public interface WebRequestInterceptor {
 
@@ -47,7 +60,7 @@ public interface WebRequestInterceptor {
      * execution (for example, flushing a Hibernate Session).
      * @param request the current web request
      * @param model the map of model objects that will be exposed to the view
-     * (may be <code>null</code>). Can be used to analyze the exposed model
+     * (may be {@code null}). Can be used to analyze the exposed model
      * and/or to add further model attributes, if desired.
      * @throws Exception in case of errors
      */
@@ -57,7 +70,7 @@ public interface WebRequestInterceptor {
      * Callback after completion of request processing, that is, after rendering
      * the view. Will be called on any outcome of handler execution, thus allows
      * for proper resource cleanup.
-     * <p>Note: Will only be called if this interceptor's <code>preHandle</code>
+     * <p>Note: Will only be called if this interceptor's {@code preHandle}
      * method has successfully completed!
      * @param request the current web request
      * @param ex exception thrown on handler execution, if any

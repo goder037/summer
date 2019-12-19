@@ -3,20 +3,20 @@ package com.rocket.summer.framework.aop.framework;
 import org.aopalliance.intercept.Interceptor;
 
 import com.rocket.summer.framework.aop.TargetSource;
-import com.rocket.summer.framework.util.Assert;
 import com.rocket.summer.framework.util.ClassUtils;
 
 /**
- * Factory for AOP proxies for programmatic use, rather than via a bean
- * factory. This class provides a simple way of obtaining and configuring
- * AOP proxies in code.
+ * Factory for AOP proxies for programmatic use, rather than via declarative
+ * setup in a bean factory. This class provides a simple way of obtaining
+ * and configuring AOP proxy instances in custom user code.
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 14.03.2003
  */
-public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
+@SuppressWarnings("serial")
+public class ProxyFactory extends ProxyCreatorSupport {
 
     /**
      * Create a new ProxyFactory.
@@ -30,9 +30,8 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * @param target the target object to be proxied
      */
     public ProxyFactory(Object target) {
-        Assert.notNull(target, "Target object must not be null");
-        setInterfaces(ClassUtils.getAllInterfaces(target));
         setTarget(target);
+        setInterfaces(ClassUtils.getAllInterfaces(target));
     }
 
     /**
@@ -40,7 +39,7 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * <p>No target, only interfaces. Must add interceptors.
      * @param proxyInterfaces the interfaces that the proxy should implement
      */
-    public ProxyFactory(Class[] proxyInterfaces) {
+    public ProxyFactory(Class<?>... proxyInterfaces) {
         setInterfaces(proxyInterfaces);
     }
 
@@ -52,18 +51,18 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * @param proxyInterface the interface that the proxy should implement
      * @param interceptor the interceptor that the proxy should invoke
      */
-    public ProxyFactory(Class proxyInterface, Interceptor interceptor) {
+    public ProxyFactory(Class<?> proxyInterface, Interceptor interceptor) {
         addInterface(proxyInterface);
         addAdvice(interceptor);
     }
 
     /**
-     * Create a ProxyFactory for the specified <code>TargetSource</code>,
+     * Create a ProxyFactory for the specified {@code TargetSource},
      * making the proxy implement the specified interface.
      * @param proxyInterface the interface that the proxy should implement
      * @param targetSource the TargetSource that the proxy should invoke
      */
-    public ProxyFactory(Class proxyInterface, TargetSource targetSource) {
+    public ProxyFactory(Class<?> proxyInterface, TargetSource targetSource) {
         addInterface(proxyInterface);
         setTargetSource(targetSource);
     }
@@ -87,7 +86,7 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * or removed interfaces. Can add and remove interceptors.
      * <p>Uses the given class loader (if necessary for proxy creation).
      * @param classLoader the class loader to create the proxy with
-     * (or <code>null</code> for the low-level proxy facility's default)
+     * (or {@code null} for the low-level proxy facility's default)
      * @return the proxy object
      */
     public Object getProxy(ClassLoader classLoader) {
@@ -105,25 +104,27 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
      * @return the proxy object
      * @see #ProxyFactory(Class, org.aopalliance.intercept.Interceptor)
      */
-    public static Object getProxy(Class proxyInterface, Interceptor interceptor) {
-        return new ProxyFactory(proxyInterface, interceptor).getProxy();
+    @SuppressWarnings("unchecked")
+    public static <T> T getProxy(Class<T> proxyInterface, Interceptor interceptor) {
+        return (T) new ProxyFactory(proxyInterface, interceptor).getProxy();
     }
 
     /**
-     * Create a proxy for the specified <code>TargetSource</code>,
+     * Create a proxy for the specified {@code TargetSource},
      * implementing the specified interface.
      * @param proxyInterface the interface that the proxy should implement
      * @param targetSource the TargetSource that the proxy should invoke
      * @return the proxy object
      * @see #ProxyFactory(Class, com.rocket.summer.framework.aop.TargetSource)
      */
-    public static Object getProxy(Class proxyInterface, TargetSource targetSource) {
-        return new ProxyFactory(proxyInterface, targetSource).getProxy();
+    @SuppressWarnings("unchecked")
+    public static <T> T getProxy(Class<T> proxyInterface, TargetSource targetSource) {
+        return (T) new ProxyFactory(proxyInterface, targetSource).getProxy();
     }
 
     /**
-     * Create a proxy for the specified <code>TargetSource</code> that extends
-     * the target class of the <code>TargetSource</code>.
+     * Create a proxy for the specified {@code TargetSource} that extends
+     * the target class of the {@code TargetSource}.
      * @param targetSource the TargetSource that the proxy should invoke
      * @return the proxy object
      */
@@ -138,4 +139,3 @@ public class ProxyFactory extends ProxyCreatorSupport implements AopProxy {
     }
 
 }
-

@@ -1,11 +1,12 @@
 package com.rocket.summer.framework.beans.factory.config;
 
+import java.util.Set;
+
+import com.rocket.summer.framework.context.BeansException;
 import com.rocket.summer.framework.beans.TypeConverter;
 import com.rocket.summer.framework.beans.factory.BeanFactory;
 import com.rocket.summer.framework.beans.factory.NoSuchBeanDefinitionException;
-import com.rocket.summer.framework.context.BeansException;
-
-import java.util.Set;
+import com.rocket.summer.framework.beans.factory.NoUniqueBeanDefinitionException;
 
 /**
  * Extension of the {@link com.rocket.summer.framework.beans.factory.BeanFactory}

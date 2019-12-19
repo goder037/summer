@@ -13,7 +13,6 @@ import com.rocket.summer.framework.web.context.request.NativeWebRequest;
 import com.rocket.summer.framework.web.method.support.HandlerMethodArgumentResolver;
 import com.rocket.summer.framework.web.method.support.HandlerMethodReturnValueHandler;
 import com.rocket.summer.framework.web.method.support.ModelAndViewContainer;
-import com.rocket.summer.framework.web.servlet.mvc.method.annotation.ModelFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
