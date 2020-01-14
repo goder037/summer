@@ -2,9 +2,9 @@ package com.rocket.summer.framework.boot.builder;
 
 import com.rocket.summer.framework.context.ApplicationContext;
 import com.rocket.summer.framework.context.ApplicationContextInitializer;
+import com.rocket.summer.framework.context.event.ApplicationEvent;
 import com.rocket.summer.framework.context.ApplicationListener;
 import com.rocket.summer.framework.context.ConfigurableApplicationContext;
-import com.rocket.summer.framework.context.event.ApplicationEvent;
 import com.rocket.summer.framework.context.event.ContextRefreshedEvent;
 import com.rocket.summer.framework.core.Ordered;
 
@@ -14,9 +14,10 @@ import com.rocket.summer.framework.core.Ordered;
  * listeners that the context is available and has a parent.
  *
  * @author Dave Syer
+ * @since 1.0.0
  */
-public class ParentContextApplicationContextInitializer implements
-        ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+public class ParentContextApplicationContextInitializer
+        implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
     private int order = Ordered.HIGHEST_PRECEDENCE;
 
@@ -43,8 +44,7 @@ public class ParentContextApplicationContextInitializer implements
         }
     }
 
-    private static class EventPublisher
-            implements ApplicationListener<ContextRefreshedEvent>, Ordered {
+    private static class EventPublisher implements ApplicationListener<ContextRefreshedEvent>, Ordered {
 
         private static EventPublisher INSTANCE = new EventPublisher();
 
@@ -56,10 +56,8 @@ public class ParentContextApplicationContextInitializer implements
         @Override
         public void onApplicationEvent(ContextRefreshedEvent event) {
             ApplicationContext context = event.getApplicationContext();
-            if (context instanceof ConfigurableApplicationContext
-                    && context == event.getSource()) {
-                context.publishEvent(new ParentContextAvailableEvent(
-                        (ConfigurableApplicationContext) context));
+            if (context instanceof ConfigurableApplicationContext && context == event.getSource()) {
+                context.publishEvent(new ParentContextAvailableEvent((ConfigurableApplicationContext) context));
             }
         }
 
@@ -71,8 +69,7 @@ public class ParentContextApplicationContextInitializer implements
     @SuppressWarnings("serial")
     public static class ParentContextAvailableEvent extends ApplicationEvent {
 
-        public ParentContextAvailableEvent(
-                ConfigurableApplicationContext applicationContext) {
+        public ParentContextAvailableEvent(ConfigurableApplicationContext applicationContext) {
             super(applicationContext);
         }
 
@@ -83,4 +80,3 @@ public class ParentContextApplicationContextInitializer implements
     }
 
 }
-

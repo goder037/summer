@@ -9,9 +9,10 @@ package com.rocket.summer.framework.web.context.support;
  * @see com.rocket.summer.framework.web.servlet.FrameworkServlet
  * @see com.rocket.summer.framework.context.ApplicationContext#publishEvent
  */
+@SuppressWarnings("serial")
 public class ServletRequestHandledEvent extends RequestHandledEvent {
 
-    /** URL that the triggered the request */
+    /** URL that triggered the request */
     private final String requestUrl;
 
     /** IP address that the request came from */
@@ -22,6 +23,9 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
 
     /** Name of the servlet that handled the request */
     private final String servletName;
+
+    /** HTTP status code of the response */
+    private final int statusCode;
 
 
     /**
@@ -45,6 +49,7 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
         this.clientAddress = clientAddress;
         this.method = method;
         this.servletName = servletName;
+        this.statusCode = -1;
     }
 
     /**
@@ -69,6 +74,33 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
         this.clientAddress = clientAddress;
         this.method = method;
         this.servletName = servletName;
+        this.statusCode = -1;
+    }
+
+    /**
+     * Create a new ServletRequestHandledEvent.
+     * @param source the component that published the event
+     * @param requestUrl the URL of the request
+     * @param clientAddress the IP address that the request came from
+     * @param method the HTTP method of the request (usually GET or POST)
+     * @param servletName the name of the servlet that handled the request
+     * @param sessionId the id of the HTTP session, if any
+     * @param userName the name of the user that was associated with the
+     * request, if any (usually the UserPrincipal)
+     * @param processingTimeMillis the processing time of the request in milliseconds
+     * @param failureCause the cause of failure, if any
+     * @param statusCode the HTTP status code of the response
+     */
+    public ServletRequestHandledEvent(Object source, String requestUrl,
+                                      String clientAddress, String method, String servletName, String sessionId,
+                                      String userName, long processingTimeMillis, Throwable failureCause, int statusCode) {
+
+        super(source, sessionId, userName, processingTimeMillis, failureCause);
+        this.requestUrl = requestUrl;
+        this.clientAddress = clientAddress;
+        this.method = method;
+        this.servletName = servletName;
+        this.statusCode = statusCode;
     }
 
 
@@ -100,6 +132,14 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
         return this.servletName;
     }
 
+    /**
+     * Return the HTTP status code of the response or -1 if the status
+     * code is not available.
+     * @since 4.1
+     */
+    public int getStatusCode() {
+        return this.statusCode;
+    }
 
     @Override
     public String getShortDescription() {
@@ -127,4 +167,3 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
     }
 
 }
-
